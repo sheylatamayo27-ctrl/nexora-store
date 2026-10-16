@@ -63,9 +63,9 @@ Para usar las fotos reales del diseño:
    - `public/images/misc/` → `hero.jpg`
    - `public/images/banners/` → `phone-banner.jpg`, `earbuds-banner.jpg`, `tablet-banner.jpg`
    - `public/images/products/` → `headphones.jpg`, `earbuds.jpg`, `openear.jpg`, `speaker.jpg`, `cube.jpg`, `powerbank.jpg`, `keyboard.jpg`, `projector.jpg`, `laptop.jpg`, `mobile.jpg`, `tablet.jpg`, `drive.jpg`, `pendrive.jpg`, `printer.jpg`, `laptopcase.jpg`
-2. En `src/components/media/AssetImage.tsx`, cambia `ASSET_EXT` de `"svg"` a `"jpg"`.
+2. Reinicia `npm run dev`. Un script (`scripts/generate-assets-manifest.mjs`, se ejecuta solo antes de `dev` y `build`) detecta las fotos reales y genera `src/data/assets.generated.ts`.
 
-Todos los componentes usan estos nombres, así que no hay que tocar nada más.
+Cada imagen se reemplaza de forma independiente: si existe `headphones.jpg` se usa; si no, se usa `headphones.svg`. Puedes ir reemplazando una por una y borrar el `.svg` cuando ya tengas su foto. Todos los componentes usan estos nombres, así que no hay que tocar nada más.
 
 ## Datos
 

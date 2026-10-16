@@ -1,18 +1,17 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-
-/**
- * Extensión de los archivos de imagen.
- * Mientras se usan placeholders es "svg". Cuando se agreguen las fotos reales
- * exportadas de Figma (mismos nombres, formato .jpg) en /public/images, basta
- * con cambiar esta constante a "jpg" y toda la tienda usará las fotos reales.
- */
-export const ASSET_EXT: "svg" | "jpg" = "svg";
+import { REAL_IMAGES } from "@/data/assets.generated";
 
 export type AssetFolder = "products" | "banners" | "misc";
 
+/**
+ * Ruta de una imagen. Si existe la foto real en /public/images (jpg, png o webp)
+ * se usa; si no, se usa el placeholder .svg con el mismo nombre.
+ * La lista de fotos reales la genera `scripts/generate-assets-manifest.mjs`.
+ */
 export function assetSrc(folder: AssetFolder, name: string): string {
-  return `/images/${folder}/${name}.${ASSET_EXT}`;
+  const ext = REAL_IMAGES[`${folder}/${name}`] ?? "svg";
+  return `/images/${folder}/${name}.${ext}`;
 }
 
 interface AssetImageProps {
@@ -31,7 +30,7 @@ interface AssetImageProps {
 export function AssetImage({ folder, name, alt, sizes, priority, className }: AssetImageProps) {
   const src = assetSrc(folder, name);
 
-  if (ASSET_EXT === "svg") {
+  if (src.endsWith(".svg")) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
