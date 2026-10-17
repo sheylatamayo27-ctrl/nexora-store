@@ -52,3 +52,38 @@
     text-wrap: balance;
   }
 }
+
+/* Slider de rango doble: el input es transparente y sin eventos; solo el
+   thumb captura el puntero, para que dos sliders superpuestos no se bloqueen. */
+.range-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+  height: 100%;
+}
+.range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #0b2a6b;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+}
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #0b2a6b;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+}
+.range-thumb:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid rgba(31, 87, 214, 0.4);
+  outline-offset: 2px;
+}

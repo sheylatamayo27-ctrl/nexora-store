@@ -50,3 +50,28 @@ export interface PromoBanner {
   align: "left" | "center";
   href: string;
 }
+
+/** Carpeta de imágenes en /public/images (coincide con AssetFolder). */
+export type ImageFolder = "products" | "banners" | "misc";
+
+export type BlogBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "heading"; text: string }
+  | { type: "quote"; text: string; cite?: string }
+  | { type: "list"; items: string[] };
+
+export interface BlogPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  author: { name: string; role: string };
+  /** Fecha de publicación en formato ISO (YYYY-MM-DD). */
+  date: string;
+  readingMinutes: number;
+  /** Clave de imagen de portada y su carpeta en /public/images. */
+  cover: string;
+  coverFolder: ImageFolder;
+  featured?: boolean;
+  content: BlogBlock[];
+}

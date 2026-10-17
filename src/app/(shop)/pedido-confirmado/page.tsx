@@ -66,7 +66,7 @@ export default function ConfirmationPage() {
                 <span
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full text-label-sm",
-                    t.state === "done" && "bg-brand-800 text-text-inverse",
+                    t.state === "done" && "bg-brand-800 text-white",
                     t.state === "current" && "border-2 border-brand-800 text-brand-800",
                     t.state === "upcoming" && "bg-surface-muted text-text-muted"
                   )}

@@ -9,20 +9,25 @@ import { Rating } from "@/components/commerce/Rating";
 import { Price } from "@/components/commerce/Price";
 import { useCart } from "@/store/cart";
 import { cn } from "@/lib/utils";
+import { discountPercent } from "@/lib/format";
 import type { Product } from "@/data/types";
 
 export function ProductCard({
   product,
   showColors = true,
+  showDiscountPercent = false,
   className,
 }: {
   product: Product;
   showColors?: boolean;
+  /** Muestra un chip "-X%" en lugar del badge por defecto (vista de ofertas). */
+  showDiscountPercent?: boolean;
   className?: string;
 }) {
   const add = useCart((s) => s.add);
   const [wished, setWished] = useState(false);
   const href = `/producto/${product.slug}`;
+  const pct = discountPercent(product.price, product.compareAt);
 
   return (
     <article
@@ -41,10 +46,16 @@ export function ProductCard({
           className="transition-transform duration-500 group-hover:scale-105"
         />
 
-        {product.badge && (
-          <Badge type={product.badge.type} className="absolute left-2.5 top-2.5 shadow-elevation-sm">
-            {product.badge.label}
+        {showDiscountPercent && pct ? (
+          <Badge type="sale" className="absolute left-2.5 top-2.5 shadow-elevation-sm">
+            −{pct}%
           </Badge>
+        ) : (
+          product.badge && (
+            <Badge type={product.badge.type} className="absolute left-2.5 top-2.5 shadow-elevation-sm">
+              {product.badge.label}
+            </Badge>
+          )
         )}
 
         {/* Quick look */}
@@ -72,7 +83,7 @@ export function ProductCard({
           type="button"
           aria-label="Agregar al carrito"
           onClick={() => add(product)}
-          className="absolute bottom-2.5 left-2.5 flex h-9 w-9 items-center justify-center rounded-md bg-brand-800 text-text-inverse shadow-elevation-sm transition-all duration-200 hover:bg-brand-900 hover:scale-105"
+          className="absolute bottom-2.5 left-2.5 flex h-9 w-9 items-center justify-center rounded-md bg-brand-800 text-white shadow-elevation-sm transition-all duration-200 hover:bg-brand-900 hover:scale-105"
         >
           <ShoppingBag className="h-[18px] w-[18px]" />
         </button>

@@ -157,7 +157,7 @@ export function CheckoutView() {
           <Section title="Pago exprés">
             <div className="grid gap-3 sm:grid-cols-3">
               {[
-                { l: "UPI", c: "bg-brand-800 text-text-inverse" },
+                { l: "UPI", c: "bg-brand-800 text-white" },
                 { l: "PayPal", c: "bg-accent-500 text-brand-900" },
                 { l: "Transferencia", c: "bg-surface text-text-primary border border-border-strong" },
               ].map((b) => (
@@ -285,7 +285,7 @@ export function CheckoutView() {
                 <div key={item.key} className="flex items-center gap-3">
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-surface-subtle">
                     <AssetImage folder="products" name={item.product.image} alt={item.product.name} sizes="56px" />
-                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand-800 text-label-xs text-text-inverse ring-2 ring-surface">
+                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand-800 text-label-xs text-white ring-2 ring-surface">
                       {item.qty}
                     </span>
                   </div>

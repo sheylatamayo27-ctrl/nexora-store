@@ -17,7 +17,7 @@ export function CheckoutSteps({ current = 1 }: { current?: number }) {
             <span
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-full text-label-sm",
-                done && "bg-brand-800 text-text-inverse",
+                done && "bg-brand-800 text-white",
                 active && "border-2 border-brand-800 text-brand-800",
                 !done && !active && "bg-surface-muted text-text-muted"
               )}

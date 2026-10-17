@@ -3,27 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Search,
-  Heart,
-  User,
-  Menu,
-  X,
-  ChevronDown,
-  Globe,
-  Zap,
-  LayoutGrid,
-} from "lucide-react";
+import { Heart, User, Menu, X, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { CartButton } from "@/components/layout/CartButton";
-import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { SearchBar } from "@/components/layout/SearchBar";
+import { LanguageSelector } from "@/components/layout/LanguageSelector";
+import { MegaMenu } from "@/components/layout/MegaMenu";
 
 const primaryNav = [
-  { label: "Electrónica", href: "/categoria/auriculares", dropdown: true },
-  { label: "Ofertas", href: "/categoria/ofertas", dropdown: true, hot: true },
-  { label: "Blogs", href: "#", dropdown: true },
+  { label: "Electrónica", href: "/categoria/auriculares" },
+  { label: "Ofertas", href: "/ofertas", hot: true },
+  { label: "Blogs", href: "/blog" },
   { label: "Contacto", href: "#" },
   { label: "Novedades", href: "#" },
 ];
@@ -52,28 +43,13 @@ export function Header() {
           <Logo className="shrink-0" />
 
           {/* Buscador (desktop) */}
-          <div className="hidden flex-1 items-center rounded-md border border-border bg-surface-subtle pl-4 pr-1 lg:flex">
-            <Search className="h-[18px] w-[18px] text-text-muted" />
-            <input
-              type="text"
-              placeholder="Busca auriculares, laptops, accesorios…"
-              className="h-11 flex-1 bg-transparent px-3 text-body text-text-primary placeholder:text-text-muted focus:outline-none"
-            />
-            <div className="flex items-center gap-1 border-l border-border px-3 text-text-secondary">
-              <span className="text-label-sm">Todas las categorías</span>
-              <ChevronDown className="h-3.5 w-3.5" />
-            </div>
-            <Button variant="accent" className="ml-1">
-              Buscar
-            </Button>
+          <div className="hidden flex-1 lg:flex">
+            <SearchBar variant="desktop" />
           </div>
 
           {/* Utilidades (desktop) */}
           <div className="ml-auto hidden items-center gap-6 lg:flex">
-            <button className="flex items-center gap-1 text-label text-text-primary">
-              <Globe className="h-[18px] w-[18px]" /> ES
-              <ChevronDown className="h-3.5 w-3.5 text-text-secondary" />
-            </button>
+            <LanguageSelector />
             <Link href="/cuenta" className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100">
                 <User className="h-5 w-5 text-brand-800" />
@@ -101,60 +77,12 @@ export function Header() {
 
         {/* Buscador (móvil) */}
         <div className="container-page pb-3 lg:hidden">
-          <div className="flex items-center gap-2 rounded-md border border-border bg-surface-subtle px-3.5">
-            <Search className="h-[18px] w-[18px] text-text-muted" />
-            <input
-              type="text"
-              placeholder="Busca auriculares, laptops…"
-              className="h-11 flex-1 bg-transparent text-body placeholder:text-text-muted focus:outline-none"
-            />
-          </div>
+          <SearchBar variant="mobile" />
         </div>
       </div>
 
-      {/* Navegación (desktop) */}
-      <nav className="hidden border-b border-border bg-surface lg:block">
-        <div className="container-page flex items-center justify-between py-3">
-          <div className="flex items-center gap-8">
-            <Link
-              href="/categoria/auriculares"
-              className="flex items-center gap-2 rounded-md bg-brand-100 px-4 py-2 text-label text-brand-800"
-            >
-              <LayoutGrid className="h-[18px] w-[18px]" />
-              Comprar todo
-              <ChevronDown className="h-3.5 w-3.5" />
-            </Link>
-            {primaryNav.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="flex items-center gap-1 text-label text-text-primary transition-colors hover:text-brand-700"
-              >
-                {item.label}
-                {item.dropdown && <ChevronDown className="h-3.5 w-3.5 text-text-secondary" />}
-                {item.hot && (
-                  <span className="rounded-sm bg-accent-500 px-1.5 py-0.5 text-label-xs text-brand-900">
-                    HOT
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
-          <div className="flex items-center gap-6">
-            <Link href="#" className="flex items-center gap-1.5 text-label text-brand-700">
-              <Zap className="h-4 w-4 text-accent-600" /> Todas las colecciones
-            </Link>
-            {secondaryNav.map((label) => (
-              <div key={label} className="flex items-center gap-6">
-                <span className="h-4 w-px bg-border" />
-                <Link href="#" className="text-label text-text-secondary hover:text-text-primary">
-                  {label}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </nav>
+      {/* Navegación con mega-menú (desktop) */}
+      <MegaMenu />
 
       {/* Drawer móvil */}
       <AnimatePresence>

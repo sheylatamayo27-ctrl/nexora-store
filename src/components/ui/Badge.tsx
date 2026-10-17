@@ -2,8 +2,8 @@ import { cn } from "@/lib/utils";
 import type { BadgeType } from "@/data/types";
 
 const styles: Record<BadgeType, string> = {
-  sale: "bg-sale-500 text-text-inverse",
-  new: "bg-brand-500 text-text-inverse",
+  sale: "bg-sale-500 text-white",
+  new: "bg-brand-500 text-white",
   hot: "bg-accent-500 text-text-primary",
 };
 

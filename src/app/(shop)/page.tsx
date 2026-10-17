@@ -17,19 +17,14 @@ import { Badge } from "@/components/ui/Badge";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { Price } from "@/components/commerce/Price";
 import { Rating } from "@/components/commerce/Rating";
+import { Countdown } from "@/components/commerce/Countdown";
+import { StockBar } from "@/components/commerce/StockBar";
 import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { Reveal } from "@/lib/motion";
 import { categories, promoBanners } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
-
-const countdown = [
-  { v: "73", l: "Días" },
-  { v: "00", l: "Hs" },
-  { v: "43", l: "Min" },
-  { v: "28", l: "Seg" },
-];
 
 const serviceFeatures = [
   { icon: Truck, title: "Envío gratis", desc: "En pedidos superiores a $500" },
@@ -120,55 +115,34 @@ export default function HomePage() {
                     Ahorros increíbles — ¡apúrate, las ofertas terminan pronto!
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <span className="text-label text-text-secondary">Termina en</span>
-                  {countdown.map((c, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      {i > 0 && <span className="text-h3 text-brand-800">:</span>}
-                      <div className="flex h-14 w-14 flex-col items-center justify-center rounded-md bg-brand-900 text-text-inverse">
-                        <span className="text-[1.35rem] font-semibold leading-none">{c.v}</span>
-                        <span className="text-body-sm text-white/70">{c.l}</span>
-                      </div>
-                    </div>
-                  ))}
+                  <Countdown endsInHours={1752} />
                 </div>
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {dealProducts.map((p) => {
-                  const pct = p.sold ? Math.round((p.sold.current / p.sold.total) * 100) : 0;
-                  return (
-                    <Link
-                      key={p.id}
-                      href={`/producto/${p.slug}`}
-                      className="flex gap-4 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong"
-                    >
-                      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-surface-subtle">
-                        <AssetImage folder="products" name={p.image} alt={p.name} sizes="96px" />
-                      </div>
-                      <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <span className="text-label-sm uppercase tracking-wide text-text-muted">
-                          {p.vendor}
-                        </span>
-                        <span className="line-clamp-2 text-label text-text-primary">{p.name}</span>
-                        <Price price={p.price} compareAt={p.compareAt} size="sm" className="mt-0.5" />
-                        <div className="mt-auto flex flex-col gap-1 pt-2">
-                          <div className="h-1.5 overflow-hidden rounded-full bg-surface-muted">
-                            <div
-                              className="h-full rounded-full bg-gradient-to-r from-accent-500 to-sale-500"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          {p.sold && (
-                            <span className="text-body-sm text-text-secondary">
-                              Vendidos: {p.sold.current} / {p.sold.total}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+                {dealProducts.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/producto/${p.slug}`}
+                    className="flex gap-4 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong"
+                  >
+                    <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-surface-subtle">
+                      <AssetImage folder="products" name={p.image} alt={p.name} sizes="96px" />
+                    </div>
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <span className="text-label-sm uppercase tracking-wide text-text-muted">
+                        {p.vendor}
+                      </span>
+                      <span className="line-clamp-2 text-label text-text-primary">{p.name}</span>
+                      <Price price={p.price} compareAt={p.compareAt} size="sm" className="mt-0.5" />
+                      {p.sold && (
+                        <StockBar current={p.sold.current} total={p.sold.total} className="mt-auto pt-2" />
+                      )}
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </Reveal>
@@ -234,7 +208,7 @@ export default function HomePage() {
                   <Badge type="hot">Más vendido</Badge>
                   <span className="text-label-sm tracking-wide text-brand-700">PRODUCTO DESTACADO</span>
                 </div>
-                <h2 className="text-h2 text-text-primary sm:text-display-l">MyBook Laptop 14"</h2>
+                <h2 className="text-h2 text-text-primary sm:text-display-l">MyBook Laptop 14″</h2>
                 <Rating rating={4.9} reviews={1240} size={16} />
                 <p className="max-w-lg text-body-lg text-text-secondary">
                   Cuerpo ultrafino de aluminio, una impresionante pantalla 2.8K OLED y batería para

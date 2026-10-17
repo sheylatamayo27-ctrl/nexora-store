@@ -109,7 +109,7 @@ export function ProductView({ product, related }: { product: Product; related: P
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
             {/* Galería */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 self-start">
               <div className="flex flex-col gap-3">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <button

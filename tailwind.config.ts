@@ -90,9 +90,14 @@ const config: Config = {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
+        dot: {
+          "0%, 80%, 100%": { opacity: "0.25", transform: "scale(0.75)" },
+          "40%": { opacity: "1", transform: "scale(1)" },
+        },
       },
       animation: {
         marquee: "marquee 28s linear infinite",
+        dot: "dot 1.2s ease-in-out infinite",
       },
     },
   },

@@ -24,3 +24,14 @@ export function discountPercent(price: number, compareAt?: number): number | nul
   if (!compareAt || compareAt <= price) return null;
   return Math.round(((compareAt - price) / compareAt) * 100);
 }
+
+/** Fecha legible en español, p. ej. "2 oct 2026". */
+export function formatDate(iso: string): string {
+  const date = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat("es-MX", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}

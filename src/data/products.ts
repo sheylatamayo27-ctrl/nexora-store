@@ -48,7 +48,7 @@ export const products: Product[] = [
     id: "p3",
     slug: "open-ear-audifonos-deportivos-inalambricos",
     name: "Open Ear Audífonos Deportivos Inalámbricos",
-    vendor: "Nexora",
+    vendor: "boAt",
     image: "openear",
     categorySlug: "audifonos",
     price: 4500,
@@ -57,12 +57,13 @@ export const products: Product[] = [
     reviews: 214,
     badge: { type: "sale", label: "Ahorra Rs. 400" },
     colors: [{ name: "Negro", hex: "#141418" }],
+    sold: { current: 41, total: 50 },
   },
   {
     id: "p4",
     slug: "altavoz-portatil-inalambrico-exterior",
     name: "Altavoz Portátil Inalámbrico para Exterior",
-    vendor: "Nexora",
+    vendor: "JBL",
     image: "speaker",
     categorySlug: "altavoces",
     price: 1700,
@@ -97,7 +98,7 @@ export const products: Product[] = [
     id: "p6",
     slug: "power-bank-compacto-de-bolsillo-10000mah",
     name: "Power Bank Compacto de Bolsillo 10000 mAh",
-    vendor: "Nexora",
+    vendor: "boAt",
     image: "powerbank",
     categorySlug: "accesorios",
     price: 1800,
@@ -106,6 +107,7 @@ export const products: Product[] = [
     reviews: 126,
     badge: { type: "sale", label: "Ahorra Rs. 300" },
     colors: [{ name: "Ciruela", hex: "#A895DB" }],
+    sold: { current: 18, total: 30 },
   },
   {
     id: "p7",
@@ -124,12 +126,13 @@ export const products: Product[] = [
       { name: "Naranja", hex: "#F58C33" },
       { name: "Amarillo", hex: "#FACC40" },
     ],
+    sold: { current: 7, total: 20 },
   },
   {
     id: "p8",
     slug: "proyector-multimedia-digital-inalambrico-4k",
     name: "Proyector Multimedia Digital Inalámbrico 4K",
-    vendor: "Nexora",
+    vendor: "Sony",
     image: "projector",
     categorySlug: "accesorios",
     price: 19100,
@@ -228,7 +231,7 @@ export const products: Product[] = [
     id: "p14",
     slug: "impresora-laser-multifuncion-oficina",
     name: "Impresora Láser Multifunción de Oficina",
-    vendor: "Nexora",
+    vendor: "Samsung",
     image: "printer",
     categorySlug: "impresoras",
     price: 12499,
@@ -254,6 +257,7 @@ export const products: Product[] = [
       { name: "Azul marino", hex: "#1E2A4A" },
       { name: "Transparente", hex: "#DCE2EC" },
     ],
+    sold: { current: 10, total: 20 },
   },
 ];
 
@@ -268,10 +272,8 @@ export function getProductsByCategory(categorySlug: string): Product[] {
 /** Productos destacados para la home. */
 export const featuredProducts = products.slice(0, 6);
 
-/** Ofertas del día: subconjunto con barra de progreso de stock. */
-export const dealProducts = [
-  { ...products[5], sold: { current: 18, total: 30 } },
-  { ...products[6], sold: { current: 7, total: 20 } },
-  { ...products[2], sold: { current: 41, total: 50 } },
-  { ...products[14], sold: { current: 10, total: 20 } },
-];
+/** Ofertas del día: los productos con barra de progreso de stock. */
+export const dealProducts = products.filter((p) => p.sold);
+
+/** Todos los productos en descuento (tienen precio de comparación). */
+export const saleProducts = products.filter((p) => p.compareAt && p.compareAt > p.price);
