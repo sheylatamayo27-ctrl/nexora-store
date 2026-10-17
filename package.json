@@ -5,7 +5,9 @@
   "description": "Nexora — tienda de electrónica. Frontend en Next.js fiel al diseño de Figma.",
   "scripts": {
     "dev": "next dev",
+    "predev": "node scripts/generate-assets-manifest.mjs",
     "build": "next build",
+    "prebuild": "node scripts/generate-assets-manifest.mjs",
     "start": "next start",
     "lint": "next lint"
   },

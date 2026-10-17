@@ -1,0 +1,23 @@
+// Archivo generado por scripts/generate-assets-manifest.mjs — no editar a mano.
+// Lista las fotos reales presentes en /public/images (el resto usa el placeholder .svg).
+export const REAL_IMAGES: Record<string, "jpg" | "jpeg" | "png" | "webp"> = {
+  "products/cube": "jpg",
+  "products/drive": "jpg",
+  "products/earbuds": "jpg",
+  "products/headphones": "jpg",
+  "products/keyboard": "jpg",
+  "products/laptop": "jpg",
+  "products/laptopcase": "jpg",
+  "products/mobile": "jpg",
+  "products/openear": "jpg",
+  "products/pendrive": "jpg",
+  "products/powerbank": "jpg",
+  "products/printer": "jpg",
+  "products/projector": "jpg",
+  "products/speaker": "jpg",
+  "products/tablet": "jpg",
+  "banners/earbuds-banner": "jpg",
+  "banners/phone-banner": "jpg",
+  "banners/tablet-banner": "jpg",
+  "misc/hero": "jpg",
+};

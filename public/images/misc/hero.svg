@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 620" width="1440" height="620">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1440" y2="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B2A6B"/>
+      <stop offset="1" stop-color="#1F57D6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1440" height="620" fill="url(#g)"/>
+  <rect width="1440" height="620" fill="url(#glow)"/>
+  <circle cx="1180.8" cy="124" r="31" fill="#FFC220" opacity="0.9"/>
+  <rect x="589.8" y="186" width="260.4" height="187.48799999999997" rx="23.435999999999996" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.3" stroke-width="2"/>
+  <text x="720" y="471.2" text-anchor="middle" font-family="Jost, Segoe UI, sans-serif" font-size="34" font-weight="600" fill="#ffffff">Nexora</text>
+  <text x="720" y="508.4" text-anchor="middle" font-family="Jost, Segoe UI, sans-serif" font-size="17" letter-spacing="4" fill="#FFC220">NEXORA</text>
+</svg>
