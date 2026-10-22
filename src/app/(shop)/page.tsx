@@ -1,15 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Truck,
-  ShieldCheck,
-  Headset,
-  RotateCcw,
-  Cpu,
-  Monitor,
-  BatteryCharging,
-  Mail,
-} from "lucide-react";
+import { ArrowRight, Cpu, Monitor, BatteryCharging, Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -19,19 +9,13 @@ import { Price } from "@/components/commerce/Price";
 import { Rating } from "@/components/commerce/Rating";
 import { Countdown } from "@/components/commerce/Countdown";
 import { StockBar } from "@/components/commerce/StockBar";
+import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
 import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { Reveal } from "@/lib/motion";
 import { categories, promoBanners } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
-
-const serviceFeatures = [
-  { icon: Truck, title: "Envío gratis", desc: "En pedidos superiores a $500" },
-  { icon: ShieldCheck, title: "Pago seguro", desc: "Checkout 100% protegido" },
-  { icon: Headset, title: "Soporte 24/7", desc: "Ayuda dedicada, siempre" },
-  { icon: RotateCcw, title: "Devoluciones fáciles", desc: "Política de 30 días" },
-];
 
 const specs = [
   { icon: Cpu, title: "Core i7 13ª gen", sub: "16 GB RAM · 1 TB SSD" },
@@ -62,9 +46,9 @@ export default function HomePage() {
                   href={`/categoria/${cat.slug}`}
                   className="group flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevation-md"
                 >
-                  <div className="flex flex-col gap-1">
-                    <span className="text-label-lg text-text-primary">{cat.name}</span>
-                    <span className="text-body-sm text-text-secondary">{cat.itemCount} artículos</span>
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="truncate text-label-lg text-text-primary">{cat.name}</span>
+                    <span className="truncate text-body-sm text-text-secondary">{cat.itemCount} artículos</span>
                     <span className="mt-1 flex items-center gap-1 text-label-sm text-brand-700">
                       Comprar <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </span>
@@ -116,7 +100,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-label text-text-secondary">Termina en</span>
+                  <span className="hidden text-label text-text-secondary sm:inline">Termina en</span>
                   <Countdown endsInHours={1752} />
                 </div>
               </div>
@@ -242,23 +226,7 @@ export default function HomePage() {
       </section>
 
       {/* Beneficios */}
-      <section className="border-y border-border bg-surface py-10">
-        <Container>
-          <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {serviceFeatures.map((f) => (
-              <div key={f.title} className="flex items-center gap-4">
-                <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-brand-100">
-                  <f.icon className="h-6 w-6 text-brand-800" />
-                </span>
-                <div className="flex flex-col">
-                  <span className="text-label-lg text-text-primary">{f.title}</span>
-                  <span className="text-body-sm text-text-secondary">{f.desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
+      <ServiceFeatures />
 
       {/* Newsletter */}
       <section className="py-14 sm:py-20">

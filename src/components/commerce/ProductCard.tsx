@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/commerce/Rating";
 import { Price } from "@/components/commerce/Price";
 import { useCart } from "@/store/cart";
+import { useFavorites } from "@/store/favorites";
+import { favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { discountPercent } from "@/lib/format";
 import type { Product } from "@/data/types";
@@ -25,9 +26,23 @@ export function ProductCard({
   className?: string;
 }) {
   const add = useCart((s) => s.add);
-  const [wished, setWished] = useState(false);
+  const toggleFavorite = useFavorites((s) => s.toggle);
+  const favorites = useFavorites((s) => s.items);
+  const wished = favorites.some((p) => p.id === product.id);
   const href = `/producto/${product.slug}`;
   const pct = discountPercent(product.price, product.compareAt);
+
+  const handleWish = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    favoriteToast(product, toggleFavorite(product));
+  };
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    add(product);
+  };
 
   return (
     <article
@@ -66,9 +81,10 @@ export function ProductCard({
         {/* Wishlist */}
         <button
           type="button"
-          aria-label="Guardar en favoritos"
-          onClick={() => setWished((w) => !w)}
-          className="absolute bottom-2.5 right-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform duration-200 hover:scale-105"
+          aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+          aria-pressed={wished}
+          onClick={handleWish}
+          className="absolute bottom-2.5 right-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform duration-200 hover:scale-105"
         >
           <Heart
             className={cn(
@@ -82,8 +98,8 @@ export function ProductCard({
         <button
           type="button"
           aria-label="Agregar al carrito"
-          onClick={() => add(product)}
-          className="absolute bottom-2.5 left-2.5 flex h-9 w-9 items-center justify-center rounded-md bg-brand-800 text-white shadow-elevation-sm transition-all duration-200 hover:bg-brand-900 hover:scale-105"
+          onClick={handleAdd}
+          className="absolute bottom-2.5 left-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-md bg-brand-800 text-white shadow-elevation-sm transition-all duration-200 hover:bg-brand-900 hover:scale-105"
         >
           <ShoppingBag className="h-[18px] w-[18px]" />
         </button>

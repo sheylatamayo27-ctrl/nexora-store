@@ -24,10 +24,14 @@ import { OptionChip } from "@/components/ui/Chip";
 import { Tabs } from "@/components/ui/Tabs";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductCard } from "@/components/commerce/ProductCard";
+import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { Container } from "@/components/ui/Container";
 import { formatPrice, discountPercent } from "@/lib/format";
 import { useCart } from "@/store/cart";
+import { useFavorites } from "@/store/favorites";
+import { favoriteToast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
 
 const editions = [
@@ -89,6 +93,10 @@ const distribution = [
 
 export function ProductView({ product, related }: { product: Product; related: Product[] }) {
   const add = useCart((s) => s.add);
+  const toggleFavorite = useFavorites((s) => s.toggle);
+  const favorites = useFavorites((s) => s.items);
+  const wished = favorites.some((p) => p.id === product.id);
+  const handleWish = () => favoriteToast(product, toggleFavorite(product));
   const [color, setColor] = useState(product.colors?.[0]?.name);
   const [edition, setEdition] = useState("pro");
   const [qty, setQty] = useState(1);
@@ -137,10 +145,25 @@ export function ProductView({ product, related }: { product: Product; related: P
                   </Badge>
                 )}
                 <div className="absolute right-4 top-4 flex flex-col gap-2">
-                  <button className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm">
-                    <Heart className="h-[18px] w-[18px]" />
+                  <button
+                    type="button"
+                    onClick={handleWish}
+                    aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+                    aria-pressed={wished}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform hover:scale-105"
+                  >
+                    <Heart
+                      className={cn(
+                        "h-[18px] w-[18px] transition-colors",
+                        wished ? "fill-sale-500 text-sale-500" : "text-text-primary"
+                      )}
+                    />
                   </button>
-                  <button className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm">
+                  <button
+                    type="button"
+                    aria-label="Compartir"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform hover:scale-105"
+                  >
                     <Share2 className="h-[18px] w-[18px]" />
                   </button>
                 </div>
@@ -243,8 +266,22 @@ export function ProductView({ product, related }: { product: Product; related: P
                 <ButtonLink href="/carrito" variant="accent" size="lg" className="flex-1">
                   Comprar ahora
                 </ButtonLink>
-                <button className="flex h-14 w-14 items-center justify-center rounded-md border border-border-strong">
-                  <Heart className="h-5 w-5" />
+                <button
+                  type="button"
+                  onClick={handleWish}
+                  aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+                  aria-pressed={wished}
+                  className={cn(
+                    "flex h-14 w-14 items-center justify-center rounded-md border transition-colors",
+                    wished ? "border-sale-500 bg-sale-100" : "border-border-strong hover:bg-surface-subtle"
+                  )}
+                >
+                  <Heart
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      wished ? "fill-sale-500 text-sale-500" : "text-text-primary"
+                    )}
+                  />
                 </button>
               </div>
 
@@ -373,6 +410,9 @@ export function ProductView({ product, related }: { product: Product; related: P
           </div>
         </div>
       </Container>
+
+      {/* Beneficios (igual que en el home), encima del pie de página */}
+      <ServiceFeatures />
     </div>
   );
 }

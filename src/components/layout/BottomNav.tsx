@@ -18,14 +18,14 @@ export function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface shadow-[0_-4px_16px_rgba(15,23,42,0.06)] lg:hidden">
-      <div className="flex items-center justify-between px-4 pb-2 pt-1">
+      <div className="flex items-center px-1 pb-2 pt-1">
         {items.map(({ label, href, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link
               key={label}
               href={href}
-              className="flex w-16 flex-col items-center gap-1 py-1.5"
+              className="flex min-w-0 flex-1 basis-0 flex-col items-center gap-1 py-1.5"
             >
               <span
                 className={cn(
@@ -35,7 +35,7 @@ export function BottomNav() {
               >
                 <Icon className={cn("h-5 w-5", active ? "text-brand-800" : "text-text-secondary")} />
               </span>
-              <span className={cn("text-label-xs", active ? "text-brand-800" : "text-text-secondary")}>
+              <span className={cn("max-w-full truncate text-label-xs", active ? "text-brand-800" : "text-text-secondary")}>
                 {label}
               </span>
             </Link>

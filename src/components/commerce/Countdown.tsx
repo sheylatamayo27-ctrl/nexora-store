@@ -50,18 +50,18 @@ export function Countdown({
   const units = remaining === null ? split(endsInHours * 3_600_000) : split(remaining);
   const box =
     size === "sm"
-      ? "h-12 w-12 text-[1.1rem]"
-      : "h-14 w-14 text-[1.35rem]";
+      ? "h-10 w-10 text-[0.95rem] sm:h-12 sm:w-12 sm:text-[1.1rem]"
+      : "h-11 w-11 text-[0.95rem] sm:h-14 sm:w-14 sm:text-[1.35rem]";
 
   return (
     <div
-      className={cn("flex items-center gap-2", className)}
+      className={cn("flex items-center gap-1.5 sm:gap-2", className)}
       role="timer"
       aria-live="off"
       suppressHydrationWarning
     >
       {units.map((u, i) => (
-        <div key={u.l} className="flex items-center gap-2">
+        <div key={u.l} className="flex items-center gap-1 sm:gap-2">
           {i > 0 && (
             <span className={cn("text-h3", tone === "dark" ? "text-white/60" : "text-brand-800")}>:</span>
           )}

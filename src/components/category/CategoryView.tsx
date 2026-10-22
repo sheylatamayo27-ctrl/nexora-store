@@ -12,6 +12,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { RangeSlider } from "@/components/ui/RangeSlider";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
 import { categories } from "@/data/categories";
 import { formatPriceShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -402,6 +403,9 @@ export function CategoryView({
           )}
         </div>
       </Container>
+
+      {/* Beneficios (igual que en el home), encima del pie de página */}
+      <ServiceFeatures />
 
       {/* Hoja de filtros (móvil) */}
       <AnimatePresence>

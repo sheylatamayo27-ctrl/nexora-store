@@ -22,7 +22,7 @@ export function Input({ label, icon: Icon, helper, error, className, ...props }:
       >
         {Icon && <Icon className="h-[18px] w-[18px] text-text-muted" />}
         <input
-          className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
+          className="h-full w-full min-w-0 flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
           {...props}
         />
       </span>
