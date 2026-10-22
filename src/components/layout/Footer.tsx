@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MapPin, Phone, Mail, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
+import { FooterSection } from "@/components/layout/FooterSection";
 
 const columns = [
   {
@@ -25,7 +26,7 @@ export function Footer() {
   return (
     <footer className="bg-brand-900 text-text-inverse">
       <div className="container-page py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:gap-12">
           {/* Marca */}
           <div className="flex flex-col gap-5">
             <Logo tone="light" />
@@ -59,24 +60,22 @@ export function Footer() {
           </div>
 
           {columns.map((col) => (
-            <div key={col.title} className="flex flex-col gap-4">
-              <h4 className="text-label-lg">{col.title}</h4>
+            <FooterSection key={col.title} title={col.title}>
               {col.links.map((l) => (
                 <Link key={l} href="#" className="text-body text-white/65 transition-colors hover:text-white">
                   {l}
                 </Link>
               ))}
-            </div>
+            </FooterSection>
           ))}
 
-          <div className="flex flex-col gap-4">
-            <h4 className="text-label-lg">Horario</h4>
+          <FooterSection title="Horario">
             {hours.map((h) => (
               <span key={h} className="text-body text-white/65">
                 {h}
               </span>
             ))}
-          </div>
+          </FooterSection>
         </div>
 
         <div className="my-8 h-px bg-white/12" />

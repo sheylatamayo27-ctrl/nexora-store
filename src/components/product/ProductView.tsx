@@ -116,14 +116,15 @@ export function ProductView({ product, related }: { product: Product; related: P
           />
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-            {/* Galería */}
-            <div className="flex gap-4 self-start">
-              <div className="flex flex-col gap-3">
+            {/* Galería: en móvil la imagen va arriba y las miniaturas en fila
+                debajo; en escritorio las miniaturas quedan en columna a la izquierda. */}
+            <div className="flex flex-col-reverse gap-3 self-start lg:flex-row lg:gap-4">
+              <div className="flex gap-3 lg:flex-col">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveThumb(i)}
-                    className={`relative h-16 w-16 overflow-hidden rounded-lg bg-surface-subtle sm:h-20 sm:w-20 ${
+                    className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-subtle sm:h-20 sm:w-20 ${
                       activeThumb === i ? "ring-2 ring-brand-800" : "ring-1 ring-border"
                     }`}
                   >

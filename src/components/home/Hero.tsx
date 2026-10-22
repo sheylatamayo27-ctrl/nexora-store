@@ -34,14 +34,16 @@ export function Hero() {
         alt={slide.title}
         priority
         sizes="100vw"
-        className="object-cover"
+        className="object-cover object-[70%_30%] lg:object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#061234]/95 via-[#061234]/70 to-transparent lg:via-[#061234]/40" />
+      {/* En móvil el degradado es vertical (oscuro abajo) para dejar ver la
+          foto arriba; en escritorio es horizontal (oscuro a la izquierda). */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/65 to-[#061234]/20 lg:bg-gradient-to-r lg:from-[#061234]/95 lg:via-[#061234]/40 lg:to-transparent" />
 
-      <div className="container-page relative flex min-h-[460px] items-center py-16 sm:min-h-[520px] lg:min-h-[580px]">
+      <div className="container-page relative flex min-h-[520px] items-end py-10 sm:min-h-[540px] sm:py-14 lg:min-h-[580px] lg:items-center lg:py-16">
         <motion.div
           key={activeIndex}
-          className="flex max-w-xl flex-col gap-5 text-text-inverse"
+          className="flex max-w-xl flex-col gap-4 text-text-inverse sm:gap-5"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
