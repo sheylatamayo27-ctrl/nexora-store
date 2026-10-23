@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Zap } from "lucide-react";
+import { Zap, Check } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
 import { ButtonLink } from "@/components/ui/Button";
 import { motion } from "@/lib/motion";
 import { heroSlides } from "@/data/hero";
+
+// Solo se muestran en escritorio (lg+); en móvil y tablet el hero va más limpio.
+const perks = ["Garantía de 2 años", "Entrega gratis", "Calificación 4.9★"];
 
 const AUTO_ROTATE_MS = 6000;
 
@@ -70,6 +73,16 @@ export function Hero() {
             >
               {slide.secondaryCta.label}
             </ButtonLink>
+          </div>
+
+          {/* Perks: solo escritorio (lg+) */}
+          <div className="mt-4 hidden flex-wrap gap-5 lg:flex">
+            {perks.map((p) => (
+              <span key={p} className="flex items-center gap-2 text-body text-white/85">
+                <Check className="h-4 w-4 text-accent-500" />
+                {p}
+              </span>
+            ))}
           </div>
         </motion.div>
       </div>

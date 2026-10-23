@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Cpu, Monitor, BatteryCharging, Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -17,6 +17,12 @@ import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { Reveal } from "@/lib/motion";
 import { categories } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
+
+const specs = [
+  { icon: Cpu, title: "Core i7 13ª gen", sub: "16 GB RAM · 1 TB SSD" },
+  { icon: Monitor, title: '14" 2.8K OLED', sub: "120 Hz · 100% DCI-P3" },
+  { icon: BatteryCharging, title: "18 h de batería", sub: "Carga rápida de 65W" },
+];
 
 export default function HomePage() {
   return (
@@ -126,7 +132,7 @@ export default function HomePage() {
       {/* Banners promocionales */}
       <section className="pb-14 sm:pb-20">
         <Container className="flex flex-col gap-8">
-          <Reveal>
+          <Reveal className="lg:hidden">
             <SectionHeader
               title="Explorar más"
               subtitle="Descubre nuestras colecciones por categoría"
@@ -142,7 +148,8 @@ export default function HomePage() {
       <section className="pb-14 sm:pb-20">
         <Container>
           <Reveal>
-            <div className="grid items-center gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-12 md:grid-cols-2 md:gap-12 lg:gap-16">
+            {/* Móvil y tablet: versión simple (igual al diseño de las fotos) */}
+            <div className="grid items-center gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-12 md:grid-cols-2 md:gap-12 lg:hidden">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-subtle">
                 <AssetImage folder="products" name="laptop" alt="MyBook Laptop 14 pulgadas" sizes="(max-width: 768px) 100vw, 50vw" />
                 <Badge type="hot" className="absolute left-5 top-5">Más vendido</Badge>
@@ -166,6 +173,47 @@ export default function HomePage() {
                 </ButtonLink>
               </div>
             </div>
+
+            {/* Escritorio (lg+): versión completa original, sin cambios */}
+            <div className="hidden items-center gap-8 rounded-2xl border border-border bg-surface p-12 lg:grid lg:grid-cols-2 lg:gap-16">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-subtle">
+                <AssetImage folder="products" name="laptop" alt="MyBook Laptop 14 pulgadas" sizes="50vw" />
+                <Badge type="sale" className="absolute left-5 top-5">Ahorra Rs. 6,501.00</Badge>
+              </div>
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center gap-3">
+                  <Badge type="hot">Más vendido</Badge>
+                  <span className="text-label-sm tracking-wide text-brand-700">PRODUCTO DESTACADO</span>
+                </div>
+                <h2 className="text-h2 text-text-primary sm:text-display-l">MyBook Laptop 14″</h2>
+                <Rating rating={4.9} reviews={1240} size={16} />
+                <p className="max-w-lg text-body-lg text-text-secondary">
+                  Cuerpo ultrafino de aluminio, una impresionante pantalla 2.8K OLED y batería para
+                  todo el día. Hecha para creadores y profesionales que trabajan desde cualquier lugar.
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {specs.map((s) => (
+                    <div key={s.title} className="flex flex-col gap-2 rounded-lg bg-surface-subtle p-4">
+                      <s.icon className="h-[22px] w-[22px] text-brand-700" />
+                      <span className="text-label text-text-primary">{s.title}</span>
+                      <span className="text-body-sm text-text-secondary">{s.sub}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Price price={85999} compareAt={92500} size="lg" />
+                  <span className="rounded-sm bg-sale-100 px-2 py-1 text-label-sm text-sale-500">7% OFF</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <ButtonLink href="/producto/mybook-laptop-14-pulgadas-2-8k-oled" variant="primary" size="lg">
+                    Agregar al carrito
+                  </ButtonLink>
+                  <ButtonLink href="/producto/mybook-laptop-14-pulgadas-2-8k-oled" variant="outline" size="lg">
+                    Comprar ahora
+                  </ButtonLink>
+                </div>
+              </div>
+            </div>
           </Reveal>
         </Container>
       </section>
@@ -174,7 +222,7 @@ export default function HomePage() {
       <ServiceFeatures />
 
       {/* Newsletter */}
-      <section className="pt-14 pb-12 sm:pt-20">
+      <section className="pt-14 pb-12 sm:pt-20 lg:pb-20">
         <Container>
           <Reveal>
             <div className="relative flex flex-col gap-8 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 to-brand-500 p-8 sm:p-12 lg:flex-row lg:items-center lg:justify-between">
