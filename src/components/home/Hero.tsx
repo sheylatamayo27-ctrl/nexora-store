@@ -7,7 +7,6 @@ import { ButtonLink } from "@/components/ui/Button";
 import { motion } from "@/lib/motion";
 import { heroSlides } from "@/data/hero";
 
-// Solo se muestran en escritorio (lg+); en móvil y tablet el hero va más limpio.
 const perks = ["Garantía de 2 años", "Entrega gratis", "Calificación 4.9★"];
 
 const AUTO_ROTATE_MS = 6000;
@@ -35,14 +34,13 @@ export function Hero() {
         alt={slide.title}
         priority
         sizes="100vw"
-        className="object-cover object-[70%_30%] md:object-center"
+        className="object-cover object-[70%_30%] lg:object-center"
       />
       {/* En móvil el degradado es vertical (oscuro abajo) para dejar ver la
-          foto arriba; desde tablet es horizontal (oscuro a la izquierda),
-          con el texto a la izquierda y la imagen a la derecha, igual al diseño. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/65 to-[#061234]/20 md:bg-gradient-to-r md:from-[#061234]/95 md:via-[#061234]/40 md:to-transparent" />
+          foto arriba; en escritorio es horizontal (oscuro a la izquierda). */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/65 to-[#061234]/20 lg:bg-gradient-to-r lg:from-[#061234]/95 lg:via-[#061234]/40 lg:to-transparent" />
 
-      <div className="container-page relative flex min-h-[520px] items-end py-10 sm:min-h-[540px] sm:py-14 md:min-h-[560px] md:items-center md:py-16 lg:min-h-[580px]">
+      <div className="container-page relative flex min-h-[520px] items-end py-10 sm:min-h-[540px] sm:py-14 lg:min-h-[580px] lg:items-center lg:py-16">
         <motion.div
           key={activeIndex}
           className="flex max-w-xl flex-col gap-4 text-text-inverse sm:gap-5"
@@ -75,8 +73,7 @@ export function Hero() {
             </ButtonLink>
           </div>
 
-          {/* Perks: solo escritorio (lg+) */}
-          <div className="mt-4 hidden flex-wrap gap-5 lg:flex">
+          <div className="mt-4 flex flex-wrap gap-5">
             {perks.map((p) => (
               <span key={p} className="flex items-center gap-2 text-body text-white/85">
                 <Check className="h-4 w-4 text-accent-500" />

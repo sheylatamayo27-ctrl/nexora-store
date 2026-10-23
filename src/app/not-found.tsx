@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -11,7 +12,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-surface-subtle">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pb-20 lg:pb-0">
         <Container className="flex flex-col items-center gap-5 py-16 text-center sm:py-24">
           <div className="flex items-center gap-3 sm:gap-4">
             <span className="text-[6rem] font-bold leading-none text-brand-800 sm:text-[10rem]">4</span>
@@ -63,6 +64,7 @@ export default function NotFound() {
         </Container>
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 }

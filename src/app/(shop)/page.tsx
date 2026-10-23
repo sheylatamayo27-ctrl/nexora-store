@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Cpu, Monitor, BatteryCharging, Mail } from "lucide-react";
+import { ArrowRight, Cpu, Monitor, BatteryCharging, Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -13,9 +13,8 @@ import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
 import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
-import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { Reveal } from "@/lib/motion";
-import { categories } from "@/data/categories";
+import { categories, promoBanners } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
 
 const specs = [
@@ -42,7 +41,7 @@ export default function HomePage() {
           <Reveal>
             {/* Móvil: fila con desplazamiento horizontal; tablet/escritorio: cuadrícula.
                 Cada tarjeta es vertical y centrada (ícono arriba, nombre y conteo). */}
-            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar snap-x md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:px-0">
+            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar snap-x sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0 lg:grid-cols-5">
               {categories.map((cat) => (
                 <Link
                   key={cat.slug}
@@ -131,16 +130,50 @@ export default function HomePage() {
 
       {/* Banners promocionales */}
       <section className="pb-14 sm:pb-20">
-        <Container className="flex flex-col gap-8">
-          <Reveal className="lg:hidden">
-            <SectionHeader
-              title="Explorar más"
-              subtitle="Descubre nuestras colecciones por categoría"
-            />
-          </Reveal>
-          <Reveal>
-            <PromoCarousel />
-          </Reveal>
+        <Container>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {promoBanners.map((b, i) => (
+              <Reveal
+                key={b.eyebrow}
+                delay={i * 0.08}
+                className={i === 2 ? "sm:col-span-2" : undefined}
+              >
+                <Link
+                  href={b.href}
+                  className="group relative flex h-80 flex-col overflow-hidden rounded-xl bg-brand-800 p-8"
+                >
+                  <AssetImage
+                    folder="banners"
+                    name={b.image}
+                    alt={b.title}
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    className="transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div
+                    className={`absolute inset-0 ${
+                      b.align === "center"
+                        ? "bg-gradient-to-t from-[#081B4B]/90 via-[#081B4B]/30 to-transparent"
+                        : "bg-gradient-to-r from-[#081B4B]/90 via-[#081B4B]/30 to-transparent"
+                    }`}
+                  />
+                  <div
+                    className={`relative mt-auto flex flex-col gap-1 ${
+                      b.align === "center" ? "items-center text-center" : "items-start"
+                    }`}
+                  >
+                    <span className="text-label-xs uppercase tracking-widest text-accent-500">
+                      {b.eyebrow}
+                    </span>
+                    <span className="max-w-[14rem] text-h3 text-text-inverse">{b.title}</span>
+                    <span className="text-body text-white/80">{b.subtitle}</span>
+                    <span className="mt-2 flex items-center gap-1.5 text-label text-text-inverse underline decoration-from-font underline-offset-4">
+                      Comprar ahora <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
         </Container>
       </section>
 
@@ -148,36 +181,9 @@ export default function HomePage() {
       <section className="pb-14 sm:pb-20">
         <Container>
           <Reveal>
-            {/* Móvil y tablet: versión simple (igual al diseño de las fotos) */}
-            <div className="grid items-center gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-12 md:grid-cols-2 md:gap-12 lg:hidden">
+            <div className="grid items-center gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-12 lg:grid-cols-2 lg:gap-16">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-subtle">
-                <AssetImage folder="products" name="laptop" alt="MyBook Laptop 14 pulgadas" sizes="(max-width: 768px) 100vw, 50vw" />
-                <Badge type="hot" className="absolute left-5 top-5">Más vendido</Badge>
-              </div>
-              <div className="flex flex-col items-start gap-4">
-                <h2 className="text-h2 text-text-primary sm:text-display-l">MyBook Laptop 14″</h2>
-                <Rating rating={4.9} reviews={1240} size={16} />
-                <p className="max-w-lg text-body-lg text-text-secondary">
-                  Cuerpo ultrafino de aluminio, una impresionante pantalla 2.8K OLED y batería para
-                  todo el día. Hecha para creadores y profesionales que trabajan desde cualquier lugar.
-                </p>
-                <Price price={85999} size="lg" />
-                <ButtonLink
-                  href="/producto/mybook-laptop-14-pulgadas-2-8k-oled"
-                  variant="primary"
-                  size="lg"
-                  icon
-                  className="mt-1 w-full sm:w-auto"
-                >
-                  Agregar al carrito
-                </ButtonLink>
-              </div>
-            </div>
-
-            {/* Escritorio (lg+): versión completa original, sin cambios */}
-            <div className="hidden items-center gap-8 rounded-2xl border border-border bg-surface p-12 lg:grid lg:grid-cols-2 lg:gap-16">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-subtle">
-                <AssetImage folder="products" name="laptop" alt="MyBook Laptop 14 pulgadas" sizes="50vw" />
+                <AssetImage folder="products" name="laptop" alt="MyBook Laptop 14 pulgadas" sizes="(max-width: 1024px) 100vw, 50vw" />
                 <Badge type="sale" className="absolute left-5 top-5">Ahorra Rs. 6,501.00</Badge>
               </div>
               <div className="flex flex-col gap-5">
@@ -222,7 +228,7 @@ export default function HomePage() {
       <ServiceFeatures />
 
       {/* Newsletter */}
-      <section className="pt-14 pb-12 sm:pt-20 lg:pb-20">
+      <section className="py-14 sm:py-20">
         <Container>
           <Reveal>
             <div className="relative flex flex-col items-start justify-between gap-8 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 to-brand-500 p-8 sm:p-12 lg:flex-row lg:items-center">
@@ -233,9 +239,7 @@ export default function HomePage() {
                   Suscríbete para ofertas exclusivas, novedades y consejos tech. Sin spam, nunca.
                 </p>
               </div>
-
-              {/* Escritorio (lg+): formulario original, sin cambios */}
-              <div className="relative hidden w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center lg:flex">
+              <div className="relative flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                 <div className="flex h-14 flex-1 items-center gap-3 rounded-md bg-surface px-4">
                   <Mail className="h-5 w-5 text-text-muted" />
                   <input
@@ -248,21 +252,6 @@ export default function HomePage() {
                   Suscribirse
                 </Button>
               </div>
-
-              {/* Móvil y tablet: input alineado con el botón */}
-              <form className="flex w-full flex-col gap-3 sm:flex-row lg:hidden">
-                <label className="flex h-14 items-center gap-3 rounded-md bg-surface px-4 sm:w-72">
-                  <Mail className="h-5 w-5 shrink-0 text-text-muted" />
-                  <input
-                    type="email"
-                    placeholder="Ingresa tu correo"
-                    className="h-full w-full bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
-                  />
-                </label>
-                <Button type="submit" variant="accent" size="lg" className="w-full sm:w-auto">
-                  Suscribirse
-                </Button>
-              </form>
             </div>
           </Reveal>
         </Container>
