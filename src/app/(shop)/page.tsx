@@ -39,22 +39,21 @@ export default function HomePage() {
             />
           </Reveal>
           <Reveal>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {/* Móvil: fila con desplazamiento horizontal; tablet/escritorio: cuadrícula.
+                Cada tarjeta es vertical y centrada (ícono arriba, nombre y conteo). */}
+            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar snap-x sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0 lg:grid-cols-5">
               {categories.map((cat) => (
                 <Link
                   key={cat.slug}
                   href={`/categoria/${cat.slug}`}
-                  className="group flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevation-md"
+                  className="group flex w-24 shrink-0 snap-start flex-col items-center gap-3 rounded-xl border border-border bg-surface p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-elevation-md sm:w-auto"
                 >
-                  <div className="flex min-w-0 flex-col gap-1">
-                    <span className="truncate text-label-lg text-text-primary">{cat.name}</span>
-                    <span className="truncate text-body-sm text-text-secondary">{cat.itemCount} artículos</span>
-                    <span className="mt-1 flex items-center gap-1 text-label-sm text-brand-700">
-                      Comprar <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                    </span>
-                  </div>
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-surface-subtle sm:h-20 sm:w-20">
                     <AssetImage folder="products" name={cat.image} alt={cat.name} sizes="80px" />
+                  </div>
+                  <div className="flex min-w-0 flex-col items-center gap-0.5">
+                    <span className="max-w-full truncate text-label text-text-primary">{cat.name}</span>
+                    <span className="text-body-sm text-text-secondary">{cat.itemCount} artículos</span>
                   </div>
                 </Link>
               ))}
@@ -75,13 +74,9 @@ export default function HomePage() {
               href="/categoria/auriculares"
             />
           </Reveal>
-          <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {featuredProducts.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                className="w-[70vw] shrink-0 snap-start sm:w-auto"
-              />
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </Container>
@@ -105,7 +100,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {dealProducts.map((p) => (
                   <Link
                     key={p.id}
@@ -136,9 +131,13 @@ export default function HomePage() {
       {/* Banners promocionales */}
       <section className="pb-14 sm:pb-20">
         <Container>
-          <div className="grid gap-5 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2">
             {promoBanners.map((b, i) => (
-              <Reveal key={b.eyebrow} delay={i * 0.08}>
+              <Reveal
+                key={b.eyebrow}
+                delay={i * 0.08}
+                className={i === 2 ? "sm:col-span-2" : undefined}
+              >
                 <Link
                   href={b.href}
                   className="group relative flex h-80 flex-col overflow-hidden rounded-xl bg-brand-800 p-8"
@@ -240,7 +239,7 @@ export default function HomePage() {
                   Suscríbete para ofertas exclusivas, novedades y consejos tech. Sin spam, nunca.
                 </p>
               </div>
-              <div className="relative flex w-full max-w-md items-center gap-2">
+              <div className="relative flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                 <div className="flex h-14 flex-1 items-center gap-3 rounded-md bg-surface px-4">
                   <Mail className="h-5 w-5 text-text-muted" />
                   <input
@@ -249,7 +248,9 @@ export default function HomePage() {
                     className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
                   />
                 </div>
-                <Button variant="accent" size="lg">Suscribirse</Button>
+                <Button variant="accent" size="lg" className="w-full sm:w-auto">
+                  Suscribirse
+                </Button>
               </div>
             </div>
           </Reveal>
