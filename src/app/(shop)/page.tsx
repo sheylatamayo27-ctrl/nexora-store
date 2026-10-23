@@ -225,15 +225,32 @@ export default function HomePage() {
       <section className="pt-14 pb-12 sm:pt-20 lg:pb-20">
         <Container>
           <Reveal>
-            <div className="relative flex flex-col gap-8 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 to-brand-500 p-8 sm:p-12 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex max-w-lg flex-col gap-2 text-text-inverse">
+            <div className="relative flex flex-col items-start justify-between gap-8 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 to-brand-500 p-8 sm:p-12 lg:flex-row lg:items-center">
+              <div className="relative flex max-w-lg flex-col gap-2 text-text-inverse">
                 <span className="text-label-xs tracking-widest text-accent-500">NEWSLETTER</span>
                 <h2 className="text-h2">Obtén 10% de descuento en tu primer pedido</h2>
                 <p className="text-body-lg text-white/75">
                   Suscríbete para ofertas exclusivas, novedades y consejos tech. Sin spam, nunca.
                 </p>
               </div>
-              <form className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+
+              {/* Escritorio (lg+): formulario original, sin cambios */}
+              <div className="relative hidden w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center lg:flex">
+                <div className="flex h-14 flex-1 items-center gap-3 rounded-md bg-surface px-4">
+                  <Mail className="h-5 w-5 text-text-muted" />
+                  <input
+                    type="email"
+                    placeholder="Ingresa tu correo"
+                    className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
+                  />
+                </div>
+                <Button variant="accent" size="lg" className="w-full sm:w-auto">
+                  Suscribirse
+                </Button>
+              </div>
+
+              {/* Móvil y tablet: input alineado con el botón */}
+              <form className="flex w-full flex-col gap-3 sm:flex-row lg:hidden">
                 <label className="flex h-14 items-center gap-3 rounded-md bg-surface px-4 sm:w-72">
                   <Mail className="h-5 w-5 shrink-0 text-text-muted" />
                   <input

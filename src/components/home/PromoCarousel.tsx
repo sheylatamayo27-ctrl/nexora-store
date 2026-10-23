@@ -48,7 +48,7 @@ export function PromoCarousel() {
               folder="banners"
               name={b.image}
               alt={b.title}
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, 33vw"
               className="transition-transform duration-700 group-hover:scale-105"
             />
             <div
