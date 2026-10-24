@@ -7,7 +7,9 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { label: "Inicio", href: "/", icon: Home },
-  { label: "Categorías", href: "/categoria/auriculares", icon: LayoutGrid },
+  // `match` detecta la pestaña activa de forma más amplia que el destino del enlace
+  // (p. ej. "Categorías" se activa en cualquier /categoria/*).
+  { label: "Categorías", href: "/categoria/auriculares", match: "/categoria", icon: LayoutGrid },
   { label: "Favoritos", href: "/favoritos", icon: Heart },
   { label: "Carrito", href: "/carrito", icon: ShoppingBag },
   { label: "Cuenta", href: "/cuenta", icon: User },
@@ -17,10 +19,11 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface shadow-[0_-4px_16px_rgba(15,23,42,0.06)] lg:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface shadow-[0_-4px_16px_rgba(15,23,42,0.06)] md:hidden">
       <div className="flex items-center px-1 pb-2 pt-1">
-        {items.map(({ label, href, icon: Icon }) => {
-          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+        {items.map(({ label, href, match, icon: Icon }) => {
+          const base = match ?? href;
+          const active = base === "/" ? pathname === "/" : pathname.startsWith(base);
           return (
             <Link
               key={label}

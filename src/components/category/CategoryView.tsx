@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { SlidersHorizontal, ChevronDown, LayoutGrid, List, X, Check } from "lucide-react";
+import { SlidersHorizontal, ChevronDown, LayoutGrid, List, Check } from "lucide-react";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -17,6 +16,8 @@ import { categories } from "@/data/categories";
 import { formatPriceShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
+import { FilterSheet, type SheetFilters } from "@/components/category/FilterSheet";
+import { SortMenu } from "@/components/category/SortMenu";
 
 const ratings = [4, 3, 2];
 const PAGE_SIZE = 12;
@@ -108,6 +109,25 @@ export function CategoryView({
   const currentPage = Math.min(page, Math.max(1, totalPages));
   const shownTo = Math.min(currentPage * PAGE_SIZE, filtered.length);
   const shown = filtered.slice(0, shownTo);
+
+  // Conteo en vivo para la hoja de filtros (borrador + valoración/color actuales).
+  const resultCount = (d: SheetFilters) =>
+    products.filter((p) => {
+      if (d.cats.length && !d.cats.includes(p.categorySlug)) return false;
+      if (p.price < d.price[0] || p.price > d.price[1]) return false;
+      if (rating && p.rating < rating) return false;
+      if (d.brands.length && !d.brands.includes(p.vendor)) return false;
+      if (colors.length && !(p.colors ?? []).some((c) => colors.includes(c.name))) return false;
+      if (d.avail.onSale && !(p.compareAt && p.compareAt > p.price)) return false;
+      return true;
+    }).length;
+
+  const applySheet = (next: SheetFilters) => {
+    setCats(next.cats);
+    setPrice(next.price);
+    setBrands(next.brands);
+    setAvail(next.avail as Record<AvailId, boolean>);
+  };
 
   useEffect(() => {
     setPage(1);
@@ -246,14 +266,27 @@ export function CategoryView({
           <Breadcrumb items={[{ label: "Tienda", href: "/categoria/auriculares" }, { label: title }]} />
           <div className="flex flex-col gap-2">
             <h1 className="text-h2 text-text-primary sm:text-display-l">{title}</h1>
-            <p className="max-w-2xl text-body-lg text-text-secondary">{description}</p>
+            {/* Escritorio: descripción (intacta). Móvil/tablet: conteo real · entrega. */}
+            <p className="hidden max-w-2xl text-body-lg text-text-secondary lg:block">{description}</p>
+            <p className="text-body text-text-secondary lg:hidden">
+              {filtered.length} productos · Entrega al día siguiente
+            </p>
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            <OptionChip selected={cats.length === 0} onClick={() => setCats([])}>
+            <OptionChip
+              selected={cats.length === 0}
+              onClick={() => setCats([])}
+              className="max-lg:shrink-0 max-lg:whitespace-nowrap"
+            >
               Todo
             </OptionChip>
             {categories.slice(0, 7).map((c) => (
-              <OptionChip key={c.slug} selected={cats.includes(c.slug)} onClick={() => toggleCat(c.slug)}>
+              <OptionChip
+                key={c.slug}
+                selected={cats.includes(c.slug)}
+                onClick={() => toggleCat(c.slug)}
+                className="max-lg:shrink-0 max-lg:whitespace-nowrap"
+              >
                 {c.name}
               </OptionChip>
             ))}
@@ -279,8 +312,21 @@ export function CategoryView({
 
         {/* Resultados */}
         <div className="flex min-w-0 flex-1 flex-col gap-6">
-          {/* Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Barra de herramientas (móvil <768): dos botones al 50% */}
+          <div className="flex gap-3 md:hidden">
+            <Button variant="primary" className="flex-1" onClick={() => setSheetOpen(true)}>
+              <SlidersHorizontal className="h-[18px] w-[18px]" /> Filtros
+              {activeCount > 0 && (
+                <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-label-xs text-brand-900">
+                  {activeCount}
+                </span>
+              )}
+            </Button>
+            <SortMenu value={sort} options={sortOptions} onChange={setSort} className="flex-1" />
+          </div>
+
+          {/* Barra de herramientas (tablet + escritorio) — en escritorio es idéntica */}
+          <div className="hidden flex-wrap items-center justify-between gap-3 md:flex">
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="primary" className="lg:hidden" onClick={() => setSheetOpen(true)}>
                 <SlidersHorizontal className="h-[18px] w-[18px]" /> Filtros
@@ -299,7 +345,7 @@ export function CategoryView({
                   "Sin resultados"
                 )}
               </span>
-              <div className="hidden flex-wrap items-center gap-2 sm:flex">
+              <div className="hidden flex-wrap items-center gap-2 lg:flex">
                 {cats.map((slug) => (
                   <FilterChip key={slug} onRemove={() => toggleCat(slug)}>
                     {categories.find((c) => c.slug === slug)?.name}
@@ -352,12 +398,33 @@ export function CategoryView({
             </div>
           </div>
 
+          {/* Chips de filtros activos (móvil + tablet) — en escritorio van en la barra */}
+          {(cats.length > 0 || brands.length > 0 || priceChanged) && (
+            <div className="flex flex-wrap items-center gap-2 lg:hidden">
+              {cats.map((slug) => (
+                <FilterChip key={slug} onRemove={() => toggleCat(slug)}>
+                  {categories.find((c) => c.slug === slug)?.name}
+                </FilterChip>
+              ))}
+              {brands.map((b) => (
+                <FilterChip key={b} onRemove={() => toggleBrand(b)}>
+                  {b}
+                </FilterChip>
+              ))}
+              {priceChanged && (
+                <FilterChip onRemove={() => setPrice([PRICE_MIN, PRICE_MAX])}>
+                  Hasta {formatPriceShort(price[1])}
+                </FilterChip>
+              )}
+            </div>
+          )}
+
           {/* Grid */}
           {filtered.length > 0 ? (
             <div
               className={
                 view === "grid"
-                  ? "grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+                  ? "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4"
                   : "flex flex-col gap-4"
               }
             >
@@ -374,30 +441,57 @@ export function CategoryView({
             </div>
           )}
 
-          {totalPages > 1 && (
+          {filtered.length > 0 && (
             <div className="flex flex-col items-center gap-5 pt-4">
-              <div className="flex w-full items-center justify-between gap-3">
-                <span className="hidden text-body text-text-secondary sm:block">
-                  Página {currentPage} de {totalPages}
+              {/* Móvil (<768): resumen + barra de progreso + "Cargar más" */}
+              <div className="flex w-full flex-col items-center gap-3 md:hidden">
+                <span className="text-body-sm text-text-secondary">
+                  Mostrando {shownTo} de {filtered.length} productos
                 </span>
-                <Pagination
-                  current={currentPage}
-                  total={totalPages}
-                  onChange={setPage}
-                  className="mx-auto sm:mx-0"
-                />
-                {currentPage < totalPages ? (
-                  <Button variant="outline" className="hidden sm:inline-flex" onClick={() => setPage((p) => p + 1)}>
+                <div
+                  className="h-1 w-40 overflow-hidden rounded-full bg-surface-muted"
+                  role="progressbar"
+                  aria-valuenow={shownTo}
+                  aria-valuemin={0}
+                  aria-valuemax={filtered.length}
+                >
+                  <div
+                    className="h-full rounded-full bg-brand-800 transition-[width] duration-500"
+                    style={{ width: `${(shownTo / filtered.length) * 100}%` }}
+                  />
+                </div>
+                {shownTo < filtered.length && (
+                  <Button variant="outline" fullWidth onClick={() => setPage((p) => p + 1)}>
                     Cargar más productos
                   </Button>
-                ) : (
-                  <span className="hidden w-[180px] sm:block" />
                 )}
               </div>
-              {currentPage < totalPages && (
-                <Button variant="outline" fullWidth className="sm:hidden" onClick={() => setPage((p) => p + 1)}>
-                  Cargar más productos
-                </Button>
+
+              {/* Tablet (768–1023): paginación numérica + "Página X de Y" */}
+              {totalPages > 1 && (
+                <div className="hidden flex-col items-center gap-3 md:flex lg:hidden">
+                  <Pagination current={currentPage} total={totalPages} onChange={setPage} />
+                  <span className="text-body text-text-secondary">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                </div>
+              )}
+
+              {/* Escritorio (≥1024): idéntico al original */}
+              {totalPages > 1 && (
+                <div className="hidden w-full items-center justify-between gap-3 lg:flex">
+                  <span className="block text-body text-text-secondary">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Pagination current={currentPage} total={totalPages} onChange={setPage} className="mx-0" />
+                  {currentPage < totalPages ? (
+                    <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
+                      Cargar más productos
+                    </Button>
+                  ) : (
+                    <span className="block w-[180px]" />
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -407,43 +501,25 @@ export function CategoryView({
       {/* Beneficios (igual que en el home), encima del pie de página */}
       <ServiceFeatures />
 
-      {/* Hoja de filtros (móvil) */}
-      <AnimatePresence>
-        {sheetOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-50 bg-brand-900/50 lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSheetOpen(false)}
-            />
-            <motion.div
-              className="fixed inset-x-0 bottom-0 z-50 flex max-h-[85vh] flex-col rounded-t-2xl bg-surface lg:hidden"
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 0.3 }}
-            >
-              <div className="flex items-center justify-between border-b border-border p-4">
-                <span className="text-h4 text-text-primary">Filtros</span>
-                <button onClick={() => setSheetOpen(false)} aria-label="Cerrar">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-5">{Facets}</div>
-              <div className="flex gap-3 border-t border-border p-4">
-                <Button variant="outline" fullWidth onClick={clearAll}>
-                  Limpiar
-                </Button>
-                <Button variant="primary" fullWidth onClick={() => setSheetOpen(false)}>
-                  Ver {filtered.length} resultados
-                </Button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Hoja de filtros (móvil/tablet) — M02b. El escritorio usa el sidebar. */}
+      <FilterSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        categories={categories
+          .filter((c) => counts[c.slug])
+          .map((c) => ({ slug: c.slug, name: c.name, count: counts[c.slug] }))}
+        brands={brandList}
+        priceMin={PRICE_MIN}
+        priceMax={PRICE_MAX}
+        priceStep={PRICE_STEP}
+        priceFormat={formatPriceShort}
+        availabilityOptions={availabilityOptions
+          .filter((o) => o.id === "inStock" || o.id === "onSale")
+          .map((o) => ({ id: o.id, label: o.label }))}
+        initial={{ cats, price, brands, avail }}
+        resultCount={resultCount}
+        onApply={applySheet}
+      />
     </div>
   );
 }
