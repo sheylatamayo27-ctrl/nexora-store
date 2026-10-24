@@ -73,7 +73,7 @@ export function Hero() {
             </ButtonLink>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-5">
+          <div className="mt-4 flex flex-wrap gap-5 max-lg:hidden">
             {perks.map((p) => (
               <span key={p} className="flex items-center gap-2 text-body text-white/85">
                 <Check className="h-4 w-4 text-accent-500" />

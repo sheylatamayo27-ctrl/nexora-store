@@ -14,6 +14,7 @@ import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { Reveal } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 import { categories, promoBanners } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
 
@@ -39,7 +40,25 @@ export default function HomePage() {
             />
           </Reveal>
           <Reveal>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {/* Móvil: fila con scroll horizontal · Tablet: grilla de 5 (ícono + nombre). */}
+            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:hidden">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.slug}
+                  href={`/categoria/${cat.slug}`}
+                  className="group flex w-[88px] shrink-0 flex-col items-center gap-2 rounded-lg border border-border bg-surface p-3 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevation-md md:w-auto"
+                >
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-surface-subtle md:h-16 md:w-16">
+                    <AssetImage folder="products" name={cat.image} alt={cat.name} sizes="64px" />
+                  </div>
+                  <span className="w-full truncate text-label-sm text-text-primary">{cat.name}</span>
+                  <span className="hidden text-body-sm text-text-secondary md:block">{cat.itemCount} artículos</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Escritorio (≥1024): tarjetas horizontales — intacto, idéntico al diseño actual. */}
+            <div className="hidden gap-4 lg:grid lg:grid-cols-5">
               {categories.map((cat) => (
                 <Link
                   key={cat.slug}
@@ -75,13 +94,9 @@ export default function HomePage() {
               href="/categoria/auriculares"
             />
           </Reveal>
-          <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 pb-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
             {featuredProducts.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                className="w-[70vw] shrink-0 snap-start sm:w-auto"
-              />
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </Container>
@@ -136,9 +151,16 @@ export default function HomePage() {
       {/* Banners promocionales */}
       <section className="pb-14 sm:pb-20">
         <Container>
-          <div className="grid gap-5 lg:grid-cols-3">
+          <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
             {promoBanners.map((b, i) => (
-              <Reveal key={b.eyebrow} delay={i * 0.08}>
+              <Reveal
+                key={b.eyebrow}
+                delay={i * 0.08}
+                className={cn(
+                  "w-[85vw] shrink-0 snap-start md:w-auto",
+                  i === 2 && "md:col-span-2 lg:col-span-1"
+                )}
+              >
                 <Link
                   href={b.href}
                   className="group relative flex h-80 flex-col overflow-hidden rounded-xl bg-brand-800 p-8"
@@ -182,7 +204,7 @@ export default function HomePage() {
       <section className="pb-14 sm:pb-20">
         <Container>
           <Reveal>
-            <div className="grid items-center gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-12 lg:grid-cols-2 lg:gap-16">
+            <div className="grid items-center gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-12 md:grid-cols-2 lg:gap-16">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-subtle">
                 <AssetImage folder="products" name="laptop" alt="MyBook Laptop 14 pulgadas" sizes="(max-width: 1024px) 100vw, 50vw" />
                 <Badge type="sale" className="absolute left-5 top-5">Ahorra Rs. 6,501.00</Badge>
@@ -198,7 +220,7 @@ export default function HomePage() {
                   Cuerpo ultrafino de aluminio, una impresionante pantalla 2.8K OLED y batería para
                   todo el día. Hecha para creadores y profesionales que trabajan desde cualquier lugar.
                 </p>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="hidden gap-3 lg:grid lg:grid-cols-3">
                   {specs.map((s) => (
                     <div key={s.title} className="flex flex-col gap-2 rounded-lg bg-surface-subtle p-4">
                       <s.icon className="h-[22px] w-[22px] text-brand-700" />
@@ -211,11 +233,21 @@ export default function HomePage() {
                   <Price price={85999} compareAt={92500} size="lg" />
                   <span className="rounded-sm bg-sale-100 px-2 py-1 text-label-sm text-sale-500">7% OFF</span>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <ButtonLink href="/producto/mybook-laptop-14-pulgadas-2-8k-oled" variant="primary" size="lg">
+                <div className="flex flex-wrap items-center gap-3 max-lg:flex-col max-lg:items-stretch">
+                  <ButtonLink
+                    href="/producto/mybook-laptop-14-pulgadas-2-8k-oled"
+                    variant="primary"
+                    size="lg"
+                    className="max-lg:w-full"
+                  >
                     Agregar al carrito
                   </ButtonLink>
-                  <ButtonLink href="/producto/mybook-laptop-14-pulgadas-2-8k-oled" variant="outline" size="lg">
+                  <ButtonLink
+                    href="/producto/mybook-laptop-14-pulgadas-2-8k-oled"
+                    variant="outline"
+                    size="lg"
+                    className="max-lg:hidden"
+                  >
                     Comprar ahora
                   </ButtonLink>
                 </div>
@@ -240,8 +272,8 @@ export default function HomePage() {
                   Suscríbete para ofertas exclusivas, novedades y consejos tech. Sin spam, nunca.
                 </p>
               </div>
-              <div className="relative flex w-full max-w-md items-center gap-2">
-                <div className="flex h-14 flex-1 items-center gap-3 rounded-md bg-surface px-4">
+              <div className="relative flex w-full max-w-md items-center gap-2 max-sm:flex-col max-sm:items-stretch">
+                <div className="flex h-14 flex-1 items-center gap-3 rounded-md bg-surface px-4 max-sm:w-full">
                   <Mail className="h-5 w-5 text-text-muted" />
                   <input
                     type="email"
@@ -249,7 +281,7 @@ export default function HomePage() {
                     className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
                   />
                 </div>
-                <Button variant="accent" size="lg">Suscribirse</Button>
+                <Button variant="accent" size="lg" className="max-sm:w-full">Suscribirse</Button>
               </div>
             </div>
           </Reveal>

@@ -14,7 +14,7 @@ export function ServiceFeatures() {
   return (
     <section className="border-y border-border bg-surface py-10">
       <Container>
-        <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {serviceFeatures.map((f) => (
             <div key={f.title} className="flex items-center gap-4">
               <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-brand-100">
