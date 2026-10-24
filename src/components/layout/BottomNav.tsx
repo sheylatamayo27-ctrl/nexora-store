@@ -18,6 +18,9 @@ const items = [
 export function BottomNav() {
   const pathname = usePathname();
 
+  // En el detalle de producto, la barra fija de compra sustituye a esta barra.
+  if (pathname.startsWith("/producto/")) return null;
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface shadow-[0_-4px_16px_rgba(15,23,42,0.06)] md:hidden">
       <div className="flex items-center px-1 pb-2 pt-1">

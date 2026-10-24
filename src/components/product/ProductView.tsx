@@ -14,6 +14,7 @@ import {
   Cpu,
   Star,
   ThumbsUp,
+  ArrowRight,
 } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Badge } from "@/components/ui/Badge";
@@ -25,7 +26,8 @@ import { Tabs } from "@/components/ui/Tabs";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
-import { SectionHeader } from "@/components/home/SectionHeader";
+import { Accordion } from "@/components/ui/Accordion";
+import { MobileGallery } from "@/components/product/MobileGallery";
 import { Container } from "@/components/ui/Container";
 import { formatPrice, discountPercent } from "@/lib/format";
 import { useCart } from "@/store/cart";
@@ -35,9 +37,9 @@ import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
 
 const editions = [
-  { label: "Estándar", value: "estandar" },
-  { label: "Pro · +Rs. 1,500", value: "pro" },
-  { label: "Max · Agotado", value: "max", disabled: true },
+  { label: "Estándar", value: "estandar", delta: -1500 },
+  { label: "Pro · +Rs. 1,500", value: "pro", delta: 0 },
+  { label: "Max · Agotado", value: "max", disabled: true, delta: 0 },
 ];
 
 const highlights = [
@@ -102,6 +104,8 @@ export function ProductView({ product, related }: { product: Product; related: P
   const [qty, setQty] = useState(1);
   const [activeThumb, setActiveThumb] = useState(0);
   const discount = discountPercent(product.price, product.compareAt);
+  const galleryImages = Array.from({ length: 4 }, () => product.image);
+  const unitPrice = product.price + (editions.find((e) => e.value === edition)?.delta ?? 0);
 
   return (
     <div className="flex flex-col">
@@ -116,9 +120,19 @@ export function ProductView({ product, related }: { product: Product; related: P
           />
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-            {/* Galería: en móvil la imagen va arriba y las miniaturas en fila
-                debajo; en escritorio las miniaturas quedan en columna a la izquierda. */}
-            <div className="flex flex-col-reverse gap-3 self-start lg:flex-row lg:gap-4">
+            {/* Galería móvil/tablet: carrusel deslizable con contador (M03/T03). */}
+            <div className="lg:hidden">
+              <MobileGallery
+                images={galleryImages}
+                alt={product.name}
+                badge={product.badge}
+                wished={wished}
+                onWish={handleWish}
+              />
+            </div>
+
+            {/* Galería escritorio (intacta): miniaturas en columna + imagen grande. */}
+            <div className="hidden self-start lg:flex lg:gap-4">
               <div className="flex gap-3 lg:flex-col">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <button
@@ -253,8 +267,8 @@ export function ProductView({ product, related }: { product: Product; related: P
                 </div>
               </div>
 
-              {/* Compra */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              {/* Compra en línea (tablet + escritorio). En móvil va en la barra fija. */}
+              <div className="hidden flex-wrap items-center gap-3 pt-1 md:flex">
                 <QuantityStepper value={qty} onChange={setQty} />
                 <Button
                   variant="primary"
@@ -273,7 +287,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                   aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
                   aria-pressed={wished}
                   className={cn(
-                    "flex h-14 w-14 items-center justify-center rounded-md border transition-colors",
+                    "flex h-14 w-14 items-center justify-center rounded-md border transition-colors max-lg:hidden",
                     wished ? "border-sale-500 bg-sale-100" : "border-border-strong hover:bg-surface-subtle"
                   )}
                 >
@@ -312,8 +326,8 @@ export function ProductView({ product, related }: { product: Product; related: P
         </Container>
       </div>
 
-      {/* Pestañas */}
-      <Container className="py-14">
+      {/* Pestañas (tablet + escritorio) */}
+      <Container className="hidden py-14 md:block">
         <Tabs
           items={[
             {
@@ -400,13 +414,133 @@ export function ProductView({ product, related }: { product: Product; related: P
         />
       </Container>
 
+      {/* Acordeones + reseñas (móvil) — M03 */}
+      <Container className="flex flex-col gap-4 py-10 md:hidden">
+        <Accordion title="Descripción" defaultOpen>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-h4 text-text-primary">Sonido envolvente, cero distracciones</h3>
+            <p className="text-body text-text-secondary">
+              Aura usa seis micrófonos y un motor de ANC híbrido adaptativo para cancelar hasta el
+              98% del ruido ambiental. Los drivers de 40 mm ofrecen graves profundos y voces nítidas,
+              mientras el Bluetooth 5.3 multipunto te deja cambiar entre laptop y teléfono al instante.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {highlights.map((h) => (
+                <div key={h.title} className="flex flex-col gap-2 rounded-lg bg-surface-subtle p-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-md bg-surface">
+                    <h.icon className="h-[18px] w-[18px] text-brand-700" />
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-label-sm text-text-primary">{h.title}</span>
+                    <span className="text-body-sm text-text-secondary">{h.sub}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Accordion>
+
+        <Accordion title="Especificaciones">
+          <div className="overflow-hidden rounded-lg border border-border">
+            {specTable.map(([k, v], i) => (
+              <div
+                key={k}
+                className={`flex flex-col gap-0.5 px-4 py-3 ${i % 2 === 0 ? "bg-surface-subtle" : "bg-surface"}`}
+              >
+                <span className="text-label-sm text-text-secondary">{k}</span>
+                <span className="text-body text-text-primary">{v}</span>
+              </div>
+            ))}
+          </div>
+        </Accordion>
+
+        <Accordion title="Envío y devoluciones">
+          <div className="flex flex-col gap-3 text-body text-text-secondary">
+            <p>Envío gratis en todos los pedidos, con entrega estimada en 24–48 h y seguimiento en tiempo real.</p>
+            <p>Devoluciones sin complicaciones durante 30 días: recogida gratuita a domicilio y reembolso al método de pago original.</p>
+            <p>Todos los productos incluyen la garantía Nexora de 2 años contra defectos de fabricación.</p>
+          </div>
+        </Accordion>
+
+        {/* Resumen de reseñas */}
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-3">
+            <span className="text-display-l text-text-primary">{product.rating.toFixed(1)}</span>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-accent-500 text-accent-500" />
+                ))}
+              </div>
+              <span className="text-body-sm text-text-secondary">
+                Basado en {product.reviews.toLocaleString("es-MX")} reseñas
+              </span>
+            </div>
+          </div>
+          <Button variant="outline" className="shrink-0">
+            Escribir reseña
+          </Button>
+        </div>
+
+        {/* Una reseña */}
+        <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-label text-brand-800">
+                {reviews[0].initials}
+              </span>
+              <div className="flex flex-col">
+                <span className="text-label text-text-primary">{reviews[0].name}</span>
+                <span className="text-body-sm text-text-muted">{reviews[0].meta}</span>
+              </div>
+            </div>
+            <div className="flex shrink-0 gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="h-3.5 w-3.5 fill-accent-500 text-accent-500" />
+              ))}
+            </div>
+          </div>
+          <h4 className="text-label-lg text-text-primary">{reviews[0].title}</h4>
+          <p className="text-body text-text-secondary">{reviews[0].body}</p>
+          <span className="flex items-center gap-2 text-label-sm text-text-secondary">
+            <ThumbsUp className="h-3.5 w-3.5" /> Útil ({reviews[0].helpful})
+          </span>
+        </article>
+      </Container>
+
       {/* Relacionados */}
       <Container className="pb-20">
         <div className="flex flex-col gap-8">
-          <SectionHeader title="También te puede gustar" />
-          <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 lg:grid-cols-5">
+          <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-h3 text-text-primary sm:text-h2">También te puede gustar</h2>
+            </div>
+            <Link
+              href="/categoria/auriculares"
+              className="flex shrink-0 items-center gap-1.5 text-label text-brand-700 transition-colors hover:text-brand-800 lg:hidden"
+            >
+              Ver todo <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Móvil: grilla de 2 columnas */}
+          <div className="grid grid-cols-2 gap-3 md:hidden">
+            {related.slice(0, 2).map((p) => (
+              <ProductCard key={p.id} product={p} showColors={false} />
+            ))}
+          </div>
+
+          {/* Tablet: carrusel con la 4ª tarjeta asomando */}
+          <div className="no-scrollbar -mx-4 hidden gap-4 overflow-x-auto px-4 pb-2 md:flex lg:hidden">
             {related.map((p) => (
-              <ProductCard key={p.id} product={p} showColors={false} className="w-[70vw] shrink-0 sm:w-auto" />
+              <ProductCard key={p.id} product={p} showColors={false} className="w-[30%] shrink-0" />
+            ))}
+          </div>
+
+          {/* Escritorio: grilla de 5 (intacta) */}
+          <div className="hidden gap-4 pb-2 lg:grid lg:grid-cols-5">
+            {related.map((p) => (
+              <ProductCard key={p.id} product={p} showColors={false} />
             ))}
           </div>
         </div>
@@ -414,6 +548,24 @@ export function ProductView({ product, related }: { product: Product; related: P
 
       {/* Beneficios (igual que en el home), encima del pie de página */}
       <ServiceFeatures />
+
+      {/* Barra fija de compra (móvil) — reemplaza a la barra de navegación inferior. */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-4 pt-3 md:hidden"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
+      >
+        <div className="flex items-center gap-2.5">
+          <QuantityStepper value={qty} onChange={setQty} />
+          <Button
+            variant="primary"
+            size="lg"
+            className="flex-1 px-4"
+            onClick={() => add(product, { qty, color })}
+          >
+            Agregar · Rs. {(unitPrice * qty).toLocaleString("es-MX")}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
