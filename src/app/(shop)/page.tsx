@@ -114,9 +114,9 @@ export default function HomePage() {
                     Ahorros increíbles — ¡apúrate, las ofertas terminan pronto!
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 max-sm:w-full">
                   <span className="hidden text-label text-text-secondary sm:inline">Termina en</span>
-                  <Countdown endsInHours={1752} />
+                  <Countdown endsInHours={1752} className="max-sm:w-full max-sm:justify-between" />
                 </div>
               </div>
 
@@ -216,7 +216,7 @@ export default function HomePage() {
                 </div>
                 <h2 className="text-h2 text-text-primary sm:text-display-l">MyBook Laptop 14″</h2>
                 <Rating rating={4.9} reviews={1240} size={16} />
-                <p className="max-w-lg text-body-lg text-text-secondary">
+                <p className="max-w-lg text-body-lg text-text-secondary max-lg:line-clamp-2">
                   Cuerpo ultrafino de aluminio, una impresionante pantalla 2.8K OLED y batería para
                   todo el día. Hecha para creadores y profesionales que trabajan desde cualquier lugar.
                 </p>

@@ -25,7 +25,7 @@ const payments = ["VISA", "Mastercard", "PayPal", "UPI", "COD"];
 export function Footer() {
   return (
     <footer className="bg-brand-900 text-text-inverse">
-      <div className="container-page py-16">
+      <div className="container-page pt-16 pb-28 lg:pb-16">
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:gap-12">
           {/* Marca */}
           <div className="flex flex-col gap-5">

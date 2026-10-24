@@ -38,7 +38,7 @@ export function Hero() {
       />
       {/* En móvil el degradado es vertical (oscuro abajo) para dejar ver la
           foto arriba; en escritorio es horizontal (oscuro a la izquierda). */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/65 to-[#061234]/20 lg:bg-gradient-to-r lg:from-[#061234]/95 lg:via-[#061234]/40 lg:to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/40 to-[#061234]/5 lg:bg-gradient-to-r lg:from-[#061234]/95 lg:via-[#061234]/40 lg:to-transparent" />
 
       <div className="container-page relative flex min-h-[520px] items-end py-10 sm:min-h-[540px] sm:py-14 lg:min-h-[580px] lg:items-center lg:py-16">
         <motion.div
