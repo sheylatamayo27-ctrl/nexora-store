@@ -30,3 +30,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# diseño (capturas de Figma, solo referencia local)
+diseño/
+
+# pruebas visuales (Playwright)
+# La línea base del escritorio (tests/visual/__baseline__) SÍ se versiona.
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/tests/visual/__captures__/

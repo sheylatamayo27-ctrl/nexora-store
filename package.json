@@ -9,7 +9,11 @@
     "build": "next build",
     "prebuild": "node scripts/generate-assets-manifest.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:visual": "playwright test",
+    "test:visual:desktop": "playwright test --project=desktop-1440 --project=desktop-1024",
+    "test:visual:mobile": "playwright test --project=mobile-390 --project=mobile-360 --project=tablet-834 --project=tablet-768",
+    "test:visual:update-desktop": "playwright test --project=desktop-1440 --project=desktop-1024 --update-snapshots"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -24,6 +28,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@types/node": "^20.16.15",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
