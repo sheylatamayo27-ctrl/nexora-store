@@ -273,7 +273,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="relative flex w-full max-w-md items-center gap-2 max-sm:flex-col max-sm:items-stretch">
-                <div className="flex h-14 flex-1 items-center gap-3 rounded-md bg-surface px-4 max-sm:w-full">
+                <div className="flex h-14 items-center gap-3 rounded-md bg-surface px-4 sm:flex-1 max-sm:w-full">
                   <Mail className="h-5 w-5 text-text-muted" />
                   <input
                     type="email"
