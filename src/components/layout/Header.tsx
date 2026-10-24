@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, User, Menu, X, ChevronDown } from "lucide-react";
@@ -23,6 +24,9 @@ const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  // El carrito no lleva buscador bajo el header (M04/T04).
+  const hideMobileSearch = pathname === "/carrito";
 
   return (
     <header className="sticky top-0 z-40 bg-surface">
@@ -75,10 +79,12 @@ export function Header() {
           </div>
         </div>
 
-        {/* Buscador (móvil) */}
-        <div className="container-page pb-3 lg:hidden">
-          <SearchBar variant="mobile" />
-        </div>
+        {/* Buscador (móvil) — oculto en pantallas sin buscador bajo el header */}
+        {!hideMobileSearch && (
+          <div className="container-page pb-3 lg:hidden">
+            <SearchBar variant="mobile" />
+          </div>
+        )}
       </div>
 
       {/* Navegación con mega-menú (desktop) */}

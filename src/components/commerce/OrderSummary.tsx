@@ -18,6 +18,7 @@ export function OrderSummary({
   total,
   showCoupon = true,
   cta,
+  ctaHiddenOnMobile = false,
   className,
 }: {
   itemsLabel: string;
@@ -28,6 +29,9 @@ export function OrderSummary({
   total: number;
   showCoupon?: boolean;
   cta?: { label: string; href: string };
+  /** Oculta el botón del resumen en móvil (<md); se usa en el carrito,
+   *  donde el pago va en la barra fija inferior. */
+  ctaHiddenOnMobile?: boolean;
   className?: string;
 }) {
   const rows: Row[] = [
@@ -78,7 +82,13 @@ export function OrderSummary({
       )}
 
       {cta && (
-        <ButtonLink href={cta.href} variant="primary" size="lg" fullWidth className="mt-1">
+        <ButtonLink
+          href={cta.href}
+          variant="primary"
+          size="lg"
+          fullWidth
+          className={cn("mt-1", ctaHiddenOnMobile && "max-md:hidden")}
+        >
           {cta.label}
         </ButtonLink>
       )}

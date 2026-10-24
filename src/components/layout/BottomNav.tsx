@@ -18,8 +18,8 @@ const items = [
 export function BottomNav() {
   const pathname = usePathname();
 
-  // En el detalle de producto, la barra fija de compra sustituye a esta barra.
-  if (pathname.startsWith("/producto/")) return null;
+  // En el detalle de producto y el carrito, la barra fija inferior sustituye a esta.
+  if (pathname.startsWith("/producto/") || pathname === "/carrito") return null;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface shadow-[0_-4px_16px_rgba(15,23,42,0.06)] md:hidden">
