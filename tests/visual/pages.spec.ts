@@ -86,14 +86,16 @@ for (const route of routes) {
     } else {
       // Captura primero (siempre disponible para comparar con Figma),
       // aunque la ruta aún tenga desbordamiento.
-      // Carpeta plana y predecible: tests/visual/__captures__/<proyecto>-<ruta>.png
-      const capturePath = `tests/visual/__captures__/${testInfo.project.name}-${route.name}.png`;
+      // Organizadas POR PANTALLA: tests/visual/__captures__/<pantalla>/<dispositivo>.png
+      // (p. ej. home/mobile-390.png, home/tablet-834.png) — así se ve de un vistazo
+      // qué captura pertenece a qué pantalla. Playwright crea las carpetas solo.
+      const capturePath = `tests/visual/__captures__/${route.name}/${testInfo.project.name}.png`;
       await page.screenshot({
         path: capturePath,
         fullPage: true,
         mask: dynamicMasks(page),
       });
-      await testInfo.attach(`${testInfo.project.name}-${route.name}`, {
+      await testInfo.attach(`${route.name}/${testInfo.project.name}`, {
         path: capturePath,
         contentType: "image/png",
       });
