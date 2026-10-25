@@ -160,7 +160,8 @@ export function OrdersView() {
           <h1 className="text-h2 text-text-primary">Mis pedidos</h1>
           <p className="text-body text-text-secondary">Rastrea, devuelve o vuelve a comprar.</p>
         </div>
-        <div className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4">
+        {/* El buscador no aparece en M09/T09: solo escritorio. */}
+        <div className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4 max-lg:hidden">
           <Search className="h-[18px] w-[18px] text-text-muted" />
           <input
             value={query}
@@ -172,13 +173,14 @@ export function OrdersView() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {/* Móvil 2×2 · tablet una fila de 4 · escritorio intacto */}
+      <div className="grid grid-cols-2 gap-4 max-lg:gap-3 md:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.l} className="flex items-center gap-4 rounded-xl border border-border bg-surface p-5">
-            <span className={cn("flex h-12 w-12 items-center justify-center rounded-lg", s.bg)}>
-              <s.icon className={cn("h-[22px] w-[22px]", s.fg)} />
+          <div key={s.l} className="flex items-center gap-4 rounded-xl border border-border bg-surface p-5 max-lg:gap-3 max-lg:p-4 max-md:gap-2.5 max-md:p-3">
+            <span className={cn("flex h-12 w-12 items-center justify-center rounded-lg max-lg:h-10 max-lg:w-10 max-lg:shrink-0 max-md:h-9 max-md:w-9", s.bg)}>
+              <s.icon className={cn("h-[22px] w-[22px] max-lg:h-5 max-lg:w-5", s.fg)} />
             </span>
-            <div className="flex flex-col">
+            <div className="flex flex-col max-lg:min-w-0">
               <span className="text-h3 text-text-primary">{s.n}</span>
               <span className="text-body-sm text-text-secondary">{s.l}</span>
             </div>
@@ -204,9 +206,11 @@ export function OrdersView() {
               )}
             >
               {t.label}
+              {/* <lg: conteo en gris junto al nombre, sin chip. */}
               <span
                 className={cn(
                   "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-label-xs",
+                  "max-lg:min-w-0 max-lg:bg-transparent max-lg:px-0 max-lg:text-label max-lg:font-normal max-lg:text-text-muted",
                   isActive ? "bg-brand-100 text-brand-800" : "bg-surface-muted text-text-secondary"
                 )}
               >
@@ -222,6 +226,52 @@ export function OrdersView() {
         <div className="flex flex-col gap-4">
           {filtered.map((o) => (
             <div key={o.id} className="overflow-hidden rounded-lg border border-border bg-surface">
+              {/* Móvil/tablet (M09/T09) */}
+              <div className="lg:hidden">
+                <div className="flex flex-col gap-0.5 bg-surface-subtle px-4 py-3 md:px-5 md:py-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-label-lg font-semibold text-text-primary">{o.id}</span>
+                    <span
+                      className={cn(
+                        "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-label-sm",
+                        statusStyles[o.status]
+                      )}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      {o.status}
+                    </span>
+                  </div>
+                  <span className="truncate text-body-sm text-text-secondary">
+                    {o.date} · {formatPrice(subtotalOf(o) + o.shipping)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:gap-5 md:p-5">
+                  <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-4">
+                    <div className="flex shrink-0 gap-1.5 md:gap-2">
+                      {o.items.slice(0, 3).map((item) => (
+                        <div
+                          key={item.name}
+                          className="relative h-12 w-12 overflow-hidden rounded-md bg-surface-subtle max-[359px]:h-10 max-[359px]:w-10 md:h-14 md:w-14"
+                        >
+                          <AssetImage folder="products" name={item.image} alt={item.name} sizes="56px" />
+                        </div>
+                      ))}
+                    </div>
+                    <span className="min-w-0 text-label-sm text-text-primary md:text-label">{o.summary}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 md:flex md:shrink-0">
+                    <Button variant="secondary" fullWidth onClick={() => setSelected(o)} className="md:w-auto max-md:px-3 max-[359px]:px-2 max-[359px]:text-label-sm">
+                      Ver detalles
+                    </Button>
+                    <Button variant="primary" fullWidth className="md:w-auto max-md:px-3 max-[359px]:px-2 max-[359px]:text-label-sm">
+                      {o.cta}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Escritorio (intacto) */}
+              <div className="max-lg:hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-subtle px-5 py-4">
                 <div className="flex flex-wrap gap-8">
                   <div className="flex flex-col">
@@ -263,6 +313,7 @@ export function OrdersView() {
                   </Button>
                   <Button variant="primary">{o.cta}</Button>
                 </div>
+              </div>
               </div>
             </div>
           ))}
