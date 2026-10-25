@@ -36,8 +36,8 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const { title } = resolve(params.slug);
-  return { title };
+  const { title, description } = resolve(params.slug);
+  return { title, description };
 }
 
 export default function CategoryPage({ params }: { params: { slug: string } }) {

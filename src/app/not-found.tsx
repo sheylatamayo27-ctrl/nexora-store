@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
@@ -14,6 +15,8 @@ import { categories } from "@/data/categories";
 // Las clases sin prefijo max-* son las del escritorio, que no cambia.
 const four =
   "text-[6rem] font-bold leading-none text-brand-800 sm:text-[10rem] max-sm:text-[7rem] sm:max-lg:text-[11rem]";
+
+export const metadata: Metadata = { title: "Página no encontrada" };
 
 export default function NotFound() {
   return (
