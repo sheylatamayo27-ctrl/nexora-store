@@ -25,8 +25,9 @@ const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  // El carrito no lleva buscador bajo el header (M04/T04).
-  const hideMobileSearch = pathname === "/carrito";
+  // El carrito y la confirmación de pedido no llevan buscador bajo el header
+  // (M04/T04, M06/T06).
+  const hideMobileSearch = pathname === "/carrito" || pathname === "/pedido-confirmado";
 
   return (
     <header className="sticky top-0 z-40 bg-surface">

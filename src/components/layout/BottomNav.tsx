@@ -19,7 +19,13 @@ export function BottomNav() {
   const pathname = usePathname();
 
   // En el detalle de producto y el carrito, la barra fija inferior sustituye a esta.
-  if (pathname.startsWith("/producto/") || pathname === "/carrito") return null;
+  // En la confirmación de pedido (M06) el diseño no lleva navegación inferior.
+  if (
+    pathname.startsWith("/producto/") ||
+    pathname === "/carrito" ||
+    pathname === "/pedido-confirmado"
+  )
+    return null;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface shadow-[0_-4px_16px_rgba(15,23,42,0.06)] md:hidden">
