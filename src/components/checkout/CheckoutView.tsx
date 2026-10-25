@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Lock,
   Mail,
@@ -35,6 +36,7 @@ function RadioCard({
   title,
   desc,
   price,
+  priceHighlight,
 }: {
   selected: boolean;
   onSelect: () => void;
@@ -42,6 +44,7 @@ function RadioCard({
   title: string;
   desc: string;
   price?: string;
+  priceHighlight?: boolean;
 }) {
   return (
     <button
@@ -60,14 +63,25 @@ function RadioCard({
       >
         {selected && <span className="h-2.5 w-2.5 rounded-full bg-brand-800" />}
       </span>
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface">
+      {/* Ícono en cuadro: visible en tablet/escritorio (≥md); oculto en móvil (M05). */}
+      <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface md:flex">
         <Icon className="h-5 w-5 text-brand-800" />
       </span>
-      <span className="flex flex-1 flex-col">
+      <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-label text-text-primary">{title}</span>
         <span className="text-body-sm text-text-secondary">{desc}</span>
       </span>
-      {price && <span className="text-label text-text-primary">{price}</span>}
+      {price && (
+        <span
+          className={cn(
+            "shrink-0 text-label",
+            // "Gratis" en verde en móvil/tablet (M05/T05); escritorio intacto.
+            priceHighlight ? "text-text-primary max-lg:text-success-500" : "text-text-primary"
+          )}
+        >
+          {price}
+        </span>
+      )}
     </button>
   );
 }
@@ -127,41 +141,95 @@ export function CheckoutView() {
         </div>
       </header>
 
-      {/* Progreso móvil */}
+      {/* Progreso (<lg): móvil con segmentos (M05), tablet con pasos (T05) */}
       <div className="border-b border-border bg-surface py-4 lg:hidden">
         <div className="container-page">
-          <CheckoutSteps current={1} />
+          {/* Móvil (<md): "Paso 2 de 4" + barra de 4 segmentos */}
+          <div className="md:hidden">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-label text-text-primary">Paso 2 de 4 · Información</span>
+              <span className="shrink-0 text-label-sm text-text-muted">Siguiente: Envío</span>
+            </div>
+            <div className="mt-3 flex gap-1.5">
+              {[0, 1, 2, 3].map((i) => (
+                <span
+                  key={i}
+                  className={cn("h-1.5 flex-1 rounded-full", i <= 1 ? "bg-brand-800" : "bg-border-strong")}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Tablet (md–lg): pasos con círculo + nombre unidos por líneas */}
+          <div className="hidden md:block">
+            <CheckoutSteps current={1} />
+          </div>
         </div>
       </div>
 
-      {/* Resumen colapsable (móvil) */}
+      {/* Resumen colapsable (móvil/tablet) — barra azul claro + panel animado */}
       <button
         onClick={() => setSummaryOpen((o) => !o)}
-        className="flex items-center justify-between border-b border-border bg-brand-100 px-4 py-3.5 lg:hidden"
+        aria-expanded={summaryOpen}
+        className="flex items-center justify-between gap-3 border-b border-border bg-brand-100 px-4 py-3.5 lg:hidden"
       >
         <span className="flex items-center gap-2 text-label text-brand-800">
-          <ShoppingBag className="h-[18px] w-[18px]" /> {summaryOpen ? "Ocultar" : "Ver"} resumen ({count})
-          <ChevronDown className={cn("h-4 w-4 transition-transform", summaryOpen && "rotate-180")} />
+          <ShoppingBag className="h-[18px] w-[18px] shrink-0" /> Ver resumen del pedido ({count})
+          <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", summaryOpen && "rotate-180")} />
         </span>
-        <span className="text-price-sm text-brand-800">{formatPrice(total)}</span>
+        <span className="shrink-0 text-price-sm text-brand-800">{formatPrice(total)}</span>
       </button>
-      {summaryOpen && (
-        <div className="border-b border-border bg-surface px-4 py-4 lg:hidden">
-          <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {summaryOpen && (
+          <motion.div
+            key="mobile-summary"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-b border-border bg-surface lg:hidden"
+          >
+            <div className="container-page flex flex-col gap-4 py-4">
+              {items.map((item) => (
+                <div key={item.key} className="flex items-center gap-3">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-surface-subtle">
+                    <AssetImage folder="products" name={item.product.image} alt={item.product.name} sizes="56px" />
+                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand-800 text-label-xs text-white ring-2 ring-surface">
+                      {item.qty}
+                    </span>
+                  </div>
+                  <span className="min-w-0 flex-1 text-label text-text-primary">{item.product.name}</span>
+                  <span className="shrink-0 text-label text-text-primary">
+                    {formatPrice(item.product.price * item.qty)}
+                  </span>
+                </div>
+              ))}
+              {count === 0 && <p className="text-body text-text-secondary">Tu carrito está vacío.</p>}
+              <div className="h-px bg-border" />
+              <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="container-page grid flex-1 gap-10 py-8 lg:grid-cols-[1.5fr_1fr]">
         {/* Formularios */}
         <div className="flex flex-col gap-5">
           <Section title="Pago exprés">
-            <div className="grid gap-3 sm:grid-cols-3">
+            {/* Móvil (<md): 2 botones (UPI, PayPal). Tablet/escritorio (≥md): 3. */}
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {[
                 { l: "UPI", c: "bg-brand-800 text-white" },
                 { l: "PayPal", c: "bg-accent-500 text-brand-900" },
-                { l: "Transferencia", c: "bg-surface text-text-primary border border-border-strong" },
+                { l: "Transferencia", c: "bg-surface text-text-primary border border-border-strong", hide: true },
               ].map((b) => (
-                <button key={b.l} className={cn("flex h-12 items-center justify-center rounded-md text-label", b.c)}>
+                <button
+                  key={b.l}
+                  className={cn(
+                    "flex h-12 items-center justify-center rounded-md text-label",
+                    b.c,
+                    b.hide && "max-md:hidden"
+                  )}
+                >
                   {b.l}
                 </button>
               ))}
@@ -176,40 +244,59 @@ export function CheckoutView() {
               </Link>
             }
           >
-            <Input label="Correo electrónico" icon={Mail} defaultValue="sheyla@nexora.store" placeholder="tu@correo.com" />
+            <Input
+              label="Correo electrónico"
+              icon={Mail}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              defaultValue="sheyla@nexora.store"
+              placeholder="tu@correo.com"
+            />
             <Checkbox checked onChange={() => {}} label="Enviarme ofertas y novedades por correo" />
           </Section>
 
           <Section title="Dirección de envío">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Input label="Nombre" defaultValue="Sheyla" />
-              <Input label="Apellidos" defaultValue="Tamayo" />
+            {/* <md: una columna (salvo Estado + CP). ≥md: grilla tipo T05. */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <Input label="Nombre" defaultValue="Sheyla" autoComplete="given-name" />
+              <Input label="Apellidos" defaultValue="Tamayo" autoComplete="family-name" />
             </div>
-            <Input label="Dirección" icon={MapPin} defaultValue="Parque Tecnológico 221B" />
-            <Input label="Depto., suite (opcional)" placeholder="Piso, referencia…" />
-            <div className="grid gap-4 sm:grid-cols-3">
-              <Input label="Ciudad" defaultValue="CDMX" />
+            <Input label="Dirección" icon={MapPin} defaultValue="Parque Tecnológico 221B" autoComplete="address-line1" />
+            <Input label="Depto., suite (opcional)" placeholder="Piso, referencia…" autoComplete="address-line2" />
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+              {/* Ciudad a ancho completo en móvil; Estado + CP lado a lado. */}
+              <Input label="Ciudad" defaultValue="CDMX" autoComplete="address-level2" className="col-span-2 md:col-span-1" />
               <Select
                 label="Estado"
                 defaultValue="cdmx"
+                autoComplete="address-level1"
                 options={[
                   { value: "cdmx", label: "Ciudad de México" },
                   { value: "jal", label: "Jalisco" },
                   { value: "nl", label: "Nuevo León" },
                 ]}
               />
-              <Input label="Código postal" defaultValue="06000" />
+              <Input label="Código postal" defaultValue="06000" inputMode="numeric" autoComplete="postal-code" />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <Select
                 label="País"
                 defaultValue="mx"
+                autoComplete="country-name"
                 options={[
                   { value: "mx", label: "México" },
                   { value: "us", label: "Estados Unidos" },
                 ]}
               />
-              <Input label="Teléfono" icon={Phone} defaultValue="+52 55 9876 5432" />
+              <Input
+                label="Teléfono"
+                icon={Phone}
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                defaultValue="+52 55 9876 5432"
+              />
             </div>
           </Section>
 
@@ -224,6 +311,7 @@ export function CheckoutView() {
                   title={o.title}
                   desc={o.desc}
                   price={o.price ? formatPrice(o.price) : "Gratis"}
+                  priceHighlight={!o.price}
                 />
               ))}
             </div>
@@ -249,12 +337,18 @@ export function CheckoutView() {
                   />
                   {o.id === "card" && payment === "card" && (
                     <div className="flex flex-col gap-4 rounded-lg bg-surface-subtle p-4">
-                      <Input label="Número de tarjeta" icon={CreditCard} defaultValue="4417 1234 5678 9010" />
+                      <Input
+                        label="Número de tarjeta"
+                        icon={CreditCard}
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        defaultValue="4417 1234 5678 9010"
+                      />
                       <div className="grid grid-cols-2 gap-4">
-                        <Input label="Vencimiento" defaultValue="08 / 29" />
-                        <Input label="CVV" icon={Lock} defaultValue="•••" />
+                        <Input label="Vencimiento" inputMode="numeric" autoComplete="cc-exp" defaultValue="08 / 29" />
+                        <Input label="CVV" icon={Lock} inputMode="numeric" autoComplete="cc-csc" defaultValue="•••" />
                       </div>
-                      <Input label="Nombre en la tarjeta" icon={User} defaultValue="SHEYLA TAMAYO" />
+                      <Input label="Nombre en la tarjeta" icon={User} autoComplete="cc-name" defaultValue="SHEYLA TAMAYO" />
                     </div>
                   )}
                 </div>
@@ -262,6 +356,16 @@ export function CheckoutView() {
             </div>
             <Checkbox checked onChange={() => {}} label="La dirección de facturación es la misma que la de envío" />
           </Section>
+
+          {/* Resumen del pedido a ancho completo — solo tablet (T05), antes de pagar. */}
+          <div className="hidden flex-col gap-4 rounded-xl border border-border bg-surface p-6 md:flex lg:hidden">
+            <h2 className="text-h4 text-text-primary">Resumen del pedido</h2>
+            <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
+            <p className="text-body-sm text-text-muted">Impuestos incluidos</p>
+            <span className="flex items-center justify-center gap-1.5 text-body-sm text-text-muted">
+              <Lock className="h-3.5 w-3.5" /> Pago seguro · Cifrado SSL de 256 bits
+            </span>
+          </div>
 
           <ButtonLink href="/pedido-confirmado" variant="primary" size="lg" fullWidth className="justify-center">
             Pagar {formatPrice(total)} de forma segura
@@ -301,10 +405,12 @@ export function CheckoutView() {
         </aside>
       </div>
 
+      {/* Footer mínimo: móvil centrado (enlaces arriba); tablet enlaces a la
+          izquierda y copyright a la derecha (T05); escritorio intacto. */}
       <footer className="border-t border-border bg-surface py-5">
-        <div className="container-page flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-body-sm text-text-muted">© 2026 Nexora Electronics</p>
-          <div className="flex gap-4 text-label-sm text-text-secondary">
+        <div className="container-page flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
+          <p className="order-2 text-body-sm text-text-muted lg:order-1">© 2026 Nexora Electronics</p>
+          <div className="order-1 flex gap-4 text-label-sm text-text-secondary lg:order-2">
             <span>Reembolsos</span>
             <span>Envíos</span>
             <span>Privacidad</span>
