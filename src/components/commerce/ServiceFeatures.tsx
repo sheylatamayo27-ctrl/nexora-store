@@ -16,7 +16,11 @@ export function ServiceFeatures() {
       <Container>
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {serviceFeatures.map((f) => (
-            <div key={f.title} className="flex items-center gap-4">
+            // ≤339px: ícono encima del texto para que "Devoluciones" quepa sin desbordar.
+            <div
+              key={f.title}
+              className="flex items-center gap-4 max-[339px]:flex-col max-[339px]:items-start max-[339px]:gap-2"
+            >
               <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-brand-100">
                 <f.icon className="h-6 w-6 text-brand-800" />
               </span>

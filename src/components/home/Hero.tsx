@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getImageProps } from "next/image";
 import { Zap, Check } from "lucide-react";
-import { AssetImage } from "@/components/media/AssetImage";
+import { assetSrc } from "@/components/media/AssetImage";
+import { REAL_IMAGES } from "@/data/assets.generated";
 import { ButtonLink } from "@/components/ui/Button";
 import { motion } from "@/lib/motion";
 import { heroSlides } from "@/data/hero";
@@ -10,6 +12,38 @@ import { heroSlides } from "@/data/hero";
 const perks = ["Garantía de 2 años", "Entrega gratis", "Calificación 4.9★"];
 
 const AUTO_ROTATE_MS = 6000;
+
+/** Variante por dispositivo (`hero-mobile`, `hero-tablet`) si existe; si no, la imagen base. */
+function variant(name: string, device: "mobile" | "tablet") {
+  return REAL_IMAGES[`misc/${name}-${device}`] ? `${name}-${device}` : name;
+}
+
+/**
+ * Imagen del hero por dispositivo con <picture>: cada pantalla descarga UNA sola
+ * imagen (escritorio ≥1024: la original; tablet 768–1023; móvil como fallback).
+ */
+function HeroImage({ name, alt }: { name: string; alt: string }) {
+  const common = { alt, fill: true, sizes: "100vw" };
+  const desktop = getImageProps({ ...common, src: assetSrc("misc", name) }).props.srcSet;
+  const tablet = getImageProps({ ...common, src: assetSrc("misc", variant(name, "tablet")) }).props.srcSet;
+  const { props: mobile } = getImageProps({
+    ...common,
+    priority: true,
+    src: assetSrc("misc", variant(name, "mobile")),
+  });
+
+  return (
+    <picture>
+      <source media="(min-width: 1024px)" srcSet={desktop} sizes="100vw" />
+      <source media="(min-width: 768px)" srcSet={tablet} sizes="100vw" />
+      {/* eslint-disable-next-line jsx-a11y/alt-text -- alt viene en `mobile` */}
+      <img
+        {...mobile}
+        className="object-cover object-[center_30%] md:object-[70%_center] lg:object-center"
+      />
+    </picture>
+  );
+}
 
 export function Hero() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -27,15 +61,7 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-brand-900">
-      <AssetImage
-        key={slide.image}
-        folder="misc"
-        name={slide.image}
-        alt={slide.title}
-        priority
-        sizes="100vw"
-        className="object-cover object-[70%_30%] lg:object-center"
-      />
+      <HeroImage key={slide.image} name={slide.image} alt={slide.title} />
       {/* En móvil el degradado es vertical (oscuro abajo) para dejar ver la
           foto arriba; en escritorio es horizontal (oscuro a la izquierda). */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/40 to-[#061234]/5 lg:bg-gradient-to-r lg:from-[#061234]/95 lg:via-[#061234]/40 lg:to-transparent" />
