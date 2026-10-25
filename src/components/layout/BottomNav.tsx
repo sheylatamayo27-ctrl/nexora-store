@@ -15,7 +15,8 @@ const items = [
   { label: "Cuenta", href: "/cuenta", icon: User },
 ];
 
-export function BottomNav() {
+/** `active`: fuerza la pestaña activa por etiqueta (p. ej. la 404 marca "Inicio"). */
+export function BottomNav({ active: forced }: { active?: string } = {}) {
   const pathname = usePathname();
 
   // En el detalle de producto y el carrito, la barra fija inferior sustituye a esta.
@@ -32,7 +33,11 @@ export function BottomNav() {
       <div className="flex items-center px-1 pb-2 pt-1">
         {items.map(({ label, href, match, icon: Icon }) => {
           const base = match ?? href;
-          const active = base === "/" ? pathname === "/" : pathname.startsWith(base);
+          const active = forced
+            ? label === forced
+            : base === "/"
+              ? pathname === "/"
+              : pathname.startsWith(base);
           return (
             <Link
               key={label}
