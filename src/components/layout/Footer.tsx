@@ -84,7 +84,7 @@ export function Footer() {
           <p className="text-body-sm text-white/60">
             © 2026 Nexora Electronics. Todos los derechos reservados.
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-[339px]:flex-wrap max-[339px]:justify-center">
             <span className="text-body-sm text-white/60">Aceptamos</span>
             {payments.map((p) => (
               <span key={p} className="rounded-sm bg-surface px-2 py-1 text-label-xs text-brand-900">

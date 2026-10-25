@@ -25,6 +25,7 @@ export default function CartPage() {
   if (!mounted) return <div className="min-h-[60vh]" />;
 
   const count = items.reduce((n, i) => n + i.qty, 0);
+  const unit = count === 1 ? "artículo" : "artículos";
   const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
   const tax = subtotal * 0.16;
   const discount = Math.round(subtotal * 0.1);
@@ -53,15 +54,21 @@ export default function CartPage() {
     <div className="flex flex-col">
       <Container className="flex flex-col gap-2 pt-8">
         <Breadcrumb items={[{ label: "Carrito de compras" }]} className="max-lg:hidden" />
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-h2 text-text-primary sm:text-display-l">Carrito de compras</h1>
-          <span className="text-label-lg text-text-secondary">({count} artículos)</span>
-        </div>
+        {/* Conteo inline dentro del h1 (más pequeño y gris). En móvil (<sm) el
+            título baja a text-h3 para que quepa en una sola línea a 360px (M04). */}
+        <h1 className="text-h3 text-text-primary sm:text-display-l">
+          Carrito de compras{" "}
+          <span className="whitespace-nowrap align-baseline text-label font-normal text-text-secondary sm:text-label-lg">
+            ({count} {unit})
+          </span>
+        </h1>
       </Container>
 
       <Container className="grid gap-8 py-8 lg:grid-cols-[1.7fr_1fr]">
-        {/* Columna de productos */}
-        <div className="flex flex-col gap-4">
+        {/* Columna de productos (max-lg:min-w-0: deja que la pista del grid encoja
+            por debajo del min-content de su contenido en móvil/tablet, evitando el
+            scroll horizontal; en escritorio (≥lg) queda intacta). */}
+        <div className="flex flex-col gap-4 max-lg:min-w-0">
           {/* Progreso envío gratis */}
           <div className="flex flex-col gap-3 rounded-xl bg-brand-100 p-5">
             <div className="flex items-center gap-3">
@@ -87,7 +94,7 @@ export default function CartPage() {
           <div className="overflow-hidden rounded-xl border border-border bg-surface">
             {/* Cabecera (solo escritorio) */}
             <div className="hidden items-center justify-between border-b border-border p-4 lg:flex">
-              <span className="text-label-lg text-text-primary">{count} artículos</span>
+              <span className="text-label-lg text-text-primary">{count} {unit}</span>
               <Link href="/categoria/auriculares" className="text-label-sm text-brand-700">
                 Seguir comprando
               </Link>
@@ -123,10 +130,12 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Resumen */}
-        <div className="lg:sticky lg:top-28 lg:h-fit">
+        {/* Resumen (max-lg:min-w-0: permite que la fila del cupón encoja en lugar
+            de forzar el ancho de la columna y desbordar la página en móvil/tablet;
+            en escritorio (≥lg) queda intacta). */}
+        <div className="max-lg:min-w-0 lg:sticky lg:top-28 lg:h-fit">
           <OrderSummary
-            itemsLabel={`Subtotal (${count} artículos)`}
+            itemsLabel={`Subtotal (${count} ${unit})`}
             subtotal={subtotal}
             tax={tax}
             discount={discount}
@@ -137,16 +146,18 @@ export default function CartPage() {
         </div>
       </Container>
 
-      {/* Garantía (solo móvil, centrada) */}
-      <Container className="md:hidden">
+      {/* Garantía (solo móvil, centrada) — con aire arriba y abajo para que no
+          quede pegada a "Comprados juntos frecuentemente". */}
+      <Container className="pt-4 pb-9 md:hidden">
         <p className="flex items-center justify-center gap-2 text-center text-body-sm text-text-secondary">
           <Check className="h-4 w-4 shrink-0 text-success-500" />
           Devoluciones gratis en 30 días · Protección al comprador
         </p>
       </Container>
 
-      {/* Recomendaciones */}
-      <Container className="pb-20">
+      {/* Recomendaciones — en móvil reservamos el alto de la barra fija de pago
+          (+ área segura) para que el contenido no quede oculto tras ella. */}
+      <Container className="pb-20 max-md:pb-[calc(6rem+env(safe-area-inset-bottom))]">
         <div className="flex flex-col gap-8">
           <SectionHeader title="Comprados juntos frecuentemente" />
 

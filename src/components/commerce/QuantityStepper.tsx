@@ -34,7 +34,10 @@ export function QuantityStepper({
         type="button"
         aria-label="Disminuir"
         onClick={() => set(qty - 1)}
-        className={cn("flex items-center justify-center text-text-primary hover:bg-surface-subtle", cell)}
+        className={cn(
+          "flex items-center justify-center text-text-primary hover:bg-surface-subtle focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/50",
+          cell
+        )}
       >
         <Minus className="h-4 w-4" />
       </button>
@@ -45,7 +48,10 @@ export function QuantityStepper({
         type="button"
         aria-label="Aumentar"
         onClick={() => set(qty + 1)}
-        className={cn("flex items-center justify-center text-text-primary hover:bg-surface-subtle", cell)}
+        className={cn(
+          "flex items-center justify-center text-text-primary hover:bg-surface-subtle focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/50",
+          cell
+        )}
       >
         <Plus className="h-4 w-4" />
       </button>

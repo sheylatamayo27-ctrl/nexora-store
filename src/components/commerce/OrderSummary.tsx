@@ -70,14 +70,16 @@ export function OrderSummary({
 
       {showCoupon && (
         <div className="flex items-center gap-2">
-          <div className="flex h-11 flex-1 items-center gap-2 rounded-md border border-border-strong bg-surface px-3">
-            <Tag className="h-4 w-4 text-text-muted" />
+          <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-border-strong bg-surface px-3">
+            <Tag className="h-4 w-4 shrink-0 text-text-muted" />
             <input
               placeholder="Código de promoción"
-              className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
+              className="h-full min-w-0 flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
             />
           </div>
-          <Button variant="outline">Aplicar</Button>
+          <Button variant="outline" className="shrink-0">
+            Aplicar
+          </Button>
         </div>
       )}
 

@@ -44,7 +44,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
               </span>
             )}
           </div>
-          <div className="mt-2 flex items-center justify-between gap-3">
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
             <QuantityStepper value={item.qty} onChange={(q) => setQty(item.key, q)} size="sm" />
             <div className="flex items-center gap-1">
               <button
