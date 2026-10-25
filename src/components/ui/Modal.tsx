@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { useRef, type ReactNode } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Modal accesible y elegante: portal al body, fondo difuminado, cierre con
- * Escape o clic fuera, bloqueo de scroll y animación suave de entrada/salida.
+ * Modal sobre Radix Dialog: portal, bloqueo de scroll compensando la barra
+ * (sin salto lateral), foco atrapado y devuelto al cerrar, Esc y clic fuera.
+ * Animaciones por data-state en globals.css (.modal-overlay / .modal-content):
+ * hoja inferior en móvil y fade + escala leve desde sm.
  */
 export function Modal({
   open,
@@ -18,6 +19,7 @@ export function Modal({
   description,
   footer,
   className,
+  srTitle = "Ventana",
 }: {
   open: boolean;
   onClose: () => void;
@@ -26,69 +28,67 @@ export function Modal({
   description?: ReactNode;
   footer?: ReactNode;
   className?: string;
+  /** Título solo para lectores de pantalla cuando no hay `title` visible. */
+  srTitle?: string;
 }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // Mientras se anima el cierre, el padre suele vaciar las props (p. ej.
+  // order = null); conservamos el último contenido para que no "salte".
+  const last = useRef({ title, description, children, footer });
+  if (open) last.current = { title, description, children, footer };
+  const view = open ? { title, description, children, footer } : last.current;
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [open, onClose]);
+  // Radix devuelve el foco al <Dialog.Trigger>; como el modal se abre desde
+  // botones propios, recordamos el elemento enfocado al abrir y lo restauramos.
+  const returnFocus = useRef<HTMLElement | null>(null);
 
-  if (!mounted) return null;
-
-  return createPortal(
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-[70] flex items-end justify-center p-0 sm:items-center sm:p-6">
-          <motion.div
-            className="absolute inset-0 bg-brand-900/50 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            className={cn(
-              "relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-surface shadow-elevation-lg sm:max-w-lg sm:rounded-2xl",
-              className
-            )}
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.98 }}
-            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 0.28 }}
-          >
-            {(title || description) && (
-              <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
-                <div className="flex flex-col gap-1">
-                  {title && <h2 className="text-h4 text-text-primary">{title}</h2>}
-                  {description && <p className="text-body-sm text-text-secondary">{description}</p>}
-                </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Cerrar"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-subtle hover:text-text-primary"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+  return (
+    <Dialog.Root open={open} onOpenChange={(next) => !next && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="modal-overlay fixed inset-0 z-[70] bg-brand-900/50" />
+        <Dialog.Content
+          {...(view.description ? {} : { "aria-describedby": undefined })}
+          aria-modal="true"
+          onOpenAutoFocus={() => {
+            returnFocus.current = document.activeElement as HTMLElement | null;
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            returnFocus.current?.focus({ preventScroll: true });
+          }}
+          className={cn(
+            "modal-content fixed inset-x-0 bottom-0 z-[70] flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-surface shadow-elevation-lg focus:outline-none",
+            "sm:inset-0 sm:m-auto sm:h-fit sm:max-h-[min(92vh,calc(100vh-3rem))] sm:w-[calc(100%-3rem)] sm:max-w-lg sm:rounded-2xl",
+            className
+          )}
+        >
+          {view.title || view.description ? (
+            <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
+              <div className="flex flex-col gap-1">
+                {view.title ? (
+                  <Dialog.Title className="text-h4 text-text-primary">{view.title}</Dialog.Title>
+                ) : (
+                  <Dialog.Title className="sr-only">{srTitle}</Dialog.Title>
+                )}
+                {view.description && (
+                  <Dialog.Description className="text-body-sm text-text-secondary">
+                    {view.description}
+                  </Dialog.Description>
+                )}
               </div>
-            )}
-            <div className="flex-1 overflow-y-auto">{children}</div>
-            {footer && <div className="border-t border-border bg-surface px-6 py-4">{footer}</div>}
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>,
-    document.body
+              <Dialog.Close
+                aria-label="Cerrar"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-subtle hover:text-text-primary"
+              >
+                <X className="h-5 w-5" />
+              </Dialog.Close>
+            </div>
+          ) : (
+            <Dialog.Title className="sr-only">{srTitle}</Dialog.Title>
+          )}
+          <div className="min-h-0 flex-1 overflow-y-auto">{view.children}</div>
+          {view.footer && <div className="border-t border-border bg-surface px-6 py-4">{view.footer}</div>}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
