@@ -13,8 +13,8 @@ import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
 import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
+import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { Reveal } from "@/lib/motion";
-import { cn } from "@/lib/utils";
 import { categories, promoBanners } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
 
@@ -151,52 +151,7 @@ export default function HomePage() {
       {/* Banners promocionales */}
       <section className="pb-14 sm:pb-20">
         <Container>
-          <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
-            {promoBanners.map((b, i) => (
-              <Reveal
-                key={b.eyebrow}
-                delay={i * 0.08}
-                className={cn(
-                  "w-[85vw] shrink-0 snap-start md:w-auto",
-                  i === 2 && "md:col-span-2 lg:col-span-1"
-                )}
-              >
-                <Link
-                  href={b.href}
-                  className="group relative flex h-80 flex-col overflow-hidden rounded-xl bg-brand-800 p-8"
-                >
-                  <AssetImage
-                    folder="banners"
-                    name={b.image}
-                    alt={b.title}
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                    className="transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div
-                    className={`absolute inset-0 ${
-                      b.align === "center"
-                        ? "bg-gradient-to-t from-[#081B4B]/90 via-[#081B4B]/30 to-transparent"
-                        : "bg-gradient-to-r from-[#081B4B]/90 via-[#081B4B]/30 to-transparent"
-                    }`}
-                  />
-                  <div
-                    className={`relative mt-auto flex flex-col gap-1 ${
-                      b.align === "center" ? "items-center text-center" : "items-start"
-                    }`}
-                  >
-                    <span className="text-label-xs uppercase tracking-widest text-accent-500">
-                      {b.eyebrow}
-                    </span>
-                    <span className="max-w-[14rem] text-h3 text-text-inverse">{b.title}</span>
-                    <span className="text-body text-white/80">{b.subtitle}</span>
-                    <span className="mt-2 flex items-center gap-1.5 text-label text-text-inverse underline decoration-from-font underline-offset-4">
-                      Comprar ahora <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
+          <PromoCarousel banners={promoBanners} />
         </Container>
       </section>
 
