@@ -66,8 +66,9 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
           >
             <ChevronLeft className="h-[18px] w-[18px]" />
           </Link>
+          {/* Móvil/tablet: volver a la izquierda y logo en la esquina superior
+              derecha (justify-between). Escritorio: solo el logo, a la izquierda. */}
           <Logo tone="light" href={null} />
-          <span className="w-9 lg:hidden" />
         </div>
 
         <div className="relative flex flex-col gap-6 text-text-inverse">
