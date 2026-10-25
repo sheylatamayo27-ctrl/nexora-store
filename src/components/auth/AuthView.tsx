@@ -132,8 +132,10 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
         </div>
       </div>
 
-      {/* Formulario */}
-      <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
+      {/* Formulario — en <lg se alinea arriba (max-lg:items-start) para no dejar
+          un hueco grande por el centrado vertical; separación ~32px móvil /
+          ~40px tablet. Escritorio (≥lg) centrado e intacto (padding = p-10). */}
+      <div className="flex flex-1 items-center justify-center px-6 pb-6 pt-8 max-lg:items-start sm:px-10 sm:pb-10 sm:pt-10">
         <div className="flex w-full min-w-0 max-w-md flex-col gap-5">
           <Link
             href="/"
