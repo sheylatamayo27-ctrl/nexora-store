@@ -23,13 +23,36 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Panel de marca */}
       <div className="relative flex min-h-[220px] flex-col justify-between overflow-hidden p-6 lg:min-h-screen lg:w-[46%] lg:p-10">
-        <AssetImage
-          folder={isSignup ? "banners" : "misc"}
-          name={isSignup ? "tablet-banner" : "hero"}
-          alt="Nexora"
-          priority
-          sizes="(max-width: 1024px) 100vw, 46vw"
-        />
+        {isSignup ? (
+          <AssetImage
+            folder="banners"
+            name="tablet-banner"
+            alt="Nexora"
+            priority
+            sizes="(max-width: 1024px) 100vw, 46vw"
+          />
+        ) : (
+          <>
+            {/* Móvil/tablet: imagen original del panel (sin cambios). */}
+            <AssetImage
+              folder="misc"
+              name="hero"
+              alt="Nexora"
+              priority
+              sizes="(max-width: 1024px) 100vw, 46vw"
+              className="lg:hidden"
+            />
+            {/* Escritorio: imagen vertical con los audífonos completos y centrados (07). */}
+            <AssetImage
+              folder="misc"
+              name="auth-panel"
+              alt="Nexora"
+              priority
+              sizes="50vw"
+              className="hidden object-[center_35%] lg:block"
+            />
+          </>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/90 via-[#061234]/40 to-[#061234]/50" />
 
         <div className="relative flex items-center justify-between lg:justify-start">
@@ -75,7 +98,7 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
 
               {/* Escritorio: testimonio + métricas (como en Figma desktop) */}
               <div className="hidden flex-col gap-8 lg:flex">
-                <figure className="flex flex-col gap-4 rounded-xl bg-white/10 p-6 backdrop-blur-sm">
+                <figure className="flex flex-col gap-4 rounded-xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm">
                   <div className="flex gap-0.5">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-accent-500 text-accent-500" />
@@ -95,7 +118,7 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
                     </span>
                   </figcaption>
                 </figure>
-                <div className="flex items-center gap-8">
+                <div className="flex items-center justify-between">
                   {stats.map((s) => (
                     <div key={s.label} className="flex flex-col gap-0.5">
                       <span className="text-h3 text-text-inverse">{s.value}</span>

@@ -19,5 +19,6 @@ export const REAL_IMAGES: Record<string, "jpg" | "jpeg" | "png" | "webp"> = {
   "banners/earbuds-banner": "jpg",
   "banners/phone-banner": "jpg",
   "banners/tablet-banner": "jpg",
+  "misc/auth-panel": "jpg",
   "misc/hero": "jpg",
 };
