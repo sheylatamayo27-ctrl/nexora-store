@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Mail, Lock, Phone, ChevronLeft, Star, Check } from "lucide-react";
+import { Mail, Lock, Phone, ChevronLeft, Star, Check, Eye } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Input } from "@/components/ui/Input";
@@ -18,6 +19,8 @@ const stats = [
 
 export function AuthView({ mode }: { mode: "signin" | "signup" }) {
   const isSignup = mode === "signup";
+  const [remember, setRemember] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
@@ -185,13 +188,20 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
           )}
           <Input label="Correo electrónico" icon={Mail} defaultValue="sheyla@nexora.store" />
           {isSignup && <Input label="Teléfono" icon={Phone} defaultValue="+52 55 9876 5432" />}
-          <Input label="Contraseña" icon={Lock} type="password" defaultValue="password123" />
+          <Input
+            label="Contraseña"
+            icon={showPassword ? Eye : Lock}
+            onIconClick={() => setShowPassword((v) => !v)}
+            iconLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            type={showPassword ? "text" : "password"}
+            defaultValue="password123"
+          />
 
           {isSignup ? (
             <Checkbox checked onChange={() => {}} label="Acepto los Términos y la Política de Privacidad" />
           ) : (
             <div className="flex items-center justify-between">
-              <Checkbox checked onChange={() => {}} label="Recordarme" />
+              <Checkbox checked={remember} onChange={setRemember} label="Recordarme" />
               <Link href="#" className="text-label text-brand-700">
                 ¿Olvidaste tu contraseña?
               </Link>

@@ -4,11 +4,14 @@ import type { LucideIcon } from "lucide-react";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   icon?: LucideIcon;
+  /** Si se pasa, el ícono se vuelve un botón (p. ej. mostrar/ocultar contraseña). */
+  onIconClick?: () => void;
+  iconLabel?: string;
   helper?: string;
   error?: boolean;
 }
 
-export function Input({ label, icon: Icon, helper, error, className, ...props }: InputProps) {
+export function Input({ label, icon: Icon, onIconClick, iconLabel, helper, error, className, ...props }: InputProps) {
   return (
     <label className={cn("flex flex-col gap-2", className)}>
       {label && <span className="text-label text-text-primary">{label}</span>}
@@ -20,7 +23,32 @@ export function Input({ label, icon: Icon, helper, error, className, ...props }:
             : "border-border-strong focus-within:border-brand-500 focus-within:ring-brand-500/15"
         )}
       >
-        {Icon && <Icon className="h-[18px] w-[18px] text-text-muted" />}
+        {Icon &&
+          (onIconClick ? (
+            // <span role="button"> en vez de <button>: un <button> dentro del
+            // <label> sería su control asociado y el clic se dispararía dos veces.
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={iconLabel}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onIconClick();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onIconClick();
+                }
+              }}
+              className="flex shrink-0 cursor-pointer items-center text-text-muted transition-colors hover:text-text-secondary focus-visible:text-brand-700 focus-visible:outline-none"
+            >
+              <Icon className="h-[18px] w-[18px]" />
+            </span>
+          ) : (
+            <Icon className="h-[18px] w-[18px] text-text-muted" />
+          ))}
         <input
           className="h-full w-full min-w-0 flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
           {...props}
