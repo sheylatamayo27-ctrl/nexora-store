@@ -25,10 +25,15 @@ const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
 export function Header({ mobileSearch = true }: { mobileSearch?: boolean } = {}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  // El carrito, la confirmación de pedido y la 404 (que trae su propio buscador)
-  // no llevan buscador bajo el header (M04/T04, M06/T06, M10/T10).
+  // El carrito, la confirmación de pedido, ofertas, el blog y la 404 (que trae su
+  // propio buscador) no llevan buscador bajo el header (M04/T04, M06/T06, M10/T10).
   const hideMobileSearch =
-    !mobileSearch || pathname === "/carrito" || pathname === "/pedido-confirmado";
+    !mobileSearch ||
+    pathname === "/carrito" ||
+    pathname === "/pedido-confirmado" ||
+    pathname === "/ofertas" ||
+    pathname === "/blog" ||
+    pathname.startsWith("/blog/");
 
   return (
     <header className="sticky top-0 z-40 bg-surface">
