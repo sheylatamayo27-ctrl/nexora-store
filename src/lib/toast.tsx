@@ -6,12 +6,18 @@ import { Heart, HeartOff, ArrowRight, ShoppingBag, type LucideIcon } from "lucid
 import { assetSrc } from "@/components/media/AssetImage";
 import type { Product } from "@/data/types";
 
+/** Un solo aviso a la vez: el nuevo reemplaza al anterior en vez de apilarse. */
+function showToast(...args: Parameters<typeof toast.custom>) {
+  toast.dismiss();
+  toast.custom(...args);
+}
+
 /**
  * Toast elegante y de marca para la lista de favoritos.
  * Muestra la miniatura del producto, el estado y un acceso directo a Favoritos.
  */
 export function favoriteToast(product: Product, added: boolean) {
-  toast.custom(
+  showToast(
     (id) => (
       <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-subtle">
@@ -63,7 +69,7 @@ export function notifyToast({
   description?: string;
   icon?: LucideIcon;
 }) {
-  toast.custom(
+  showToast(
     () => (
       <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-800">

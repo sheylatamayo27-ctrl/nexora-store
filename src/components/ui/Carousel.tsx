@@ -7,13 +7,15 @@ import { cn } from "@/lib/utils";
  * Lógica común de los carruseles nativos (scroll-snap) con puntos indicadores.
  * Cada hijo directo del contenedor (`scrollerRef`) es una tarjeta.
  *
- * - `count`: posiciones posibles = tarjetas − tarjetas visibles a la vez + 1
- *   (se recalcula al cambiar el ancho; `initialCount` evita saltos en SSR).
- * - `active`: la primera tarjeta visible (≥60 %), vía IntersectionObserver.
- * - `goTo(i)`: desplaza el carrusel hasta la tarjeta i.
+ * El carrusel avanza por páginas de tantas tarjetas como caben a la vez:
+ * - `count`: número de páginas (se recalcula al cambiar el ancho;
+ *   `initialCount` evita saltos en SSR).
+ * - `active`: página de la primera tarjeta visible (≥60 %), vía IntersectionObserver.
+ * - `goTo(i)`: desplaza el carrusel hasta la página i.
  */
 export function useCarousel(initialCount: number, align: ScrollLogicalPosition = "start") {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const perViewRef = useRef(1);
   const [active, setActive] = useState(0);
   const [count, setCount] = useState(initialCount);
 
@@ -29,7 +31,8 @@ export function useCarousel(initialCount: number, align: ScrollLogicalPosition =
         1,
         Math.round((scroller.clientWidth + gap) / (items[0].offsetWidth + gap))
       );
-      setCount(Math.max(1, items.length - perView + 1));
+      perViewRef.current = perView;
+      setCount(Math.ceil(items.length / perView));
     };
     measure();
     const resizeObserver = new ResizeObserver(measure);
@@ -43,7 +46,14 @@ export function useCarousel(initialCount: number, align: ScrollLogicalPosition =
           if (entry.intersectionRatio >= 0.6) visible.add(index);
           else visible.delete(index);
         }
-        if (visible.size) setActive(Math.min(...visible));
+        if (!visible.size) return;
+        // Al final del carrusel, la última página aunque esté incompleta.
+        const last = items.length - 1;
+        setActive(
+          visible.has(last)
+            ? Math.ceil(items.length / perViewRef.current) - 1
+            : Math.floor(Math.min(...visible) / perViewRef.current)
+        );
       },
       { root: scroller, threshold: 0.6 }
     );
@@ -57,7 +67,7 @@ export function useCarousel(initialCount: number, align: ScrollLogicalPosition =
 
   const goTo = useCallback(
     (index: number) => {
-      const item = scrollerRef.current?.children[index] as HTMLElement | undefined;
+      const item = scrollerRef.current?.children[index * perViewRef.current] as HTMLElement | undefined;
       if (!item) return;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       item.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest", inline: align });
