@@ -20,6 +20,7 @@ export const REAL_IMAGES: Record<string, "jpg" | "jpeg" | "png" | "webp"> = {
   "banners/phone-banner": "jpg",
   "banners/tablet-banner": "jpg",
   "misc/auth-panel": "jpg",
+  "misc/auth-register.jpg": "jpg",
   "misc/hero": "jpg",
   "misc/hero-mobile": "jpg",
   "misc/hero-tablet": "jpg",
