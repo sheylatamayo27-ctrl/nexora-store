@@ -10,25 +10,28 @@ import type { PromoBanner } from "@/data/types";
 
 /**
  * Banners promocionales ("Explorar más").
- * Móvil (<md): carrusel nativo con scroll-snap centrado + puntos indicadores.
+ * Móvil (<md): carrusel de un banner a todo el ancho por vista (como
+ * "Colección destacada") + puntos indicadores.
  * Tablet/escritorio (≥md): grilla, idéntica a la versión anterior.
  */
 export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
-  const { scrollerRef, active, count, goTo } = useCarousel(banners.length, "center");
+  const { scrollerRef, active, count, goTo } = useCarousel(banners.length);
 
   return (
     <>
       <div
         ref={scrollerRef}
         aria-label="Explorar más"
-        className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar max-md:snap-mandatory max-md:overscroll-x-contain md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3"
+        className="flex snap-x gap-4 overflow-x-auto pb-2 no-scrollbar max-md:snap-mandatory max-md:overscroll-x-contain md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:pb-0 lg:grid-cols-3"
       >
         {banners.map((b, i) => (
+          // En móvil el Reveal (que se activa al entrar en vertical) dejaría ocultos
+          // los banners que esperan a la derecha: se muestran siempre.
           <Reveal
             key={b.eyebrow}
             delay={i * 0.08}
             className={cn(
-              "w-[85vw] shrink-0 snap-start max-md:snap-center md:w-auto",
+              "w-full shrink-0 snap-start snap-always max-md:!transform-none max-md:!opacity-100 md:w-auto",
               i === 2 && "md:col-span-2 lg:col-span-1"
             )}
           >
