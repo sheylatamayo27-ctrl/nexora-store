@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
+import { CarouselDots, useCarousel } from "@/components/ui/Carousel";
 import { Reveal } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { PromoBanner } from "@/data/types";
@@ -14,32 +14,7 @@ import type { PromoBanner } from "@/data/types";
  * Tablet/escritorio (≥md): grilla, idéntica a la versión anterior.
  */
 export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-
-  // Banner activo = el que está mayormente visible dentro del carrusel.
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const items = Array.from(scroller.children) as HTMLElement[];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(items.indexOf(entry.target as HTMLElement));
-        }
-      },
-      { root: scroller, threshold: 0.6 }
-    );
-    items.forEach((item) => observer.observe(item));
-    return () => observer.disconnect();
-  }, []);
-
-  const goTo = (index: number) => {
-    const item = scrollerRef.current?.children[index] as HTMLElement | undefined;
-    if (!item) return;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    item.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest", inline: "center" });
-  };
+  const { scrollerRef, active, count, goTo } = useCarousel(banners.length, "center");
 
   return (
     <>
@@ -94,27 +69,14 @@ export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
         ))}
       </div>
 
-      {/* Indicadores (solo móvil). El botón mide 44px para el toque; el punto, 8px.
-          -mt-2.5 deja ~16px visibles entre los banners y los puntos. */}
-      <div className="-mt-2.5 flex justify-center md:hidden">
-        {banners.map((b, i) => (
-          <button
-            key={b.eyebrow}
-            type="button"
-            onClick={() => goTo(i)}
-            aria-label={`Ir al banner ${i + 1} de ${banners.length}`}
-            aria-current={i === active ? "true" : undefined}
-            className="flex h-11 min-w-[44px] items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/50 rounded-full"
-          >
-            <span
-              className={cn(
-                "block h-2 rounded-full transition-all duration-300 ease-out motion-reduce:transition-none",
-                i === active ? "w-6 bg-brand-800" : "w-2 bg-border-strong"
-              )}
-            />
-          </button>
-        ))}
-      </div>
+      {/* Indicadores (solo móvil). -mt-2.5 deja ~16px visibles entre los banners y los puntos. */}
+      <CarouselDots
+        count={count}
+        active={active}
+        onSelect={goTo}
+        label={(i, n) => `Ir al banner ${i + 1} de ${n}`}
+        className="-mt-2.5 md:hidden"
+      />
     </>
   );
 }

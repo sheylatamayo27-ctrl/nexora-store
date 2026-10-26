@@ -5,6 +5,35 @@
 @layer base {
   :root {
     --font-jost: "Jost", sans-serif;
+
+    /* Elementos flotantes en móvil/tablet: el botón "Volver arriba" y, encima de
+       él, los avisos. Ambos se apilan sobre la barra fija de compra/pago
+       ([data-fixed-bar], 81px + área segura) cuando la página la tiene. */
+    --fixed-bar-h: 0px;
+    --fab-bottom: calc(16px + var(--fixed-bar-h) + env(safe-area-inset-bottom));
+    --toast-bottom: var(--fab-bottom);
+  }
+
+  @media (max-width: 767.98px) {
+    :root:has([data-fixed-bar]) {
+      --fixed-bar-h: 81px;
+    }
+  }
+
+  /* Con el botón visible (48px + 12px de separación), los avisos suben. */
+  :root:has([data-back-to-top][data-visible="true"]) {
+    --toast-bottom: calc(var(--fab-bottom) + 60px);
+  }
+
+  /* Avisos en móvil/tablet: entran desde abajo con un deslizamiento corto
+     (el fundido lo pone sonner) y acompañan al botón si aparece o desaparece. */
+  @media (max-width: 1023.98px) {
+    [data-sonner-toaster][data-y-position="bottom"] {
+      transition: transform 400ms ease, bottom 300ms ease-out;
+    }
+    [data-sonner-toast][data-y-position="bottom"]:not([data-mounted="true"]) {
+      --y: translateY(16px);
+    }
   }
 
   * {

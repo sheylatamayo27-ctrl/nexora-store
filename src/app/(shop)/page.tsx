@@ -4,7 +4,6 @@ import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { ProductCard } from "@/components/commerce/ProductCard";
 import { Price } from "@/components/commerce/Price";
 import { Rating } from "@/components/commerce/Rating";
 import { Countdown } from "@/components/commerce/Countdown";
@@ -14,6 +13,7 @@ import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { PromoCarousel } from "@/components/home/PromoCarousel";
+import { FeaturedCarousel } from "@/components/home/FeaturedCarousel";
 import { Reveal } from "@/lib/motion";
 import { categories, promoBanners } from "@/data/categories";
 import { featuredProducts, dealProducts } from "@/data/products";
@@ -94,11 +94,7 @@ export default function HomePage() {
               href="/categoria/auriculares"
             />
           </Reveal>
-          <div className="grid grid-cols-2 gap-3 pb-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
-            {featuredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <FeaturedCarousel products={featuredProducts} />
         </Container>
       </section>
 

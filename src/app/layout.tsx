@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/layout/Toaster";
+import { BackToTop } from "@/components/layout/BackToTop";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -46,6 +47,7 @@ export default function RootLayout({
     <html lang="es" className={jost.variable}>
       <body className="font-sans">
         {children}
+        <BackToTop />
         <Toaster />
       </body>
     </html>
