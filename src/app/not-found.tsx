@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { ButtonLink } from "@/components/ui/Button";
@@ -76,7 +75,6 @@ export default function NotFound() {
         </Container>
       </main>
       <Footer />
-      <BottomNav active="Inicio" />
     </div>
   );
 }

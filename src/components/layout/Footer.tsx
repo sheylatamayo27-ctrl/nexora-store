@@ -25,7 +25,9 @@ const payments = ["VISA", "Mastercard", "PayPal", "UPI", "COD"];
 export function Footer() {
   return (
     <footer className="bg-brand-900 text-text-inverse">
-      <div className="container-page pt-16 pb-28 md:pb-16">
+      {/* En móvil, si la página tiene una barra fija abajo ([data-fixed-bar], 81px +
+          área segura), se reserva su alto para que no tape el final del footer. */}
+      <div className="container-page pt-16 pb-16 max-md:[body:has([data-fixed-bar])_&]:pb-[calc(9rem+env(safe-area-inset-bottom))]">
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:gap-12">
           {/* Marca */}
           <div className="flex flex-col gap-5">

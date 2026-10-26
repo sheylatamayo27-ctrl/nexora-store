@@ -59,9 +59,7 @@ export default function ConfirmationPage() {
   const total = subtotal + tax - discount;
 
   return (
-    // max-md:-mb-20 cancela el pb-20 móvil del <main> (sin barra inferior aquí),
-    // para que no quede hueco entre los botones y el footer (M06).
-    <Container className="flex flex-col gap-6 py-8 max-md:-mb-20 sm:py-12">
+    <Container className="flex flex-col gap-6 py-8 sm:py-12">
       {/* Tarjeta de éxito */}
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-8 text-center sm:p-12">
         <span className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-success-100">

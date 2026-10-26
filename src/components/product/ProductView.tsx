@@ -111,7 +111,7 @@ export function ProductView({ product, related }: { product: Product; related: P
     <div className="flex flex-col">
       {/* Bloque superior */}
       <div className="bg-surface">
-        <Container className="flex flex-col gap-6 py-6">
+        <Container className="flex flex-col gap-6 py-6 max-lg:gap-4 max-lg:pt-4">
           <Breadcrumb
             items={[
               { label: "Tienda", href: "/categoria/auriculares" },
@@ -549,8 +549,9 @@ export function ProductView({ product, related }: { product: Product; related: P
       {/* Beneficios (igual que en el home), encima del pie de página */}
       <ServiceFeatures />
 
-      {/* Barra fija de compra (móvil) — reemplaza a la barra de navegación inferior. */}
+      {/* Barra fija de compra (móvil). El footer reserva su alto vía [data-fixed-bar]. */}
       <div
+        data-fixed-bar
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-4 pt-3 md:hidden"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
       >

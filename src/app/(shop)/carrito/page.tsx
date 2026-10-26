@@ -155,9 +155,8 @@ export default function CartPage() {
         </p>
       </Container>
 
-      {/* Recomendaciones — en móvil reservamos el alto de la barra fija de pago
-          (+ área segura) para que el contenido no quede oculto tras ella. */}
-      <Container className="pb-20 max-md:pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      {/* Recomendaciones */}
+      <Container className="pb-20">
         <div className="flex flex-col gap-8">
           <SectionHeader title="Comprados juntos frecuentemente" />
 
@@ -184,8 +183,9 @@ export default function CartPage() {
         </div>
       </Container>
 
-      {/* Barra fija de pago (móvil) — reemplaza a la barra de navegación inferior. */}
+      {/* Barra fija de pago (móvil). El footer reserva su alto vía [data-fixed-bar]. */}
       <div
+        data-fixed-bar
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-4 pt-3 shadow-[0_-4px_16px_rgba(15,23,42,0.08)] md:hidden"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
       >
