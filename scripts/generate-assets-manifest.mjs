@@ -1,5 +1,5 @@
 /**
- * Genera `src/data/assets.generated.ts` revisando /public/images.
+ * Genera `src/lib/assets.generated.ts` revisando /public/images.
  *
  * Para cada imagen (carpeta/nombre) guarda la mejor extensión disponible:
  * fotos reales (jpg, png, webp) tienen prioridad sobre el placeholder .svg.
@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const imagesDir = join(root, "public", "images");
-const outFile = join(root, "src", "data", "assets.generated.ts");
+const outFile = join(root, "src", "lib", "assets.generated.ts");
 
 const folders = ["products", "banners", "misc"];
 // Orden de prioridad: la foto real gana al placeholder.

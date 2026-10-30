@@ -46,7 +46,7 @@ export function favoriteToast(product: Product, added: boolean) {
 
         {added && (
           <Link
-            href="/favoritos"
+            href="/wishlist"
             onClick={() => toast.dismiss(id)}
             className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-label-sm text-brand-700 transition-colors hover:bg-brand-100"
           >

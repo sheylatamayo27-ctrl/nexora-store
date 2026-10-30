@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { getImageProps } from "next/image";
 import { Zap, Check } from "lucide-react";
 import { assetSrc } from "@/components/media/AssetImage";
-import { REAL_IMAGES } from "@/data/assets.generated";
+import { REAL_IMAGES } from "@/lib/assets.generated";
 import { ButtonLink } from "@/components/ui/Button";
 import { motion } from "@/lib/motion";
-import { heroSlides } from "@/data/hero";
+import type { HeroSlide } from "@/data/types";
 
 const perks = ["Garantía de 2 años", "Entrega gratis", "Calificación 4.9★"];
 
@@ -45,19 +45,19 @@ function HeroImage({ name, alt }: { name: string; alt: string }) {
   );
 }
 
-export function Hero() {
+export function Hero({ slides }: { slides: HeroSlide[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const hasMultipleSlides = heroSlides.length > 1;
+  const hasMultipleSlides = slides.length > 1;
 
   useEffect(() => {
     if (!hasMultipleSlides) return;
     const id = setInterval(() => {
-      setActiveIndex((i) => (i + 1) % heroSlides.length);
+      setActiveIndex((i) => (i + 1) % slides.length);
     }, AUTO_ROTATE_MS);
     return () => clearInterval(id);
-  }, [hasMultipleSlides]);
+  }, [hasMultipleSlides, slides.length]);
 
-  const slide = heroSlides[activeIndex];
+  const slide = slides[activeIndex];
 
   return (
     <section className="relative overflow-hidden bg-brand-900">
@@ -112,7 +112,7 @@ export function Hero() {
 
       {hasMultipleSlides && (
         <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur">
-          {heroSlides.map((_, i) => (
+          {slides.map((_, i) => (
             <button
               key={i}
               type="button"

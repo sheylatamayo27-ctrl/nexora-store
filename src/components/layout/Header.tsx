@@ -10,11 +10,11 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { CartButton } from "@/components/layout/CartButton";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { LanguageSelector } from "@/components/layout/LanguageSelector";
-import { MegaMenu } from "@/components/layout/MegaMenu";
+import { MegaMenu, type MegaMenuData } from "@/components/layout/MegaMenu";
 
 const primaryNav = [
-  { label: "Electrónica", href: "/categoria/auriculares" },
-  { label: "Ofertas", href: "/ofertas", hot: true },
+  { label: "Electrónica", href: "/category/headphones" },
+  { label: "Ofertas", href: "/offers", hot: true },
   { label: "Blogs", href: "/blog" },
   { label: "Contacto", href: "#" },
   { label: "Novedades", href: "#" },
@@ -22,7 +22,7 @@ const primaryNav = [
 
 const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
 
-export function Header({ mobileSearch = true }: { mobileSearch?: boolean } = {}) {
+export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuData; mobileSearch?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   // El producto, el carrito, la confirmación de pedido, ofertas, el blog y la 404
@@ -30,10 +30,10 @@ export function Header({ mobileSearch = true }: { mobileSearch?: boolean } = {})
   // (M03/T03, M04/T04, M06/T06, M10/T10).
   const hideMobileSearch =
     !mobileSearch ||
-    pathname.startsWith("/producto/") ||
-    pathname === "/carrito" ||
-    pathname === "/pedido-confirmado" ||
-    pathname === "/ofertas" ||
+    pathname.startsWith("/product/") ||
+    pathname === "/cart" ||
+    pathname === "/order-confirmation" ||
+    pathname === "/offers" ||
     pathname === "/blog" ||
     pathname.startsWith("/blog/");
 
@@ -63,7 +63,7 @@ export function Header({ mobileSearch = true }: { mobileSearch?: boolean } = {})
           {/* Utilidades (desktop) */}
           <div className="ml-auto hidden items-center gap-6 lg:flex">
             <LanguageSelector />
-            <Link href="/cuenta" className="flex items-center gap-3">
+            <Link href="/account" className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100">
                 <User className="h-5 w-5 text-brand-800" />
               </span>
@@ -78,10 +78,10 @@ export function Header({ mobileSearch = true }: { mobileSearch?: boolean } = {})
 
           {/* Iconos (móvil) */}
           <div className="ml-auto flex items-center gap-4 lg:hidden">
-            <Link href="/favoritos" aria-label="Favoritos">
+            <Link href="/wishlist" aria-label="Favoritos">
               <Heart className="h-[22px] w-[22px]" />
             </Link>
-            <Link href="/cuenta" aria-label="Cuenta">
+            <Link href="/account" aria-label="Cuenta">
               <User className="h-[22px] w-[22px]" />
             </Link>
             <CartButton compact />
@@ -97,7 +97,7 @@ export function Header({ mobileSearch = true }: { mobileSearch?: boolean } = {})
       </div>
 
       {/* Navegación con mega-menú (desktop) */}
-      <MegaMenu />
+      <MegaMenu data={megaMenu} />
 
       {/* Drawer móvil */}
       <AnimatePresence>

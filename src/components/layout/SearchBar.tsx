@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, ChevronDown, X } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Price } from "@/components/commerce/Price";
 import { Button } from "@/components/ui/Button";
-import { searchProducts } from "@/lib/search";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useSearch } from "@/hooks/useSearch";
 import { cn } from "@/lib/utils";
 
 const MAX_SUGGESTIONS = 6;
+/** Mínimo de caracteres para sugerir (por debajo, la API no devuelve nada). */
+const MIN_QUERY_LENGTH = 2;
+const DEBOUNCE_MS = 250;
 
 export function SearchBar({
   variant = "desktop",
@@ -27,7 +31,14 @@ export function SearchBar({
   const [active, setActive] = useState(-1);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const results = useMemo(() => searchProducts(query, MAX_SUGGESTIONS), [query]);
+  const term = query.trim();
+  const debouncedTerm = useDebouncedValue(term, DEBOUNCE_MS);
+  const { results, isLoading, error, mutate } = useSearch(
+    debouncedTerm.length >= MIN_QUERY_LENGTH ? debouncedTerm : "",
+    MAX_SUGGESTIONS
+  );
+  // Lo escrito aún no tiene respuesta (debounce en curso o petición en vuelo).
+  const pending = debouncedTerm !== term || isLoading;
 
   useEffect(() => {
     if (!open) return;
@@ -48,7 +59,7 @@ export function SearchBar({
   const submit = () => {
     const q = query.trim();
     if (q.length < 1) return;
-    go(`/buscar?q=${encodeURIComponent(q)}`);
+    go(`/search?q=${encodeURIComponent(q)}`);
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -62,7 +73,7 @@ export function SearchBar({
     } else if (e.key === "Enter") {
       if (active >= 0 && results[active]) {
         e.preventDefault();
-        go(`/producto/${results[active].slug}`);
+        go(`/product/${results[active].slug}`);
       } else {
         submit();
       }
@@ -72,7 +83,7 @@ export function SearchBar({
     }
   };
 
-  const showDropdown = open && query.trim().length >= 2;
+  const showDropdown = open && term.length >= MIN_QUERY_LENGTH;
 
   return (
     <div ref={wrapRef} className="relative flex-1">
@@ -135,17 +146,31 @@ export function SearchBar({
         <div
           id={listId}
           role="listbox"
+          aria-busy={pending}
           className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-lg border border-border bg-surface shadow-elevation-lg"
         >
-          {results.length > 0 ? (
+          {error && !pending ? (
+            <div className="px-4 py-8 text-center">
+              <p className="text-label text-text-primary">No pudimos cargar los resultados</p>
+              <p className="mt-1 text-body-sm text-text-secondary">Revisa tu conexión e inténtalo de nuevo.</p>
+              <button
+                type="button"
+                onClick={() => mutate()}
+                className="mt-3 text-label-sm text-brand-700 hover:text-brand-800"
+              >
+                Reintentar
+              </button>
+            </div>
+          ) : results.length > 0 && !error ? (
             <>
-              <ul className="max-h-[22rem] overflow-y-auto py-1">
+              {/* Mientras llega la respuesta de lo último escrito, la lista anterior se atenúa. */}
+              <ul className={cn("max-h-[22rem] overflow-y-auto py-1 transition-opacity", pending && "opacity-60")}>
                 {results.map((p, i) => (
                   <li key={p.id} id={`${listId}-${i}`} role="option" aria-selected={active === i}>
                     <Link
-                      href={`/producto/${p.slug}`}
+                      href={`/product/${p.slug}`}
                       onMouseEnter={() => setActive(i)}
-                      onClick={() => go(`/producto/${p.slug}`)}
+                      onClick={() => go(`/product/${p.slug}`)}
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 transition-colors",
                         active === i ? "bg-surface-subtle" : "hover:bg-surface-subtle"
@@ -170,6 +195,22 @@ export function SearchBar({
               >
                 Ver todos los resultados para “{query.trim()}”
               </button>
+            </>
+          ) : pending ? (
+            <>
+              <span className="sr-only">Buscando…</span>
+              <ul aria-hidden className="py-1">
+                {Array.from({ length: 3 }, (_, i) => (
+                  <li key={i} className="flex items-center gap-3 px-3 py-2.5">
+                    <div className="h-12 w-12 shrink-0 animate-pulse rounded-md bg-surface-subtle" />
+                    <div className="flex min-w-0 flex-1 flex-col gap-2">
+                      <div className="h-3.5 w-3/4 animate-pulse rounded bg-surface-muted" />
+                      <div className="h-3 w-1/3 animate-pulse rounded bg-surface-muted" />
+                    </div>
+                    <div className="h-4 w-14 animate-pulse rounded bg-surface-muted" />
+                  </li>
+                ))}
+              </ul>
             </>
           ) : (
             <div className="px-4 py-8 text-center">

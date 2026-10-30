@@ -5,29 +5,31 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, LayoutGrid, Zap, ArrowRight, Clock } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
-import { categories } from "@/data/categories";
-import { saleProducts } from "@/data/products";
-import { blogPosts } from "@/data/blog";
+import type { BlogPost, Category, Product } from "@/data/types";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+/** Lo que pinta cada panel, ya seleccionado en el servidor (`./mega-menu-data`). */
+export interface MegaMenuData {
+  /** Electrónica: grilla de 5×2. */
+  categories: Category[];
+  /** Ofertas: los mayores descuentos. */
+  deals: Product[];
+  /** Blogs: últimos artículos, sin el cuerpo (viajan en el HTML de cada página). */
+  posts: Pick<BlogPost, "slug" | "title" | "category" | "cover" | "coverFolder" | "readingMinutes">[];
+}
 
 type MenuKey = "electronica" | "ofertas" | "blogs";
 
 const navItems: { key: MenuKey; label: string; href: string; hot?: boolean }[] = [
-  { key: "electronica", label: "Electrónica", href: "/categoria/auriculares" },
-  { key: "ofertas", label: "Ofertas", href: "/ofertas", hot: true },
+  { key: "electronica", label: "Electrónica", href: "/category/headphones" },
+  { key: "ofertas", label: "Ofertas", href: "/offers", hot: true },
   { key: "blogs", label: "Blogs", href: "/blog" },
 ];
 
 const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
 
-const topDeals = [...saleProducts]
-  .sort((a, b) => (discountPercent(b.price, b.compareAt) ?? 0) - (discountPercent(a.price, a.compareAt) ?? 0))
-  .slice(0, 4);
-
-const latestPosts = blogPosts.slice(0, 4);
-
-export function MegaMenu() {
+export function MegaMenu({ data }: { data: MegaMenuData }) {
   const [activeKey, setActiveKey] = useState<MenuKey | null>(null);
   const openTimer = useRef<ReturnType<typeof setTimeout>>();
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -56,7 +58,7 @@ export function MegaMenu() {
       <div className="container-page flex items-center justify-between py-3">
         <div className="flex items-center gap-8">
           <Link
-            href="/categoria/auriculares"
+            href="/category/headphones"
             className="flex items-center gap-2 rounded-md bg-brand-100 px-4 py-2 text-label text-brand-800 transition-colors hover:bg-brand-500 hover:text-white"
           >
             <LayoutGrid className="h-[18px] w-[18px]" />
@@ -97,7 +99,7 @@ export function MegaMenu() {
         </div>
 
         <div className="flex items-center gap-6">
-          <Link href="/categoria/auriculares" className="flex items-center gap-1.5 text-label text-brand-700">
+          <Link href="/category/headphones" className="flex items-center gap-1.5 text-label text-brand-700">
             <Zap className="h-4 w-4 text-accent-600" /> Todas las colecciones
           </Link>
           {secondaryNav.map((label) => (
@@ -124,9 +126,9 @@ export function MegaMenu() {
             className="absolute left-0 right-0 top-full z-40 border-b border-border bg-surface shadow-elevation-lg"
           >
             <div className="container-page py-8">
-              {activeKey === "electronica" && <ElectronicaPanel />}
-              {activeKey === "ofertas" && <OfertasPanel />}
-              {activeKey === "blogs" && <BlogsPanel />}
+              {activeKey === "electronica" && <ElectronicaPanel categories={data.categories} />}
+              {activeKey === "ofertas" && <OfertasPanel deals={data.deals} />}
+              {activeKey === "blogs" && <BlogsPanel posts={data.posts} />}
             </div>
           </motion.div>
         )}
@@ -135,23 +137,24 @@ export function MegaMenu() {
   );
 }
 
-function ElectronicaPanel() {
+function ElectronicaPanel({ categories }: { categories: MegaMenuData["categories"] }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <h3 className="text-label-lg text-text-primary">Compra por categoría</h3>
         <Link
-          href="/categoria/auriculares"
+          href="/category/headphones"
           className="flex items-center gap-1 text-label-sm text-brand-700 hover:text-brand-800"
         >
           Ver todas <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
+      {/* Grilla de 5×2: las 10 primeras categorías. */}
       <div className="grid grid-cols-5 gap-3">
         {categories.map((cat) => (
           <Link
             key={cat.slug}
-            href={`/categoria/${cat.slug}`}
+            href={`/category/${cat.slug}`}
             className="group flex items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:border-brand-500 hover:bg-surface-subtle"
           >
             <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-surface-subtle">
@@ -170,22 +173,22 @@ function ElectronicaPanel() {
   );
 }
 
-function OfertasPanel() {
+function OfertasPanel({ deals }: { deals: MegaMenuData["deals"] }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <h3 className="text-label-lg text-text-primary">Descuentos destacados</h3>
-        <Link href="/ofertas" className="flex items-center gap-1 text-label-sm text-brand-700 hover:text-brand-800">
+        <Link href="/offers" className="flex items-center gap-1 text-label-sm text-brand-700 hover:text-brand-800">
           Ver todas las ofertas <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
       <div className="grid grid-cols-4 gap-4">
-        {topDeals.map((p) => {
+        {deals.map((p) => {
           const pct = discountPercent(p.price, p.compareAt);
           return (
             <Link
               key={p.id}
-              href={`/producto/${p.slug}`}
+              href={`/product/${p.slug}`}
               className="group flex gap-3 rounded-lg border border-border p-3 transition-colors hover:border-brand-500 hover:bg-surface-subtle"
             >
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-surface-subtle">
@@ -210,7 +213,7 @@ function OfertasPanel() {
   );
 }
 
-function BlogsPanel() {
+function BlogsPanel({ posts }: { posts: MegaMenuData["posts"] }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -220,7 +223,7 @@ function BlogsPanel() {
         </Link>
       </div>
       <div className="grid grid-cols-4 gap-3">
-        {latestPosts.map((post) => (
+        {posts.map((post) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}

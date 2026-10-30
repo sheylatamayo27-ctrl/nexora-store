@@ -23,7 +23,7 @@ function split(ms: number): Unit[] {
 /**
  * Contador regresivo en vivo con el estilo de "Oferta del día".
  * El plazo se fija al montar (cliente) para evitar desajustes de hidratación;
- * `endsInHours` define la duración restante. Reutilizable en home y /ofertas.
+ * `endsInHours` define la duración restante. Reutilizable en home y /offers.
  */
 export function Countdown({
   endsInHours = 72,

@@ -17,7 +17,7 @@ export function CartButton({ compact = false }: { compact?: boolean }) {
   const subtotal = mounted ? items.reduce((s, i) => s + i.product.price * i.qty, 0) : 0;
 
   return (
-    <Link href="/carrito" className="flex items-center gap-3" aria-label="Ver carrito">
+    <Link href="/cart" className="flex items-center gap-3" aria-label="Ver carrito">
       <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-brand-800 text-white">
         <ShoppingBag className="h-5 w-5" />
         {count > 0 && (

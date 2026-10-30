@@ -15,8 +15,13 @@ import { SectionHeader } from "@/components/home/SectionHeader";
 import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { FeaturedCarousel } from "@/components/home/FeaturedCarousel";
 import { Reveal } from "@/lib/motion";
-import { categories, promoBanners } from "@/data/categories";
-import { featuredProducts, dealProducts } from "@/data/products";
+import {
+  getCategories,
+  getDealProducts,
+  getFeaturedProducts,
+  getHeroSlides,
+  getPromoBanners,
+} from "@/server";
 
 const specs = [
   { icon: Cpu, title: "Core i7 13ª gen", sub: "16 GB RAM · 1 TB SSD" },
@@ -24,10 +29,21 @@ const specs = [
   { icon: BatteryCharging, title: "18 h de batería", sub: "Carga rápida de 65W" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [heroSlides, categories, featuredProducts, dealProducts, promoBanners] = await Promise.all([
+    getHeroSlides(),
+    getCategories(),
+    getFeaturedProducts(),
+    getDealProducts(),
+    getPromoBanners(),
+  ]);
+
+  /** "Top 10": las grillas de colecciones son de 5 columnas (2 filas exactas). */
+  const topCategories = categories.slice(0, 10);
+
   return (
     <div className="flex flex-col">
-      <Hero />
+      <Hero slides={heroSlides} />
 
       {/* Colecciones */}
       <section className="py-14 sm:py-20">
@@ -36,16 +52,16 @@ export default function HomePage() {
             <SectionHeader
               title="Compra por colección"
               subtitle="Top 10 más vendidos esta semana · Entrega al día siguiente"
-              href="/categoria/auriculares"
+              href="/category/headphones"
             />
           </Reveal>
           <Reveal>
             {/* Móvil: fila con scroll horizontal · Tablet: grilla de 5 (ícono + nombre). */}
             <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:hidden">
-              {categories.map((cat) => (
+              {topCategories.map((cat) => (
                 <Link
                   key={cat.slug}
-                  href={`/categoria/${cat.slug}`}
+                  href={`/category/${cat.slug}`}
                   className="group flex w-[88px] shrink-0 flex-col items-center gap-2 rounded-lg border border-border bg-surface p-3 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevation-md md:w-auto"
                 >
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-surface-subtle md:h-16 md:w-16">
@@ -59,10 +75,10 @@ export default function HomePage() {
 
             {/* Escritorio (≥1024): tarjetas horizontales — intacto, idéntico al diseño actual. */}
             <div className="hidden gap-4 lg:grid lg:grid-cols-5">
-              {categories.map((cat) => (
+              {topCategories.map((cat) => (
                 <Link
                   key={cat.slug}
-                  href={`/categoria/${cat.slug}`}
+                  href={`/category/${cat.slug}`}
                   className="group flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevation-md"
                 >
                   <div className="flex min-w-0 flex-col gap-1">
@@ -91,7 +107,7 @@ export default function HomePage() {
             <SectionHeader
               title="Colección destacada"
               subtitle="Los más vendidos seleccionados · Entrega al día siguiente"
-              href="/categoria/auriculares"
+              href="/category/headphones"
             />
           </Reveal>
           <FeaturedCarousel products={featuredProducts} />
@@ -120,7 +136,7 @@ export default function HomePage() {
                 {dealProducts.map((p) => (
                   <Link
                     key={p.id}
-                    href={`/producto/${p.slug}`}
+                    href={`/product/${p.slug}`}
                     className="flex gap-4 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong"
                   >
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-surface-subtle">
@@ -186,7 +202,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-3 max-lg:flex-col max-lg:items-stretch">
                   <ButtonLink
-                    href="/producto/mybook-laptop-14-pulgadas-2-8k-oled"
+                    href="/product/mybook-14-inch-laptop-2-8k-oled"
                     variant="primary"
                     size="lg"
                     className="max-lg:w-full"
@@ -194,7 +210,7 @@ export default function HomePage() {
                     Agregar al carrito
                   </ButtonLink>
                   <ButtonLink
-                    href="/producto/mybook-laptop-14-pulgadas-2-8k-oled"
+                    href="/product/mybook-14-inch-laptop-2-8k-oled"
                     variant="outline"
                     size="lg"
                     className="max-lg:hidden"

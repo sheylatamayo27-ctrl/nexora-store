@@ -18,9 +18,9 @@ type ActiveId = "dashboard" | "orders" | "wishlist" | "addresses" | "payments" |
 
 // `desktopOnly`: no aparece en las pestañas de móvil/tablet (M09/T09 muestran 6).
 const navItems: { id: ActiveId; label: string; href: string; icon: LucideIcon; desktopOnly?: boolean }[] = [
-  { id: "dashboard", label: "Panel", href: "/cuenta", icon: LayoutGrid },
-  { id: "orders", label: "Mis pedidos", href: "/cuenta", icon: Package },
-  { id: "wishlist", label: "Favoritos", href: "/favoritos", icon: Heart },
+  { id: "dashboard", label: "Panel", href: "/account", icon: LayoutGrid },
+  { id: "orders", label: "Mis pedidos", href: "/account", icon: Package },
+  { id: "wishlist", label: "Favoritos", href: "/wishlist", icon: Heart },
   { id: "addresses", label: "Direcciones", href: "#", icon: MapPin },
   { id: "payments", label: "Métodos de pago", href: "#", icon: CreditCard },
   { id: "notifications", label: "Notificaciones", href: "#", icon: Mail, desktopOnly: true },

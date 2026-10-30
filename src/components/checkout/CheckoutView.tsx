@@ -239,7 +239,7 @@ export function CheckoutView() {
           <Section
             title="Contacto"
             right={
-              <Link href="/entrar" className="text-label-sm text-brand-700 underline underline-offset-2">
+              <Link href="/login" className="text-label-sm text-brand-700 underline underline-offset-2">
                 Iniciar sesión
               </Link>
             }
@@ -367,7 +367,7 @@ export function CheckoutView() {
             </span>
           </div>
 
-          <ButtonLink href="/pedido-confirmado" variant="primary" size="lg" fullWidth className="justify-center">
+          <ButtonLink href="/order-confirmation" variant="primary" size="lg" fullWidth className="justify-center">
             Pagar {formatPrice(total)} de forma segura
           </ButtonLink>
           <p className="text-center text-body-sm text-text-muted">
@@ -380,7 +380,7 @@ export function CheckoutView() {
           <div className="sticky top-8 flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-h4 text-text-primary">Tu pedido ({count})</h2>
-              <Link href="/carrito" className="text-label-sm text-brand-700 underline underline-offset-2">
+              <Link href="/cart" className="text-label-sm text-brand-700 underline underline-offset-2">
                 Editar
               </Link>
             </div>

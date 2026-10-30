@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { SlidersHorizontal, ChevronDown, LayoutGrid, List, Check } from "lucide-react";
 import { ProductCard } from "@/components/commerce/ProductCard";
+import { ProductCardSkeletons } from "@/components/commerce/ProductCardSkeleton";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Radio } from "@/components/ui/Radio";
@@ -12,25 +13,36 @@ import { RangeSlider } from "@/components/ui/RangeSlider";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
-import { categories } from "@/data/categories";
+import type { Category } from "@/data/types";
 import { formatPriceShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Product } from "@/data/types";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { productsKey, useProducts } from "@/hooks/useProducts";
+import type { ProductFacets, ProductListQuery, ProductListResponse, ProductSort } from "@/server/api-types";
 import { FilterSheet, type SheetFilters } from "@/components/category/FilterSheet";
 import { SortMenu } from "@/components/category/SortMenu";
+import {
+  PAGE_SIZE,
+  PRICE_MAX,
+  PRICE_MIN,
+  defaultFilters,
+  toListQuery,
+  type AvailId,
+} from "@/components/category/query";
 
 const ratings = [4, 3, 2];
-const PAGE_SIZE = 12;
-const PRICE_MIN = 0;
-const PRICE_MAX = 90000;
 const PRICE_STEP = 500;
+/** Espera tras mover el slider de precio o tocar la hoja de filtros antes de pedir a la API. */
+const DEBOUNCE_MS = 250;
 
-const sortOptions = [
+const sortOptions: { id: ProductSort; label: string }[] = [
   { id: "popular", label: "Más populares" },
   { id: "price-asc", label: "Precio: menor a mayor" },
   { id: "price-desc", label: "Precio: mayor a menor" },
   { id: "rating", label: "Mejor valorados" },
 ];
+
+const toSort = (id: string): ProductSort => sortOptions.find((o) => o.id === id)?.id ?? "popular";
 
 const availabilityOptions = [
   { id: "inStock", label: "Solo en stock" },
@@ -38,89 +50,94 @@ const availabilityOptions = [
   { id: "freeDelivery", label: "Envío gratis" },
 ] as const;
 
-type AvailId = (typeof availabilityOptions)[number]["id"];
-
+/**
+ * Listado de una categoría. Filtros, orden y páginas se piden a GET /api/products
+ * (SWR); la primera página llega ya calculada del servidor (`initialData`) para que
+ * el HTML inicial traiga los productos.
+ */
 export function CategoryView({
   title,
   description,
-  products,
+  categories,
   initialCategories = [],
+  saleOnly = false,
+  facets,
+  initialData,
 }: {
   title: string;
   description: string;
-  products: Product[];
+  /** Todas las categorías (nombres de los filtros, chips y la hoja de filtros). */
+  categories: Category[];
   initialCategories?: string[];
+  /** Vista de ofertas: el listado parte solo de los productos rebajados. */
+  saleOnly?: boolean;
+  /** Conteos de categorías, marcas y colores del conjunto base (del servidor). */
+  facets: ProductFacets;
+  /** Primera página con los filtros iniciales, calculada en el servidor (SEO, sin parpadeo). */
+  initialData: ProductListResponse;
 }) {
-  const [cats, setCats] = useState<string[]>(initialCategories);
-  const [price, setPrice] = useState<[number, number]>([PRICE_MIN, PRICE_MAX]);
-  const [rating, setRating] = useState<number | null>(null);
-  const [brands, setBrands] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
-  const [avail, setAvail] = useState<Record<AvailId, boolean>>({
-    inStock: true,
-    onSale: false,
-    freeDelivery: false,
-  });
-  const [sort, setSort] = useState("popular");
+  const [initial] = useState(() => defaultFilters(initialCategories));
+  const [cats, setCats] = useState<string[]>(initial.cats);
+  const [price, setPrice] = useState<[number, number]>(initial.price);
+  const [rating, setRating] = useState<number | null>(initial.rating);
+  const [brands, setBrands] = useState<string[]>(initial.brands);
+  const [colors, setColors] = useState<string[]>(initial.colors);
+  const [avail, setAvail] = useState<Record<AvailId, boolean>>(initial.avail);
+  const [sort, setSort] = useState<ProductSort>(initial.sort);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [sheetDraft, setSheetDraft] = useState<SheetFilters | null>(null);
 
-  const counts = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const p of products) map[p.categorySlug] = (map[p.categorySlug] ?? 0) + 1;
-    return map;
-  }, [products]);
-
-  const brandList = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const p of products) map[p.vendor] = (map[p.vendor] ?? 0) + 1;
-    return Object.entries(map).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-  }, [products]);
-
-  const colorList = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const p of products) for (const c of p.colors ?? []) if (!map.has(c.name)) map.set(c.name, c.hex);
-    return [...map.entries()];
-  }, [products]);
+  const { categories: counts, brands: brandList, colors: colorList } = facets;
 
   const priceChanged = price[0] !== PRICE_MIN || price[1] !== PRICE_MAX;
 
-  const filtered = useMemo(() => {
-    let list = products.filter((p) => {
-      if (cats.length && !cats.includes(p.categorySlug)) return false;
-      if (p.price < price[0] || p.price > price[1]) return false;
-      if (rating && p.rating < rating) return false;
-      if (brands.length && !brands.includes(p.vendor)) return false;
-      if (colors.length && !(p.colors ?? []).some((c) => colors.includes(c.name))) return false;
-      if (avail.onSale && !(p.compareAt && p.compareAt > p.price)) return false;
-      return true;
-    });
-    list = [...list].sort((a, b) => {
-      if (sort === "price-asc") return a.price - b.price;
-      if (sort === "price-desc") return b.price - a.price;
-      if (sort === "rating") return b.rating - a.rating;
-      return b.reviews - a.reviews;
-    });
-    return list;
-  }, [products, cats, price, rating, brands, colors, avail, sort]);
+  // El slider de precio cambia en cada paso del arrastre: se pide al dejar de moverlo.
+  const debouncedPrice = useDebouncedValue(price, DEBOUNCE_MS);
+  const query = toListQuery({ cats, price: debouncedPrice, rating, brands, colors, avail, sort }, saleOnly);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  // Filtros u orden nuevos → página 1. Se ajusta en este mismo render (no en un
+  // efecto) para no llegar a pedir las páginas 2..N de la consulta nueva.
+  const filtersKey = JSON.stringify([cats, debouncedPrice, rating, brands, colors, avail, sort]);
+  const [pageFilters, setPageFilters] = useState(filtersKey);
+  if (pageFilters !== filtersKey) {
+    setPageFilters(filtersKey);
+    setPage(1);
+  }
+
+  const { items, total, totalPages, isLoading, error, mutate } = useProducts(query, {
+    fallbackData: initialData,
+  });
+  const failed = Boolean(error) && !isLoading;
+
   const currentPage = Math.min(page, Math.max(1, totalPages));
-  const shownTo = Math.min(currentPage * PAGE_SIZE, filtered.length);
-  const shown = filtered.slice(0, shownTo);
+  const shownTo = Math.min(currentPage * PAGE_SIZE, total);
 
-  // Conteo en vivo para la hoja de filtros (borrador + valoración/color actuales).
-  const resultCount = (d: SheetFilters) =>
-    products.filter((p) => {
-      if (d.cats.length && !d.cats.includes(p.categorySlug)) return false;
-      if (p.price < d.price[0] || p.price > d.price[1]) return false;
-      if (rating && p.rating < rating) return false;
-      if (d.brands.length && !d.brands.includes(p.vendor)) return false;
-      if (colors.length && !(p.colors ?? []).some((c) => colors.includes(c.name))) return false;
-      if (d.avail.onSale && !(p.compareAt && p.compareAt > p.price)) return false;
-      return true;
-    }).length;
+  // Conteo de la hoja de filtros (borrador + valoración/color actuales): se pide a la
+  // API con la misma forma que la grilla, así al aplicarlo ya está en caché.
+  const debouncedDraft = useDebouncedValue(sheetDraft, DEBOUNCE_MS);
+  const draftQuery =
+    debouncedDraft &&
+    toListQuery(
+      {
+        cats: debouncedDraft.cats,
+        price: debouncedDraft.price,
+        rating,
+        brands: debouncedDraft.brands,
+        colors,
+        avail: { ...avail, ...debouncedDraft.avail },
+        sort,
+      },
+      saleOnly
+    );
+  const draftIsApplied = !draftQuery || productsKey(draftQuery) === productsKey(query);
+  const draftList = useProducts(draftIsApplied ? null : draftQuery);
+  const sheetCount = draftIsApplied
+    ? total
+    : draftList.isLoading || draftList.error
+      ? undefined
+      : draftList.total;
 
   const applySheet = (next: SheetFilters) => {
     setCats(next.cats);
@@ -128,10 +145,6 @@ export function CategoryView({
     setBrands(next.brands);
     setAvail(next.avail as Record<AvailId, boolean>);
   };
-
-  useEffect(() => {
-    setPage(1);
-  }, [cats, price, rating, brands, colors, avail, sort]);
 
   const toggleCat = (slug: string) =>
     setCats((c) => (c.includes(slug) ? c.filter((x) => x !== slug) : [...c, slug]));
@@ -149,12 +162,13 @@ export function CategoryView({
     (avail.onSale ? 1 : 0);
 
   const clearAll = () => {
-    setCats([]);
-    setPrice([PRICE_MIN, PRICE_MAX]);
-    setRating(null);
-    setBrands([]);
-    setColors([]);
-    setAvail({ inStock: true, onSale: false, freeDelivery: false });
+    const cleared = defaultFilters();
+    setCats(cleared.cats);
+    setPrice(cleared.price);
+    setRating(cleared.rating);
+    setBrands(cleared.brands);
+    setColors(cleared.colors);
+    setAvail(cleared.avail);
   };
 
   const Facets = (
@@ -263,13 +277,13 @@ export function CategoryView({
       {/* Encabezado de categoría */}
       <div className="bg-surface">
         <Container className="flex flex-col gap-5 py-8">
-          <Breadcrumb items={[{ label: "Tienda", href: "/categoria/auriculares" }, { label: title }]} />
+          <Breadcrumb items={[{ label: "Tienda", href: "/category/headphones" }, { label: title }]} />
           <div className="flex flex-col gap-2">
             <h1 className="text-h2 text-text-primary sm:text-display-l">{title}</h1>
             {/* Escritorio: descripción (intacta). Móvil/tablet: conteo real · entrega. */}
             <p className="hidden max-w-2xl text-body-lg text-text-secondary lg:block">{description}</p>
             <p className="text-body text-text-secondary lg:hidden">
-              {filtered.length} productos · Entrega al día siguiente
+              {total} productos · Entrega al día siguiente
             </p>
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
@@ -322,7 +336,7 @@ export function CategoryView({
                 </span>
               )}
             </Button>
-            <SortMenu value={sort} options={sortOptions} onChange={setSort} className="flex-1" />
+            <SortMenu value={sort} options={sortOptions} onChange={(id) => setSort(toSort(id))} className="flex-1" />
           </div>
 
           {/* Barra de herramientas (tablet + escritorio) — en escritorio es idéntica */}
@@ -337,9 +351,9 @@ export function CategoryView({
                 )}
               </Button>
               <span className="text-body text-text-secondary">
-                {filtered.length > 0 ? (
+                {total > 0 ? (
                   <>
-                    Mostrando <span className="text-text-primary">1–{shownTo}</span> de {filtered.length}
+                    Mostrando <span className="text-text-primary">1–{shownTo}</span> de {total}
                   </>
                 ) : (
                   "Sin resultados"
@@ -367,7 +381,7 @@ export function CategoryView({
               <div className="relative">
                 <select
                   value={sort}
-                  onChange={(e) => setSort(e.target.value)}
+                  onChange={(e) => setSort(toSort(e.target.value))}
                   aria-label="Ordenar por"
                   className="h-10 appearance-none rounded-md border border-border-strong bg-surface pl-4 pr-9 text-label-sm text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 >
@@ -420,16 +434,35 @@ export function CategoryView({
           )}
 
           {/* Grid */}
-          {filtered.length > 0 ? (
+          {failed ? (
+            <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface py-20 text-center">
+              <p className="text-h4 text-text-primary">No pudimos cargar los productos</p>
+              <button onClick={() => mutate()} className="text-label text-brand-700">
+                Reintentar
+              </button>
+            </div>
+          ) : isLoading || total > 0 ? (
             <div
+              aria-busy={isLoading || undefined}
               className={
                 view === "grid"
                   ? "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4"
                   : "flex flex-col gap-4"
               }
             >
-              {shown.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {isLoading ? (
+                <ProductCardSkeletons count={items.length || PAGE_SIZE} />
+              ) : (
+                items.map((p) => <ProductCard key={p.id} product={p} />)
+              )}
+              {/* Páginas 2..N ("Cargar más" / paginación): cada una es su propia petición. */}
+              {Array.from({ length: currentPage - 1 }, (_, i) => (
+                <ProductPage
+                  key={i + 2}
+                  query={query}
+                  page={i + 2}
+                  expected={Math.max(0, Math.min(PAGE_SIZE, total - (i + 1) * PAGE_SIZE))}
+                />
               ))}
             </div>
           ) : (
@@ -441,26 +474,26 @@ export function CategoryView({
             </div>
           )}
 
-          {filtered.length > 0 && (
+          {!failed && total > 0 && (
             <div className="flex flex-col items-center gap-5 pt-4">
               {/* Móvil (<768): resumen + barra de progreso + "Cargar más" */}
               <div className="flex w-full flex-col items-center gap-3 md:hidden">
                 <span className="text-body-sm text-text-secondary">
-                  Mostrando {shownTo} de {filtered.length} productos
+                  Mostrando {shownTo} de {total} productos
                 </span>
                 <div
                   className="h-1 w-40 overflow-hidden rounded-full bg-surface-muted"
                   role="progressbar"
                   aria-valuenow={shownTo}
                   aria-valuemin={0}
-                  aria-valuemax={filtered.length}
+                  aria-valuemax={total}
                 >
                   <div
                     className="h-full rounded-full bg-brand-800 transition-[width] duration-500"
-                    style={{ width: `${(shownTo / filtered.length) * 100}%` }}
+                    style={{ width: `${(shownTo / total) * 100}%` }}
                   />
                 </div>
-                {shownTo < filtered.length && (
+                {shownTo < total && (
                   <Button variant="outline" fullWidth onClick={() => setPage((p) => p + 1)}>
                     Cargar más productos
                   </Button>
@@ -517,10 +550,35 @@ export function CategoryView({
           .filter((o) => o.id === "inStock" || o.id === "onSale")
           .map((o) => ({ id: o.id, label: o.label }))}
         initial={{ cats, price, brands, avail }}
-        resultCount={resultCount}
+        resultCount={sheetCount}
+        onDraftChange={setSheetDraft}
         onApply={applySheet}
       />
     </div>
+  );
+}
+
+/** Página 2 en adelante del listado: se pide al pulsar "Cargar más" o elegir una página. */
+function ProductPage({ query, page, expected }: { query: ProductListQuery; page: number; expected: number }) {
+  const { items, isLoading, error, mutate } = useProducts({ ...query, page });
+
+  if (isLoading) return <ProductCardSkeletons count={expected} />;
+  if (error) {
+    return (
+      <div className="col-span-full flex items-center justify-center gap-2 py-6 text-body text-text-secondary">
+        No pudimos cargar más productos.
+        <button onClick={() => mutate()} className="text-label text-brand-700">
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+  return (
+    <>
+      {items.map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
+    </>
   );
 }
 

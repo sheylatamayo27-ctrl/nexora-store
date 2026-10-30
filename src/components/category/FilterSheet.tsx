@@ -36,6 +36,7 @@ export function FilterSheet({
   availabilityOptions,
   initial,
   resultCount,
+  onDraftChange,
   onApply,
 }: {
   open: boolean;
@@ -48,7 +49,10 @@ export function FilterSheet({
   priceFormat: (n: number) => string;
   availabilityOptions: { id: string; label: string }[];
   initial: SheetFilters;
-  resultCount: (draft: SheetFilters) => number;
+  /** Resultados del borrador; `undefined` mientras se consultan (se muestra el último). */
+  resultCount: number | undefined;
+  /** Borrador mientras la hoja está abierta (`null` al cerrarla), para consultar su conteo. */
+  onDraftChange: (draft: SheetFilters | null) => void;
   onApply: (next: SheetFilters) => void;
 }) {
   const [draft, setDraft] = useState<SheetFilters>(initial);
@@ -59,6 +63,10 @@ export function FilterSheet({
     if (open) setDraft(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  useEffect(() => {
+    onDraftChange(open ? draft : null);
+  }, [open, draft, onDraftChange]);
 
   // Bloquea el scroll del body mientras la hoja está abierta.
   useEffect(() => {
@@ -123,7 +131,10 @@ export function FilterSheet({
       avail: { inStock: true, onSale: false, freeDelivery: false },
     });
 
-  const count = resultCount(draft);
+  // Mientras llega el conteo de un borrador nuevo se mantiene el último conocido.
+  const [lastCount, setLastCount] = useState(resultCount ?? 0);
+  if (resultCount !== undefined && resultCount !== lastCount) setLastCount(resultCount);
+  const count = resultCount ?? lastCount;
 
   return (
     <AnimatePresence>

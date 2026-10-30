@@ -29,7 +29,7 @@ export function ProductCard({
   const toggleFavorite = useFavorites((s) => s.toggle);
   const favorites = useFavorites((s) => s.items);
   const wished = favorites.some((p) => p.id === product.id);
-  const href = `/producto/${product.slug}`;
+  const href = `/product/${product.slug}`;
   const pct = discountPercent(product.price, product.compareAt);
 
   const handleWish = (e: React.MouseEvent) => {

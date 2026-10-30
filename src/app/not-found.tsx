@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { getMegaMenuData } from "@/components/layout/mega-menu-data";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
 import { ButtonLink } from "@/components/ui/Button";
 import { NotFoundSearch } from "@/components/search/NotFoundSearch";
-import { categories } from "@/data/categories";
+import { getCategories } from "@/server";
 
 // Móvil/tablet (M10/T10): sin buscador bajo el header, "4" grandes pegados a un
 // círculo con anillo azul, botones apilados en móvil y "Inicio" activo abajo.
@@ -17,10 +18,12 @@ const four =
 
 export const metadata: Metadata = { title: "Página no encontrada" };
 
-export default function NotFound() {
+export default async function NotFound() {
+  const [megaMenu, categories] = await Promise.all([getMegaMenuData(), getCategories()]);
+
   return (
     <div className="flex min-h-screen flex-col bg-surface-subtle">
-      <Header mobileSearch={false} />
+      <Header megaMenu={megaMenu} mobileSearch={false} />
       <main className="flex-1">
         <Container className="flex flex-col items-center gap-5 py-16 text-center sm:py-24 max-sm:pb-12 max-sm:pt-10 sm:max-lg:pb-[4.5rem] sm:max-lg:pt-[4.5rem]">
           <div className="flex items-center gap-3 sm:gap-4 max-lg:mb-2 max-sm:gap-1.5 sm:max-lg:gap-2">
@@ -46,7 +49,7 @@ export default function NotFound() {
               <ChevronRight className="h-4 w-4 lg:hidden" />
             </ButtonLink>
             <ButtonLink
-              href="/categoria/auriculares"
+              href="/category/headphones"
               variant="outline"
               size="lg"
               className="max-lg:h-12 max-lg:bg-surface"
@@ -64,7 +67,7 @@ export default function NotFound() {
               {categories.slice(0, 6).map((c) => (
                 <Link
                   key={c.slug}
-                  href={`/categoria/${c.slug}`}
+                  href={`/category/${c.slug}`}
                   className="rounded-md border border-border-strong bg-surface px-4 py-2 text-label text-text-primary transition-colors hover:border-brand-500 max-lg:whitespace-nowrap max-lg:py-2.5 max-sm:px-3 max-sm:text-[0.9375rem] max-[374px]:px-2.5 max-[374px]:text-label max-[339px]:px-2 max-[339px]:text-label-sm sm:max-lg:text-[0.9375rem]"
                 >
                   {c.name}

@@ -8,10 +8,11 @@ import { BlogCard } from "@/components/blog/BlogCard";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Reveal } from "@/lib/motion";
 import { formatDate } from "@/lib/format";
-import { blogPosts, getPostBySlug, getRelatedPosts } from "@/data/blog";
+import { getBlogPosts, getPostBySlug, getRelatedPosts } from "@/server";
 import type { BlogBlock } from "@/data/types";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const blogPosts = await getBlogPosts();
   return blogPosts.map((p) => ({ slug: p.slug }));
 }
 
@@ -20,7 +21,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const post = getPostBySlug(params.slug);
+  const post = await getPostBySlug(params.slug);
   if (!post) return { title: "Artículo no encontrado" };
   return { title: post.title, description: post.excerpt };
 }
@@ -52,11 +53,11 @@ function Block({ block }: { block: BlogBlock }) {
   }
 }
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const post = await getPostBySlug(params.slug);
   if (!post) notFound();
 
-  const related = getRelatedPosts(post.slug);
+  const related = await getRelatedPosts(post.slug);
 
   return (
     <div className="bg-surface-subtle">

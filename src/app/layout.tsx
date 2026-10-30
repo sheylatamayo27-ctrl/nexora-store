@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import { Providers } from "./providers";
 import { Toaster } from "@/components/layout/Toaster";
 import { BackToTop } from "@/components/layout/BackToTop";
 
-const jost = Jost({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+// Jost auto-alojada (licencia OFL en ./fonts/OFL.txt): el build no depende de Google Fonts.
+// Es una fuente variable: este único archivo (subset latin, el mismo que servía
+// Google Fonts) cubre los pesos 400–700.
+const jost = localFont({
+  src: [{ path: "./fonts/jost-variable-latin.woff2", weight: "400 700", style: "normal" }],
   variable: "--font-jost",
   display: "swap",
 });
@@ -46,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={jost.variable}>
       <body className="font-sans">
-        {children}
+        <Providers>{children}</Providers>
         <BackToTop />
         <Toaster />
       </body>

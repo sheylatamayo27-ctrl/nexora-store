@@ -105,7 +105,7 @@ export function OffersView({
                 return (
                   <Link
                     key={p.id}
-                    href={`/producto/${p.slug}`}
+                    href={`/product/${p.slug}`}
                     className="group flex gap-4 rounded-lg border border-border bg-surface p-4 transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-elevation-md"
                   >
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-surface-subtle">

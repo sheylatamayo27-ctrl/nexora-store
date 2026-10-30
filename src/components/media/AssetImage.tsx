@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { REAL_IMAGES } from "@/data/assets.generated";
+import { REAL_IMAGES } from "@/lib/assets.generated";
 
 export type AssetFolder = "products" | "banners" | "misc";
 

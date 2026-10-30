@@ -114,7 +114,7 @@ export function ProductView({ product, related }: { product: Product; related: P
         <Container className="flex flex-col gap-6 py-6 max-lg:gap-4 max-lg:pt-4">
           <Breadcrumb
             items={[
-              { label: "Tienda", href: "/categoria/auriculares" },
+              { label: "Tienda", href: "/category/headphones" },
               { label: product.name },
             ]}
           />
@@ -278,7 +278,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                 >
                   Agregar al carrito
                 </Button>
-                <ButtonLink href="/carrito" variant="accent" size="lg" className="flex-1">
+                <ButtonLink href="/cart" variant="accent" size="lg" className="flex-1">
                   Comprar ahora
                 </ButtonLink>
                 <button
@@ -516,7 +516,7 @@ export function ProductView({ product, related }: { product: Product; related: P
               <h2 className="text-h3 text-text-primary sm:text-h2">También te puede gustar</h2>
             </div>
             <Link
-              href="/categoria/auriculares"
+              href="/category/headphones"
               className="flex shrink-0 items-center gap-1.5 text-label text-brand-700 transition-colors hover:text-brand-800 lg:hidden"
             >
               Ver todo <ArrowRight className="h-4 w-4" />

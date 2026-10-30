@@ -7,14 +7,15 @@ import { BlogCard } from "@/components/blog/BlogCard";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Reveal } from "@/lib/motion";
 import { formatDate } from "@/lib/format";
-import { blogPosts, featuredPost } from "@/data/blog";
+import { getBlogPosts, getFeaturedPost } from "@/server";
 
 export const metadata: Metadata = {
   title: "Blog",
   description: "Guías de compra, novedades y consejos tech del equipo de Nexora.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const [blogPosts, featuredPost] = await Promise.all([getBlogPosts(), getFeaturedPost()]);
   const rest = blogPosts.filter((p) => p.slug !== featuredPost.slug);
 
   return (

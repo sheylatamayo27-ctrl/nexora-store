@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
-/** Buscador de la página 404: lleva a /buscar?q=… (sin JS, el form hace lo mismo). */
+/** Buscador de la página 404: lleva a /search?q=… (sin JS, el form hace lo mismo). */
 export function NotFoundSearch() {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
   return (
     <form
-      action="/buscar"
+      action="/search"
       role="search"
       onSubmit={(e) => {
         e.preventDefault();
         const q = query.trim();
-        router.push(q ? `/buscar?q=${encodeURIComponent(q)}` : "/buscar");
+        router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
       }}
       className="flex w-full max-w-lg items-center gap-2 rounded-lg border border-border-strong bg-surface p-1.5 pl-5 max-sm:pl-4"
     >

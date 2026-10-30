@@ -209,7 +209,7 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
             </div>
           )}
 
-          <ButtonLink href="/cuenta" variant="primary" size="lg" fullWidth icon className="justify-center">
+          <ButtonLink href="/account" variant="primary" size="lg" fullWidth icon className="justify-center">
             {isSignup ? "Crear cuenta" : "Iniciar sesión"}
           </ButtonLink>
 
@@ -218,7 +218,7 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
               {isSignup ? "¿Ya tienes cuenta?" : "¿Nueva en Nexora?"}
             </span>
             <Link
-              href={isSignup ? "/entrar" : "/crear-cuenta"}
+              href={isSignup ? "/login" : "/register"}
               className="text-label text-brand-700 underline underline-offset-2"
             >
               {isSignup ? "Iniciar sesión" : "Crear cuenta"}

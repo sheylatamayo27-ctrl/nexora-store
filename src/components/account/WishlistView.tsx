@@ -39,10 +39,10 @@ export function WishlistView() {
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <ButtonLink href="/categoria/auriculares" variant="primary" size="lg">
+          <ButtonLink href="/category/headphones" variant="primary" size="lg">
             Explorar productos
           </ButtonLink>
-          <ButtonLink href="/ofertas" variant="outline" size="lg">
+          <ButtonLink href="/offers" variant="outline" size="lg">
             <Sparkles className="h-[18px] w-[18px]" /> Ver ofertas
           </ButtonLink>
         </div>
