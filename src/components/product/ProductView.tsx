@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Heart,
@@ -94,10 +94,13 @@ const distribution = [
 ];
 
 export function ProductView({ product, related }: { product: Product; related: Product[] }) {
+  const [mounted, setMounted] = useState(false);
   const add = useCart((s) => s.add);
   const toggleFavorite = useFavorites((s) => s.toggle);
   const favorites = useFavorites((s) => s.items);
-  const wished = favorites.some((p) => p.id === product.id);
+  useEffect(() => setMounted(true), []);
+  // Hasta el montaje se pinta como en el servidor (favoritos vienen de localStorage).
+  const wished = mounted && favorites.some((p) => p.id === product.id);
   const handleWish = () => favoriteToast(product, toggleFavorite(product));
   const [color, setColor] = useState(product.colors?.[0]?.name);
   const [edition, setEdition] = useState("pro");

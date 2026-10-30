@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Heart, Share2, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -7,9 +8,12 @@ import { useFavorites } from "@/store/favorites";
 import { useCart } from "@/store/cart";
 import { notifyToast } from "@/lib/toast";
 
+/** Favoritos. El contenido sale del store del navegador (localStorage). */
 export function WishlistView() {
+  const [mounted, setMounted] = useState(false);
   const items = useFavorites((s) => s.items);
   const addToCart = useCart((s) => s.add);
+  useEffect(() => setMounted(true), []);
 
   const addAll = () => {
     items.forEach((p) => addToCart(p));
@@ -25,6 +29,8 @@ export function WishlistView() {
       description: "Compártelo con quien quieras",
       icon: Share2,
     });
+
+  if (!mounted) return <div className="min-h-[60vh]" />;
 
   if (items.length === 0) {
     return (

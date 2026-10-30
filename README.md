@@ -27,7 +27,7 @@ Scripts: `npm run dev` · `npm run build` · `npm start` · `npm run lint`
 | Estilos | Tailwind CSS (tokens del diseño en `tailwind.config.ts`) |
 | Tipografía | Jost auto-alojada (`next/font/local`, `src/app/fonts/`, licencia SIL OFL) |
 | Animaciones | Framer Motion |
-| Estado (carrito) | Zustand (persistido en localStorage) |
+| Estado (carrito y favoritos) | Zustand (persistido en localStorage: `nexora-cart`, `nexora-favorites`) |
 | Datos en cliente | SWR (búsqueda y listado de categoría, contra `/api`) |
 | Iconos | lucide-react |
 
@@ -54,6 +54,7 @@ src/
   data/types.ts         # tipos de dominio (Product, Category, BlogPost…)
   lib/                  # utils (cn), format (precios), motion (Reveal)
   store/cart.ts         # carrito (Zustand)
+  store/favorites.ts    # favoritos (Zustand)
 public/images/          # imágenes (products / banners / misc)
 ```
 
@@ -112,7 +113,29 @@ Los componentes de cliente nunca importan `@/server`: el Server Component más c
 
 ## URLs
 
-Rutas y slugs en inglés (`/product/[slug]`, `/category/[slug]`, `/cart`, `/search`, `/offers`, `/wishlist`, `/account`, `/login`, `/register`, `/order-confirmation`); los nombres visibles siguen en español. Los slugs del blog también están en inglés (títulos y contenido en español). Las URLs antiguas en español redirigen de forma permanente a las nuevas (`redirects()` en `next.config.mjs`).
+Rutas y slugs en inglés (`/product/[slug]`, `/category/[slug]`, `/cart`, `/search`, `/offers`, `/wishlist`, `/account`, `/account/addresses`, `/account/payments`, `/account/notifications`, `/account/settings`, `/login`, `/register`, `/forgot-password`, `/order-confirmation`); los nombres visibles siguen en español. Los slugs del blog también están en inglés (títulos y contenido en español). Las URLs antiguas en español redirigen de forma permanente a las nuevas (`redirects()` en `next.config.mjs`).
+
+## Pendiente de completar por el comprador
+
+### Enlaces sin destino (`href: "#"`)
+
+Páginas de contenido que la plantilla no incluye. Cambia el `"#"` por la URL de tu página (cada lista lleva el comentario `href "#"` encima):
+
+| Enlace | Dónde |
+|---|---|
+| Redes sociales (Facebook, Instagram, Twitter, YouTube) | `src/components/layout/Footer.tsx` (`socials`) |
+| Centro de ayuda, Devoluciones, Envíos, Garantía | `src/components/layout/Footer.tsx` (`columns`, "Atención al cliente") |
+| Nosotros, Empleos, Contacto, Privacidad | `src/components/layout/Footer.tsx` (`columns`, "Empresa") |
+| FAQs, Nosotros | `src/components/layout/MegaMenu.tsx` y `src/components/layout/Header.tsx` (`secondaryNav`) |
+| Contacto, Novedades | `src/components/layout/Header.tsx` (`primaryNav`, menú móvil) |
+
+### Pantallas solo de front-end
+
+No envían nada a ningún sitio: validan en el cliente y simulan el resultado. Cada componente indica en un comentario dónde va la llamada real.
+
+- `/forgot-password` (`src/components/auth/ForgotPasswordView.tsx`) — valida el correo y muestra "Te enviamos un enlace", sin enviar ningún correo.
+- `/account/settings` (`src/components/account/SettingsView.tsx`) — valida el perfil y muestra "Cambios guardados", sin guardar nada.
+- `/account/payments`, `/account/addresses` y `/account/notifications` — siempre vacías; "Agregar" solo muestra un aviso de "Próximamente".
 
 ---
 

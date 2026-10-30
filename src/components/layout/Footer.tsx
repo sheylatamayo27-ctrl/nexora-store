@@ -3,22 +3,42 @@ import { MapPin, Phone, Mail, Facebook, Instagram, Twitter, Youtube } from "luci
 import { Logo } from "@/components/brand/Logo";
 import { FooterSection } from "@/components/layout/FooterSection";
 
+// href "#": página pendiente de completar por el comprador (ver README).
 const columns = [
   {
     title: "Comprar",
-    links: ["Auriculares", "Audífonos", "Laptops", "Smartphones", "Accesorios"],
+    links: [
+      { label: "Auriculares", href: "/category/headphones" },
+      { label: "Audífonos", href: "/category/earbuds" },
+      { label: "Laptops", href: "/category/laptops" },
+      { label: "Smartphones", href: "/category/smartphones" },
+      { label: "Accesorios", href: "/category/accessories" },
+    ],
   },
   {
     title: "Atención al cliente",
-    links: ["Centro de ayuda", "Rastrear pedido", "Devoluciones", "Envíos", "Garantía"],
+    links: [
+      { label: "Centro de ayuda", href: "#" },
+      { label: "Rastrear pedido", href: "/account" },
+      { label: "Devoluciones", href: "#" },
+      { label: "Envíos", href: "#" },
+      { label: "Garantía", href: "#" },
+    ],
   },
   {
     title: "Empresa",
-    links: ["Nosotros", "Empleos", "Blog", "Contacto", "Privacidad"],
+    links: [
+      { label: "Nosotros", href: "#" },
+      { label: "Empleos", href: "#" },
+      { label: "Blog", href: "/blog" },
+      { label: "Contacto", href: "#" },
+      { label: "Privacidad", href: "#" },
+    ],
   },
 ];
 
 const hours = ["Lun – Vie: 9:00 – 21:00", "Sábado: 10:00 – 20:00", "Domingo: 11:00 – 18:00"];
+// Redes sociales: href "#" pendiente de completar por el comprador (ver README).
 const socials = [Facebook, Instagram, Twitter, Youtube];
 const payments = ["VISA", "Mastercard", "PayPal", "UPI", "COD"];
 
@@ -64,8 +84,8 @@ export function Footer() {
           {columns.map((col) => (
             <FooterSection key={col.title} title={col.title}>
               {col.links.map((l) => (
-                <Link key={l} href="#" className="text-body text-white/65 transition-colors hover:text-white">
-                  {l}
+                <Link key={l.label} href={l.href} className="text-body text-white/65 transition-colors hover:text-white">
+                  {l.label}
                 </Link>
               ))}
             </FooterSection>

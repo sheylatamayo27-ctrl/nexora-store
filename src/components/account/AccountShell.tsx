@@ -21,10 +21,10 @@ const navItems: { id: ActiveId; label: string; href: string; icon: LucideIcon; d
   { id: "dashboard", label: "Panel", href: "/account", icon: LayoutGrid },
   { id: "orders", label: "Mis pedidos", href: "/account", icon: Package },
   { id: "wishlist", label: "Favoritos", href: "/wishlist", icon: Heart },
-  { id: "addresses", label: "Direcciones", href: "#", icon: MapPin },
-  { id: "payments", label: "Métodos de pago", href: "#", icon: CreditCard },
-  { id: "notifications", label: "Notificaciones", href: "#", icon: Mail, desktopOnly: true },
-  { id: "settings", label: "Configuración", href: "#", icon: Settings },
+  { id: "addresses", label: "Direcciones", href: "/account/addresses", icon: MapPin },
+  { id: "payments", label: "Métodos de pago", href: "/account/payments", icon: CreditCard },
+  { id: "notifications", label: "Notificaciones", href: "/account/notifications", icon: Mail, desktopOnly: true },
+  { id: "settings", label: "Configuración", href: "/account/settings", icon: Settings },
 ];
 
 export function AccountShell({

@@ -27,7 +27,12 @@ const navItems: { key: MenuKey; label: string; href: string; hot?: boolean }[] =
   { key: "blogs", label: "Blogs", href: "/blog" },
 ];
 
-const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
+// href "#": página pendiente de completar por el comprador (ver README).
+const secondaryNav = [
+  { label: "FAQs", href: "#" },
+  { label: "Rastrear pedido", href: "/account" },
+  { label: "Nosotros", href: "#" },
+];
 
 export function MegaMenu({ data }: { data: MegaMenuData }) {
   const [activeKey, setActiveKey] = useState<MenuKey | null>(null);
@@ -102,11 +107,11 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
           <Link href="/category/headphones" className="flex items-center gap-1.5 text-label text-brand-700">
             <Zap className="h-4 w-4 text-accent-600" /> Todas las colecciones
           </Link>
-          {secondaryNav.map((label) => (
-            <div key={label} className="flex items-center gap-6">
+          {secondaryNav.map((item) => (
+            <div key={item.label} className="flex items-center gap-6">
               <span className="h-4 w-px bg-border" />
-              <Link href="#" className="text-label text-text-secondary hover:text-text-primary">
-                {label}
+              <Link href={item.href} className="text-label text-text-secondary hover:text-text-primary">
+                {item.label}
               </Link>
             </div>
           ))}

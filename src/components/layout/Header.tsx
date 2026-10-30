@@ -12,6 +12,7 @@ import { SearchBar } from "@/components/layout/SearchBar";
 import { LanguageSelector } from "@/components/layout/LanguageSelector";
 import { MegaMenu, type MegaMenuData } from "@/components/layout/MegaMenu";
 
+// href "#": página pendiente de completar por el comprador (ver README).
 const primaryNav = [
   { label: "Electrónica", href: "/category/headphones" },
   { label: "Ofertas", href: "/offers", hot: true },
@@ -20,7 +21,11 @@ const primaryNav = [
   { label: "Novedades", href: "#" },
 ];
 
-const secondaryNav = ["FAQs", "Rastrear pedido", "Nosotros"];
+const secondaryNav = [
+  { label: "FAQs", href: "#" },
+  { label: "Rastrear pedido", href: "/account" },
+  { label: "Nosotros", href: "#" },
+];
 
 export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuData; mobileSearch?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -136,14 +141,14 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
                   </Link>
                 ))}
                 <div className="my-2 h-px bg-border" />
-                {secondaryNav.map((label) => (
+                {secondaryNav.map((item) => (
                   <Link
-                    key={label}
-                    href="#"
+                    key={item.label}
+                    href={item.href}
                     onClick={() => setMenuOpen(false)}
                     className="rounded-md px-3 py-2.5 text-label text-text-secondary hover:bg-surface-subtle"
                   >
-                    {label}
+                    {item.label}
                   </Link>
                 ))}
               </nav>

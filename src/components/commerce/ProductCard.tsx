@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Badge } from "@/components/ui/Badge";
@@ -25,10 +26,13 @@ export function ProductCard({
   showDiscountPercent?: boolean;
   className?: string;
 }) {
+  const [mounted, setMounted] = useState(false);
   const add = useCart((s) => s.add);
   const toggleFavorite = useFavorites((s) => s.toggle);
   const favorites = useFavorites((s) => s.items);
-  const wished = favorites.some((p) => p.id === product.id);
+  useEffect(() => setMounted(true), []);
+  // Hasta el montaje se pinta como en el servidor (favoritos vienen de localStorage).
+  const wished = mounted && favorites.some((p) => p.id === product.id);
   const href = `/product/${product.slug}`;
   const pct = discountPercent(product.price, product.compareAt);
 
