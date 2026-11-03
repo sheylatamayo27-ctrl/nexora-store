@@ -233,7 +233,6 @@
     "quickView": "Quick view"
   },
   "product": {
-    "loading": "Loading product…",
     "brandLine": "{vendor} AUDIO",
     "reviewCount": "{count, plural, one {{formatted} review} other {{formatted} reviews}}",
     "taxLine": "Taxes included · Monthly payments from Rs. 667/mo · Free shipping",
@@ -651,5 +650,11 @@
     "goHome": "Go home",
     "browseCategories": "Browse categories",
     "popularCategories": "Popular categories"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "We couldn’t display this page. Please try again in a few seconds.",
+    "retry": "Try again",
+    "goHome": "Back to home"
   }
 }

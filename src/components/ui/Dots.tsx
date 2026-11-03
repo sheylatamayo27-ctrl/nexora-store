@@ -28,3 +28,12 @@ export function Dots({
     </span>
   );
 }
+
+/** Dots centrados en un área alta: respaldo mínimo de los `<Suspense>` de los layouts. */
+export function PageDots() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <Dots size="lg" />
+    </div>
+  );
+}

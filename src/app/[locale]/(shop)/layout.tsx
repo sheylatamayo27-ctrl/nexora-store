@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { getMegaMenuData } from "@/components/layout/mega-menu-data";
+import { PageDots } from "@/components/ui/Dots";
 import type { Locale } from "@/i18n/routing";
 
 export default async function ShopLayout({
@@ -17,7 +19,9 @@ export default async function ShopLayout({
   return (
     <div className="flex min-h-screen flex-col bg-surface-subtle">
       <Header megaMenu={megaMenu} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <Suspense fallback={<PageDots />}>{children}</Suspense>
+      </main>
       <Footer />
     </div>
   );

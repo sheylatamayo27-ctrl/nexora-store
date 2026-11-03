@@ -43,14 +43,18 @@ src/
     document.tsx        # <html lang>, fuente Jost, proveedores
     fonts/              # Jost (.woff2 variable, subset latin) + OFL.txt
     globals.css         # estilos base + utilidades
+    global-error.tsx    # error en el layout raíz: documento propio, textos en ES/EN
     [locale]/           # todas las páginas, por idioma
       layout.tsx        # metadatos del sitio en el idioma
       (shop)/           # grupo con Header/Footer
         layout.tsx
-        page.tsx        # Home
+        (home)/page.tsx # Home (en su grupo para que su loading.tsx no cubra otras rutas)
+      **/loading.tsx    # skeleton de cada ruta, con las medidas de la página real
+      **/error.tsx      # pantalla de error de cada ruta (ErrorFallback: reintentar / inicio)
     api/                # API simulada (fuera de [locale]; idioma por ?locale=)
   components/
-    ui/                 # Button, Badge, Container…
+    ui/                 # Button, Badge, Container, Skeleton, ErrorFallback…
+    skeletons/blocks    # piezas de los loading.tsx (tarjeta, migas, resumen, cuenta, acceso)
     commerce/           # ProductCard, Price, Rating…
     layout/             # Header, Footer, BottomNav, AnnouncementBar
     home/               # secciones de la home (Hero, Marquee…)

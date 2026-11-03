@@ -233,7 +233,6 @@
     "quickView": "Vista rápida"
   },
   "product": {
-    "loading": "Cargando producto…",
     "brandLine": "{vendor} AUDIO",
     "reviewCount": "{count, plural, one {{formatted} reseña} other {{formatted} reseñas}}",
     "taxLine": "Impuestos incluidos · Mensualidades desde Rs. 667/mes · Envío gratis",
@@ -651,5 +650,11 @@
     "goHome": "Ir al inicio",
     "browseCategories": "Explorar categorías",
     "popularCategories": "Categorías populares"
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "description": "No pudimos mostrar esta página. Inténtalo de nuevo en unos segundos.",
+    "retry": "Intentar de nuevo",
+    "goHome": "Volver al inicio"
   }
 }
