@@ -72,17 +72,36 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   options: { value: string; label: string }[];
+  /** Primera opción, vacía y no elegible ("Selecciona…"); se ve atenuada mientras esté seleccionada. */
+  placeholder?: string;
+  helper?: React.ReactNode;
+  error?: boolean;
 }
 
-export function Select({ label, options, className, ...props }: SelectProps) {
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  { label, options, placeholder, helper, error, className, ...props },
+  ref
+) {
   return (
     <label className={cn("flex flex-col gap-2", className)}>
       {label && <span className="text-label text-text-primary">{label}</span>}
       <div className="relative">
         <select
-          className="h-12 w-full appearance-none rounded-md border border-border-strong bg-surface px-4 pr-10 text-body text-text-primary focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15"
+          ref={ref}
+          className={cn(
+            "h-12 w-full appearance-none rounded-md border bg-surface px-4 pr-10 text-body text-text-primary focus:outline-none focus:ring-4",
+            error
+              ? "border-sale-500 focus:ring-sale-500/15"
+              : "border-border-strong focus:border-brand-500 focus:ring-brand-500/15",
+            placeholder && "has-[option[value='']:checked]:text-text-muted [&>option]:text-text-primary"
+          )}
           {...props}
         >
+          {placeholder && (
+            <option value="" disabled>
+              {placeholder}
+            </option>
+          )}
           {options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -99,6 +118,11 @@ export function Select({ label, options, className, ...props }: SelectProps) {
           <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
+      {helper && (
+        <span className={cn("text-body-sm", error ? "text-sale-500" : "text-text-secondary")}>
+          {helper}
+        </span>
+      )}
     </label>
   );
-}
+});

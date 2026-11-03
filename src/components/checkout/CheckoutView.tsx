@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState, useTransition } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlertCircle,
+  CheckCircle2,
   Lock,
   Mail,
   MapPin,
@@ -21,41 +25,44 @@ import {
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
-import { Input, Select } from "@/components/ui/Input";
+import { FormField, SelectField } from "@/components/ui/FormField";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { ButtonLink } from "@/components/ui/Button";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { AssetImage } from "@/components/media/AssetImage";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/format";
+import { FORM_OPTIONS, focusFirstError, useErrorText } from "@/lib/forms";
+import { checkoutSchema, type CheckoutData } from "@/lib/schemas/checkout";
+import { simulateRequest } from "@/lib/simulate";
+import { notifyToast } from "@/lib/toast";
 import { useCart } from "@/store/cart";
 import { cn } from "@/lib/utils";
 
-function RadioCard({
-  selected,
-  onSelect,
-  icon: Icon,
-  title,
-  desc,
-  price,
-  priceHighlight,
-}: {
+type RadioCardProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "title"> & {
   selected: boolean;
-  onSelect: () => void;
   icon: LucideIcon;
   title: string;
   desc: string;
   price?: string;
   priceHighlight?: boolean;
-}) {
+};
+
+/**
+ * Opción de una lista (envío, pago): tarjeta con un radio nativo oculto, así se
+ * registra con `register()` y se elige con teclado (flechas) como cualquier radio.
+ */
+const RadioCard = forwardRef<HTMLInputElement, RadioCardProps>(function RadioCard(
+  { selected, icon: Icon, title, desc, price, priceHighlight, ...props },
+  ref
+) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
+    <label
       className={cn(
-        "flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors",
+        "relative flex w-full cursor-pointer items-center gap-4 rounded-lg border p-4 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500/40",
         selected ? "border-brand-800 bg-brand-100" : "border-border bg-surface hover:border-border-strong"
       )}
     >
+      <input ref={ref} type="radio" className="sr-only" {...props} />
       <span
         className={cn(
           "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
@@ -83,9 +90,9 @@ function RadioCard({
           {price}
         </span>
       )}
-    </button>
+    </label>
   );
-}
+});
 
 function Section({ title, children, right }: { title: string; children: React.ReactNode; right?: React.ReactNode }) {
   return (
@@ -113,15 +120,86 @@ const paymentOptions = [
   { id: "cod", icon: Package, title: "cashOnDelivery", desc: "cashOnDeliveryDesc" },
 ] as const;
 
+// `label`: claves del namespace "checkout".
+const footerLinks = [
+  { href: "/devoluciones", label: "refunds" },
+  { href: "/envios", label: "shippingLink" },
+  { href: "/privacidad", label: "privacy" },
+  { href: "/terminos", label: "termsLink" },
+] as const;
+
+/** El formulario arranca vacío; solo vienen elegidos el envío exprés y el pago con tarjeta. */
+const CHECKOUT_DEFAULTS: CheckoutData = {
+  email: "",
+  newsletter: true,
+  phone: "",
+  firstName: "",
+  lastName: "",
+  address: "",
+  apartment: "",
+  city: "",
+  state: "",
+  postalCode: "",
+  country: "",
+  shippingMethod: "express",
+  paymentMethod: "card",
+  cardNumber: "",
+  cardExpiry: "",
+  cardCvc: "",
+  cardName: "",
+};
+
+/** Campos que se registran con `field()` (inputs y selects). */
+type TextField = Exclude<keyof CheckoutData, "newsletter" | "shippingMethod" | "paymentMethod">;
+
+/**
+ * Checkout. Solo front-end: valida con zod (al salir de cada campo y al pagar)
+ * y simula el cobro; para conectarlo, cambia `simulateRequest` por la llamada
+ * real (p. ej. POST /api/orders con los datos validados).
+ */
 export function CheckoutView() {
   const t = useTranslations("checkout");
   const tCommon = useTranslations("common");
+  const errorText = useErrorText();
+  const router = useRouter();
+  const [navigating, startNavigation] = useTransition();
   const [mounted, setMounted] = useState(false);
   const items = useCart((s) => s.items);
-  const [shipping, setShipping] = useState<string>("express");
-  const [payment, setPayment] = useState("card");
   const [summaryOpen, setSummaryOpen] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  const {
+    register,
+    control,
+    watch,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CheckoutData>({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: CHECKOUT_DEFAULTS,
+    // El foco al primer error lo lleva `focusFirstError` (centrado en pantalla).
+    shouldFocusError: false,
+    ...FORM_OPTIONS,
+  });
+  const shipping = watch("shippingMethod");
+  const payment = watch("paymentMethod");
+
+  const field = (name: TextField) => ({ ...register(name), error: errorText(errors[name]?.message) });
+
+  const onSubmit = async () => {
+    try {
+      await simulateRequest(2000);
+      notifyToast({ icon: CheckCircle2, title: t("paymentSuccess"), description: t("paymentSuccessDescription") });
+      startNavigation(() => router.push("/order-confirmation"));
+    } catch {
+      notifyToast({
+        tone: "error",
+        icon: AlertCircle,
+        title: t("paymentFailed"),
+        description: tCommon("checkConnection"),
+      });
+    }
+  };
 
   const subtotal = mounted ? items.reduce((s, i) => s + i.product.price * i.qty, 0) : 0;
   const shipCost = shippingOptions.find((o) => o.id === shipping)?.price ?? 0;
@@ -217,7 +295,7 @@ export function CheckoutView() {
 
       <div className="container-page grid flex-1 gap-10 py-8 lg:grid-cols-[1.5fr_1fr]">
         {/* Formularios */}
-        <div className="flex flex-col gap-5">
+        <form noValidate onSubmit={handleSubmit(onSubmit, focusFirstError)} className="flex flex-col gap-5">
           <Section title={t("expressCheckout")}>
             {/* Móvil (<md): 2 botones (UPI, PayPal). Tablet/escritorio (≥md): 3. */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -228,6 +306,7 @@ export function CheckoutView() {
               ].map((b) => (
                 <button
                   key={b.l}
+                  type="button"
                   className={cn(
                     "flex h-12 items-center justify-center rounded-md text-label",
                     b.c,
@@ -248,58 +327,84 @@ export function CheckoutView() {
               </Link>
             }
           >
-            <Input
+            <FormField
               label={tCommon("fields.email")}
               icon={Mail}
               type="email"
               inputMode="email"
               autoComplete="email"
-              defaultValue="sheyla@nexora.store"
               placeholder={t("emailPlaceholder")}
+              {...field("email")}
             />
-            <Checkbox checked onChange={() => {}} label={t("newsletterOptIn")} />
+            <Controller
+              control={control}
+              name="newsletter"
+              render={({ field: newsletter }) => (
+                <Checkbox checked={newsletter.value} onChange={newsletter.onChange} label={t("newsletterOptIn")} />
+              )}
+            />
           </Section>
 
           <Section title={t("shippingAddress")}>
             {/* <md: una columna (salvo Estado + CP). ≥md: grilla tipo T05. */}
             <div className="grid gap-4 md:grid-cols-2">
-              <Input label={tCommon("fields.firstName")} defaultValue="Sheyla" autoComplete="given-name" />
-              <Input label={tCommon("fields.lastName")} defaultValue="Tamayo" autoComplete="family-name" />
+              <FormField label={tCommon("fields.firstName")} autoComplete="given-name" {...field("firstName")} />
+              <FormField label={tCommon("fields.lastName")} autoComplete="family-name" {...field("lastName")} />
             </div>
-            <Input label={t("address")} icon={MapPin} defaultValue="Parque Tecnológico 221B" autoComplete="address-line1" />
-            <Input label={t("apartment")} placeholder={t("apartmentPlaceholder")} autoComplete="address-line2" />
+            <FormField label={t("address")} icon={MapPin} autoComplete="address-line1" {...field("address")} />
+            <FormField
+              label={t("apartment")}
+              placeholder={t("apartmentPlaceholder")}
+              autoComplete="address-line2"
+              {...field("apartment")}
+            />
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {/* Ciudad a ancho completo en móvil; Estado + CP lado a lado. */}
-              <Input label={t("city")} defaultValue="CDMX" autoComplete="address-level2" className="col-span-2 md:col-span-1" />
-              <Select
+              <FormField
+                label={t("city")}
+                autoComplete="address-level2"
+                className="col-span-2 md:col-span-1"
+                {...field("city")}
+              />
+              <SelectField
                 label={t("state")}
-                defaultValue="cdmx"
+                placeholder={t("selectPlaceholder")}
+                defaultValue=""
                 autoComplete="address-level1"
                 options={[
                   { value: "cdmx", label: t("stateCdmx") },
                   { value: "jal", label: t("stateJalisco") },
                   { value: "nl", label: t("stateNuevoLeon") },
                 ]}
+                {...field("state")}
               />
-              <Input label={t("postalCode")} defaultValue="06000" inputMode="numeric" autoComplete="postal-code" />
+              <FormField
+                label={t("postalCode")}
+                inputMode="numeric"
+                autoComplete="postal-code"
+                maxLength={5}
+                {...field("postalCode")}
+              />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <Select
+              <SelectField
                 label={t("country")}
-                defaultValue="mx"
+                placeholder={t("selectPlaceholder")}
+                defaultValue=""
                 autoComplete="country-name"
                 options={[
                   { value: "mx", label: t("countryMexico") },
                   { value: "us", label: t("countryUs") },
                 ]}
+                {...field("country")}
               />
-              <Input
+              <FormField
                 label={tCommon("fields.phone")}
                 icon={Phone}
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
-                defaultValue="+52 55 9876 5432"
+                {...field("phone")}
               />
             </div>
           </Section>
@@ -309,8 +414,10 @@ export function CheckoutView() {
               {shippingOptions.map((o) => (
                 <RadioCard
                   key={o.id}
+                  {...register("shippingMethod")}
+                  value={o.id}
+                  defaultChecked={o.id === CHECKOUT_DEFAULTS.shippingMethod}
                   selected={shipping === o.id}
-                  onSelect={() => setShipping(o.id)}
                   icon={o.icon}
                   title={t(o.title)}
                   desc={t(o.desc)}
@@ -333,26 +440,44 @@ export function CheckoutView() {
               {paymentOptions.map((o) => (
                 <div key={o.id} className="flex flex-col gap-3">
                   <RadioCard
+                    {...register("paymentMethod")}
+                    value={o.id}
+                    defaultChecked={o.id === CHECKOUT_DEFAULTS.paymentMethod}
                     selected={payment === o.id}
-                    onSelect={() => setPayment(o.id)}
                     icon={o.icon}
                     title={t(o.title)}
                     desc={t(o.desc)}
                   />
                   {o.id === "card" && payment === "card" && (
                     <div className="flex flex-col gap-4 rounded-lg bg-surface-subtle p-4">
-                      <Input
+                      <FormField
                         label={t("cardNumber")}
                         icon={CreditCard}
                         inputMode="numeric"
                         autoComplete="cc-number"
-                        defaultValue="4417 1234 5678 9010"
+                        placeholder="1234 5678 9012 3456"
+                        maxLength={19}
+                        {...field("cardNumber")}
                       />
                       <div className="grid grid-cols-2 gap-4">
-                        <Input label={t("expiry")} inputMode="numeric" autoComplete="cc-exp" defaultValue="08 / 29" />
-                        <Input label={t("cvv")} icon={Lock} inputMode="numeric" autoComplete="cc-csc" defaultValue="•••" />
+                        <FormField
+                          label={t("expiry")}
+                          inputMode="numeric"
+                          autoComplete="cc-exp"
+                          placeholder={t("expiryPlaceholder")}
+                          maxLength={7}
+                          {...field("cardExpiry")}
+                        />
+                        <FormField
+                          label={t("cvv")}
+                          icon={Lock}
+                          inputMode="numeric"
+                          autoComplete="cc-csc"
+                          maxLength={4}
+                          {...field("cardCvc")}
+                        />
                       </div>
-                      <Input label={t("nameOnCard")} icon={User} autoComplete="cc-name" defaultValue="SHEYLA TAMAYO" />
+                      <FormField label={t("nameOnCard")} icon={User} autoComplete="cc-name" {...field("cardName")} />
                     </div>
                   )}
                 </div>
@@ -371,11 +496,11 @@ export function CheckoutView() {
             </span>
           </div>
 
-          <ButtonLink href="/order-confirmation" variant="primary" size="lg" fullWidth className="justify-center">
+          <SubmitButton busy={isSubmitting || navigating} busyLabel={t("processingPayment")}>
             {t("payAmount", { amount: formatPrice(total) })}
-          </ButtonLink>
+          </SubmitButton>
           <p className="text-center text-body-sm text-text-muted">{t("terms")}</p>
-        </div>
+        </form>
 
         {/* Resumen (escritorio) */}
         <aside className="hidden lg:block">
@@ -413,10 +538,18 @@ export function CheckoutView() {
         <div className="container-page flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
           <p className="order-2 text-body-sm text-text-muted lg:order-1">{t("copyright")}</p>
           <div className="order-1 flex gap-4 text-label-sm text-text-secondary lg:order-2">
-            <span>{t("refunds")}</span>
-            <span>{t("shippingLink")}</span>
-            <span>{t("privacy")}</span>
-            <span>{t("termsLink")}</span>
+            {/* Páginas aún por crear: sin prefetch, que daría un 404 en consola por cada enlace
+                al ver el footer. Cuando existan, se puede quitar `prefetch={false}`. */}
+            {footerLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                prefetch={false}
+                className="transition-colors hover:text-text-primary"
+              >
+                {t(l.label)}
+              </Link>
+            ))}
           </div>
         </div>
       </footer>

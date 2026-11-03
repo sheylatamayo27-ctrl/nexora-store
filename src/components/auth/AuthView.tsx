@@ -8,18 +8,12 @@ import { useTranslations } from "next-intl";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { FieldError, FormField } from "@/components/ui/FormField";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { Button } from "@/components/ui/Button";
-import { Dots } from "@/components/ui/Dots";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { Link, useRouter } from "@/i18n/navigation";
 import { notifyToast } from "@/lib/toast";
 import { simulateRequest } from "@/lib/simulate";
-import {
-  loginSchema,
-  registerSchema,
-  type LoginData,
-  type RegisterData,
-  type ValidationKey,
-} from "@/lib/schemas/auth";
+import { FORM_OPTIONS, useErrorText } from "@/lib/forms";
+import { loginSchema, registerSchema, type LoginData, type RegisterData } from "@/lib/schemas/auth";
 
 /** Valores de ejemplo con los que arrancan los formularios. */
 const SIGNIN_DEFAULTS: LoginData = { email: "sheyla@nexora.store", password: "password123" };
@@ -32,45 +26,6 @@ const SIGNUP_DEFAULTS: RegisterData = {
   password: "Password123",
   acceptTerms: true,
 };
-
-/**
- * Valida al salir de cada campo (y, tras el primer envío, al escribir). El error
- * de un campo aparece 300 ms después: si el blur viene de un clic (en la casilla,
- * en "¿Olvidaste tu contraseña?"…), el mensaje empujaría el contenido entre el
- * mousedown y el mouseup y el clic se perdería. Al enviar se muestran al instante.
- */
-const FORM_OPTIONS = { mode: "onBlur", delayError: 300 } as const;
-
-/** Traduce la clave de error que devuelve zod (ver src/lib/schemas/auth.ts). */
-function useErrorText() {
-  const t = useTranslations("validation");
-  return (message?: string) => (message ? t(message as ValidationKey) : undefined);
-}
-
-/** Botón de envío: mientras se envía (y hasta que carga la cuenta), deshabilitado con puntos y texto de progreso. */
-function SubmitButton({ busy, label, busyLabel }: { busy: boolean; label: string; busyLabel: string }) {
-  return (
-    <Button
-      type="submit"
-      variant="primary"
-      size="lg"
-      fullWidth
-      icon={!busy}
-      disabled={busy}
-      aria-busy={busy || undefined}
-      className="justify-center disabled:opacity-80"
-    >
-      {busy ? (
-        <>
-          <Dots size="sm" tone="inverse" />
-          {busyLabel}
-        </>
-      ) : (
-        label
-      )}
-    </Button>
-  );
-}
 
 /**
  * Inicio de sesión. Solo front-end: valida con zod (al salir de cada campo y al
@@ -105,7 +60,7 @@ function SignInForm() {
         tone: "error",
         icon: AlertCircle,
         title: t("signInFailed"),
-        description: t("requestFailedDescription"),
+        description: tCommon("checkConnection"),
       });
     }
   };
@@ -128,7 +83,9 @@ function SignInForm() {
         </Link>
       </div>
 
-      <SubmitButton busy={isSubmitting || navigating} label={tCommon("signIn")} busyLabel={t("signingIn")} />
+      <SubmitButton busy={isSubmitting || navigating} busyLabel={t("signingIn")} icon>
+        {tCommon("signIn")}
+      </SubmitButton>
     </form>
   );
 }
@@ -163,7 +120,7 @@ function SignUpForm() {
         tone: "error",
         icon: AlertCircle,
         title: t("signUpFailed"),
-        description: t("requestFailedDescription"),
+        description: tCommon("checkConnection"),
       });
     }
   };
@@ -195,7 +152,9 @@ function SignUpForm() {
         )}
       />
 
-      <SubmitButton busy={isSubmitting || navigating} label={tCommon("createAccount")} busyLabel={t("creatingAccount")} />
+      <SubmitButton busy={isSubmitting || navigating} busyLabel={t("creatingAccount")} icon>
+        {tCommon("createAccount")}
+      </SubmitButton>
     </form>
   );
 }
