@@ -121,7 +121,7 @@ Los componentes de cliente nunca importan `@/server`: el Server Component más c
 
 ## URLs
 
-Rutas y slugs en inglés (`/product/[slug]`, `/category/[slug]`, `/cart`, `/search`, `/offers`, `/wishlist`, `/account`, `/account/addresses`, `/account/payments`, `/account/notifications`, `/account/settings`, `/login`, `/register`, `/forgot-password`, `/order-confirmation`) en ambos idiomas: el español va sin prefijo y el inglés bajo `/en` (`/en/cart`, `/en/product/[slug]`…). Los slugs del blog también están en inglés. Las URLs antiguas en español redirigen de forma permanente a las nuevas (`redirects()` en `next.config.mjs`).
+Rutas y slugs en inglés (`/product/[slug]`, `/category/[slug]`, `/cart`, `/search`, `/offers`, `/wishlist`, `/account`, `/account/addresses`, `/account/payments`, `/account/notifications`, `/account/settings`, `/login`, `/register`, `/forgot-password`, `/order-confirmation`) en ambos idiomas: el español va sin prefijo y el inglés bajo `/en` (`/en/cart`, `/en/product/[slug]`…). Los slugs del blog también están en inglés. Las URLs antiguas en español redirigen de forma permanente a las nuevas (`src/lib/legacy-redirects.ts`, aplicado en `src/middleware.ts` antes que el idioma).
 
 ## Idiomas (i18n)
 
