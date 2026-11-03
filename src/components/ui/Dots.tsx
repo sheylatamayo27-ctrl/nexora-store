@@ -7,9 +7,12 @@ import { cn } from "@/lib/utils";
  */
 export function Dots({
   size = "md",
+  tone = "brand",
   className,
 }: {
   size?: "sm" | "md" | "lg";
+  /** "inverse": puntos blancos, para fondos oscuros (p. ej. dentro de un botón primario). */
+  tone?: "brand" | "inverse";
   className?: string;
 }) {
   const t = useTranslations("common");
@@ -21,7 +24,7 @@ export function Dots({
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className={cn("animate-dot rounded-full bg-brand-700", dot)}
+          className={cn("animate-dot rounded-full", tone === "inverse" ? "bg-white" : "bg-brand-700", dot)}
           style={{ animationDelay: `${i * 0.16}s` }}
         />
       ))}

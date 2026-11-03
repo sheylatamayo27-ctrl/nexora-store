@@ -94,11 +94,16 @@ const config: Config = {
           "0%, 80%, 100%": { opacity: "0.25", transform: "scale(0.75)" },
           "40%": { opacity: "1", transform: "scale(1)" },
         },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(-2px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         marquee: "marquee 28s linear infinite",
         dot: "dot 1.2s ease-in-out infinite",
         shimmer: "shimmer 2s infinite",
+        "fade-in": "fade-in 0.2s ease-out",
       },
     },
   },

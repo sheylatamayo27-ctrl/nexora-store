@@ -61,20 +61,30 @@ export function favoriteToast(product: Product, added: boolean) {
   });
 }
 
-/** Toast de marca genérico (mismo lenguaje visual que el de favoritos). Recibe los textos ya traducidos. */
+/**
+ * Toast de marca genérico (mismo lenguaje visual que el de favoritos). Recibe los textos ya traducidos.
+ * `tone: "error"` pinta el ícono en rojo (fallos de envío, etc.).
+ */
 export function notifyToast({
   title,
   description,
   icon: Icon = ShoppingBag,
+  tone = "brand",
 }: {
   title: string;
   description?: string;
   icon?: LucideIcon;
+  tone?: "brand" | "error";
 }) {
   showToast(
     () => (
       <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-800">
+        <span
+          className={
+            "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg " +
+            (tone === "error" ? "bg-sale-100 text-sale-500" : "bg-brand-100 text-brand-800")
+          }
+        >
           <Icon className="h-5 w-5" />
         </span>
         <div className="flex min-w-0 flex-1 flex-col">

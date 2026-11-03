@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
@@ -7,11 +8,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Si se pasa, el ícono se vuelve un botón (p. ej. mostrar/ocultar contraseña). */
   onIconClick?: () => void;
   iconLabel?: string;
-  helper?: string;
+  helper?: React.ReactNode;
   error?: boolean;
 }
 
-export function Input({ label, icon: Icon, onIconClick, iconLabel, helper, error, className, ...props }: InputProps) {
+/** La ref llega al <input>: `register()` de react-hook-form la usa para leerlo y enfocarlo. */
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { label, icon: Icon, onIconClick, iconLabel, helper, error, className, ...props },
+  ref
+) {
   return (
     <label className={cn("flex flex-col gap-2", className)}>
       {label && <span className="text-label text-text-primary">{label}</span>}
@@ -50,6 +55,7 @@ export function Input({ label, icon: Icon, onIconClick, iconLabel, helper, error
             <Icon className="h-[18px] w-[18px] text-text-muted" />
           ))}
         <input
+          ref={ref}
           className="h-full w-full min-w-0 flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
           {...props}
         />
@@ -61,7 +67,7 @@ export function Input({ label, icon: Icon, onIconClick, iconLabel, helper, error
       )}
     </label>
   );
-}
+});
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
