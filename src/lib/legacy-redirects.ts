@@ -77,8 +77,10 @@ const legacyBlogSlugs = new Map(
  * Ruta nueva que corresponde a `pathname` si es una URL antigua; si no, `null`.
  * En categoría y producto cualquier otro slug conserva su valor (solo cambia el
  * segmento); en el blog solo se redirigen los slugs renombrados.
+ * La barra final no cuenta: en Netlify el middleware recibe /carrito/ tal cual.
  */
-export function legacyRedirect(pathname: string): string | null {
+export function legacyRedirect(rawPathname: string): string | null {
+  const pathname = rawPathname.replace(/\/+$/, "");
   const route = legacyRoutes.get(pathname);
   if (route) return route;
 
