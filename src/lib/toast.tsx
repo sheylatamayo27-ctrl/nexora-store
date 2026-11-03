@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 import { Heart, HeartOff, ArrowRight, ShoppingBag, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { assetSrc } from "@/components/media/AssetImage";
+import { AssetImage } from "@/components/media/AssetImage";
 import { Link } from "@/i18n/navigation";
 import type { Product } from "@/data/types";
 
@@ -19,12 +19,7 @@ function FavoriteToast({ id, product, added }: { id: string | number; product: P
   return (
     <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-subtle">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={assetSrc("products", product.image)}
-          alt={product.name}
-          className="h-full w-full object-cover"
-        />
+        <AssetImage folder="products" name={product.image} alt={product.name} sizes="48px" />
         <span
           className={
             "absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-surface " +

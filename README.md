@@ -71,17 +71,17 @@ public/images/          # imágenes (products / banners / misc)
 
 ## Imágenes
 
-Mientras se integran las fotos reales, la tienda usa **placeholders SVG** con la estética de la marca, ubicados en `public/images/{products,banners,misc}`.
+Las fotos están en **WebP** en `public/images/{products,banners,misc}`. Los componentes las piden por nombre, sin extensión (`AssetImage folder="products" name="headphones"`), y `next/image` las sirve redimensionadas en AVIF/WebP según la pantalla.
 
-Para usar las fotos reales del diseño:
+Para cambiar o añadir una foto:
 
-1. Exporta cada imagen desde Figma como **JPG** (o colócalas con estos nombres) en las carpetas:
-   - `public/images/misc/` → `hero.jpg`
-   - `public/images/banners/` → `phone-banner.jpg`, `earbuds-banner.jpg`, `tablet-banner.jpg`
-   - `public/images/products/` → `headphones.jpg`, `earbuds.jpg`, `openear.jpg`, `speaker.jpg`, `cube.jpg`, `powerbank.jpg`, `keyboard.jpg`, `projector.jpg`, `laptop.jpg`, `mobile.jpg`, `tablet.jpg`, `drive.jpg`, `pendrive.jpg`, `printer.jpg`, `laptopcase.jpg`
-2. Reinicia `npm run dev`. Un script (`scripts/generate-assets-manifest.mjs`, se ejecuta solo antes de `dev` y `build`) detecta las fotos reales y genera `src/lib/assets.generated.ts`.
+1. Guárdala con su nombre en la carpeta que corresponde, en **WebP** de preferencia (JPG y PNG también sirven):
+   - `public/images/misc/` → `hero` (y `hero-tablet`, `hero-mobile`), `auth-panel`, `auth-register`
+   - `public/images/banners/` → `phone-banner`, `earbuds-banner`, `tablet-banner`
+   - `public/images/products/` → `headphones`, `earbuds`, `openear`, `speaker`, `cube`, `powerbank`, `keyboard`, `projector`, `laptop`, `mobile`, `tablet`, `drive`, `pendrive`, `printer`, `laptopcase`
+2. Reinicia `npm run dev`. Un script (`scripts/generate-assets-manifest.mjs`, se ejecuta solo antes de `dev` y `build`) detecta las fotos y genera `src/lib/assets.generated.ts`.
 
-Cada imagen se reemplaza de forma independiente: si existe `headphones.jpg` se usa; si no, se usa `headphones.svg`. Puedes ir reemplazando una por una y borrar el `.svg` cuando ya tengas su foto. Todos los componentes usan estos nombres, así que no hay que tocar nada más.
+Deja un solo archivo por nombre: si hay varios, gana el JPG, luego el PNG y por último el WebP. Si falta una foto se busca `<nombre>.svg`, y si tampoco existe se muestra un ícono en su lugar sin romper el diseño. Los íconos y la imagen para redes (`src/app/icon.png`, `opengraph-image.png`…) siguen en PNG: Next los exige con esos nombres.
 
 ## Datos
 
