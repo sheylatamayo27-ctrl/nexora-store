@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 /**
@@ -21,6 +22,7 @@ export function SortMenu({
   onChange: (id: string) => void;
   className?: string;
 }) {
+  const t = useTranslations("category");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const current = options.find((o) => o.id === value);
@@ -48,7 +50,7 @@ export function SortMenu({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Ordenar por"
+        aria-label={t("sortBy")}
         className="flex h-11 w-full items-center justify-between gap-2 rounded-md border border-border-strong bg-surface pl-4 pr-3 text-label-sm text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
       >
         <span className="truncate">{current?.label}</span>

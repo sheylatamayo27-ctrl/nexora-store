@@ -1,3 +1,5 @@
+import { intlLocales, type Locale } from "@/i18n/routing";
+
 /**
  * Formato de precios. El diseño original usa la etiqueta "Rs." con separador de
  * miles y dos decimales (p. ej. "Rs. 1,800.00"). Centralizado aquí para poder
@@ -25,13 +27,18 @@ export function discountPercent(price: number, compareAt?: number): number | nul
   return Math.round(((compareAt - price) / compareAt) * 100);
 }
 
-/** Fecha legible en español, p. ej. "2 oct 2026". */
-export function formatDate(iso: string): string {
+/** Fecha legible en el idioma, p. ej. "2 oct 2026" (es) o "Oct 2, 2026" (en). */
+export function formatDate(iso: string, locale: Locale): string {
   const date = new Date(`${iso}T00:00:00`);
   if (Number.isNaN(date.getTime())) return iso;
-  return new Intl.DateTimeFormat("es-MX", {
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     day: "numeric",
     month: "short",
     year: "numeric",
   }).format(date);
+}
+
+/** Número con separador de miles del idioma, p. ej. "1,240" (es-MX y en-US). */
+export function formatNumber(value: number, locale: Locale): string {
+  return value.toLocaleString(intlLocales[locale]);
 }

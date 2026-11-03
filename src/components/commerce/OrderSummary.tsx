@@ -1,4 +1,5 @@
 import { Tag, Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -34,20 +35,22 @@ export function OrderSummary({
   ctaHiddenOnMobile?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("cart");
+  const tCommon = useTranslations("common");
   const rows: Row[] = [
     { label: itemsLabel, value: formatPrice(subtotal) },
     {
-      label: "Envío",
-      value: shipping ? formatPrice(shipping) : "Gratis",
+      label: tCommon("shipping"),
+      value: shipping ? formatPrice(shipping) : tCommon("free"),
       highlight: !shipping,
     },
-    { label: "Impuestos estimados (IVA 16%)", value: formatPrice(tax) },
+    { label: t("estimatedTax"), value: formatPrice(tax) },
   ];
-  if (discount) rows.push({ label: "Descuento (NEXORA10)", value: `−${formatPrice(discount)}`, highlight: true });
+  if (discount) rows.push({ label: tCommon("discountCode"), value: `−${formatPrice(discount)}`, highlight: true });
 
   return (
     <div className={cn("flex flex-col gap-4 rounded-xl border border-border bg-surface p-6", className)}>
-      <h3 className="text-h4 text-text-primary">Resumen del pedido</h3>
+      <h3 className="text-h4 text-text-primary">{tCommon("orderSummary")}</h3>
 
       <div className="flex flex-col gap-3">
         {rows.map((r) => (
@@ -63,22 +66,22 @@ export function OrderSummary({
       <div className="h-px bg-border" />
 
       <div className="flex items-center justify-between">
-        <span className="text-label-lg text-text-primary">Total</span>
+        <span className="text-label-lg text-text-primary">{tCommon("total")}</span>
         <span className="text-h3 text-brand-800">{formatPrice(total)}</span>
       </div>
-      <span className="text-body-sm text-text-muted">Incluye todos los impuestos</span>
+      <span className="text-body-sm text-text-muted">{t("taxesIncluded")}</span>
 
       {showCoupon && (
         <div className="flex items-center gap-2">
           <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-border-strong bg-surface px-3">
             <Tag className="h-4 w-4 shrink-0 text-text-muted" />
             <input
-              placeholder="Código de promoción"
+              placeholder={t("promoCode")}
               className="h-full min-w-0 flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
             />
           </div>
           <Button variant="outline" className="shrink-0">
-            Aplicar
+            {t("apply")}
           </Button>
         </div>
       )}
@@ -96,7 +99,7 @@ export function OrderSummary({
       )}
 
       <div className="flex items-center justify-center gap-2 text-body-sm text-text-muted">
-        <Lock className="h-3.5 w-3.5" /> Pago seguro · Cifrado SSL de 256 bits
+        <Lock className="h-3.5 w-3.5" /> {tCommon("securePaymentSsl")}
       </div>
     </div>
   );

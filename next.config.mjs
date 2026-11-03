@@ -1,6 +1,12 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
+/** next-intl: idioma y diccionario de cada petición (ver src/i18n/request.ts). */
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
 /*
  * URLs antiguas en español → nuevas en inglés. La web ya estaba publicada con las
  * antiguas: se redirigen de forma permanente para conservar el SEO y los enlaces.
+ * Las redirecciones se resuelven antes que el middleware de idioma.
  */
 
 /** Rutas sin slug. */
@@ -84,4 +90,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

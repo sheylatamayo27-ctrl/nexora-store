@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export function QuantityStepper({
@@ -17,6 +18,7 @@ export function QuantityStepper({
   min?: number;
   max?: number;
 }) {
+  const t = useTranslations("common");
   const [internal, setInternal] = useState(value ?? 1);
   const qty = value ?? internal;
 
@@ -32,7 +34,7 @@ export function QuantityStepper({
     <div className="inline-flex items-center overflow-hidden rounded-md border border-border-strong bg-surface">
       <button
         type="button"
-        aria-label="Disminuir"
+        aria-label={t("decrease")}
         onClick={() => set(qty - 1)}
         className={cn(
           "flex items-center justify-center text-text-primary hover:bg-surface-subtle focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/50",
@@ -46,7 +48,7 @@ export function QuantityStepper({
       </span>
       <button
         type="button"
-        aria-label="Aumentar"
+        aria-label={t("increase")}
         onClick={() => set(qty + 1)}
         className={cn(
           "flex items-center justify-center text-text-primary hover:bg-surface-subtle focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/50",

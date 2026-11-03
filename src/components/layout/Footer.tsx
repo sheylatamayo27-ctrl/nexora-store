@@ -1,48 +1,53 @@
-import Link from "next/link";
 import { MapPin, Phone, Mail, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { FooterSection } from "@/components/layout/FooterSection";
+import { Link } from "@/i18n/navigation";
 
-// href "#": página pendiente de completar por el comprador (ver README).
+// `title` y `key`: textos en el namespace "footer". href "#": página pendiente
+// de completar por el comprador (ver README).
 const columns = [
   {
-    title: "Comprar",
+    title: "shop",
     links: [
-      { label: "Auriculares", href: "/category/headphones" },
-      { label: "Audífonos", href: "/category/earbuds" },
-      { label: "Laptops", href: "/category/laptops" },
-      { label: "Smartphones", href: "/category/smartphones" },
-      { label: "Accesorios", href: "/category/accessories" },
+      { key: "headphones", href: "/category/headphones" },
+      { key: "earbuds", href: "/category/earbuds" },
+      { key: "laptops", href: "/category/laptops" },
+      { key: "smartphones", href: "/category/smartphones" },
+      { key: "accessories", href: "/category/accessories" },
     ],
   },
   {
-    title: "Atención al cliente",
+    title: "customerService",
     links: [
-      { label: "Centro de ayuda", href: "#" },
-      { label: "Rastrear pedido", href: "/account" },
-      { label: "Devoluciones", href: "#" },
-      { label: "Envíos", href: "#" },
-      { label: "Garantía", href: "#" },
+      { key: "helpCenter", href: "#" },
+      { key: "trackOrder", href: "/account" },
+      { key: "returns", href: "#" },
+      { key: "shipping", href: "#" },
+      { key: "warranty", href: "#" },
     ],
   },
   {
-    title: "Empresa",
+    title: "company",
     links: [
-      { label: "Nosotros", href: "#" },
-      { label: "Empleos", href: "#" },
-      { label: "Blog", href: "/blog" },
-      { label: "Contacto", href: "#" },
-      { label: "Privacidad", href: "#" },
+      { key: "about", href: "#" },
+      { key: "careers", href: "#" },
+      { key: "blog", href: "/blog" },
+      { key: "contact", href: "#" },
+      { key: "privacy", href: "#" },
     ],
   },
-];
+] as const;
 
-const hours = ["Lun – Vie: 9:00 – 21:00", "Sábado: 10:00 – 20:00", "Domingo: 11:00 – 18:00"];
+const hours = ["weekdays", "saturday", "sunday"] as const;
 // Redes sociales: href "#" pendiente de completar por el comprador (ver README).
 const socials = [Facebook, Instagram, Twitter, Youtube];
+// Marcas de medios de pago: no se traducen.
 const payments = ["VISA", "Mastercard", "PayPal", "UPI", "COD"];
 
 export function Footer() {
+  const t = useTranslations("footer");
+
   return (
     <footer className="bg-brand-900 text-text-inverse">
       {/* En móvil, si la página tiene una barra fija abajo ([data-fixed-bar], 81px +
@@ -52,10 +57,8 @@ export function Footer() {
           {/* Marca */}
           <div className="flex flex-col gap-5">
             <Logo tone="light" />
-            <p className="max-w-xs text-body text-white/70">
-              Tu tienda de los últimos gadgets, audio y dispositivos inteligentes — con envío
-              rápido y soporte real.
-            </p>
+            <p className="max-w-xs text-body text-white/70">{t("tagline")}</p>
+            {/* Datos de contacto: nombres propios, iguales en todos los idiomas. */}
             <div className="flex flex-col gap-3 text-body text-white/85">
               <span className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-accent-500" /> Parque Tecnológico 221B, CDMX
@@ -73,7 +76,7 @@ export function Footer() {
                   key={i}
                   href="#"
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
-                  aria-label="Red social"
+                  aria-label={t("socialLink")}
                 >
                   <Icon className="h-[18px] w-[18px]" />
                 </Link>
@@ -82,19 +85,19 @@ export function Footer() {
           </div>
 
           {columns.map((col) => (
-            <FooterSection key={col.title} title={col.title}>
+            <FooterSection key={col.title} title={t(col.title)}>
               {col.links.map((l) => (
-                <Link key={l.label} href={l.href} className="text-body text-white/65 transition-colors hover:text-white">
-                  {l.label}
+                <Link key={l.key} href={l.href} className="text-body text-white/65 transition-colors hover:text-white">
+                  {t(l.key)}
                 </Link>
               ))}
             </FooterSection>
           ))}
 
-          <FooterSection title="Horario">
+          <FooterSection title={t("hours")}>
             {hours.map((h) => (
               <span key={h} className="text-body text-white/65">
-                {h}
+                {t(h)}
               </span>
             ))}
           </FooterSection>
@@ -103,11 +106,9 @@ export function Footer() {
         <div className="my-8 h-px bg-white/12" />
 
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-body-sm text-white/60">
-            © 2026 Nexora Electronics. Todos los derechos reservados.
-          </p>
+          <p className="text-body-sm text-white/60">{t("copyright")}</p>
           <div className="flex items-center gap-2 max-[339px]:flex-wrap max-[339px]:justify-center">
-            <span className="text-body-sm text-white/60">Aceptamos</span>
+            <span className="text-body-sm text-white/60">{t("weAccept")}</span>
             {payments.map((p) => (
               <span key={p} className="rounded-sm bg-surface px-2 py-1 text-label-xs text-brand-900">
                 {p}

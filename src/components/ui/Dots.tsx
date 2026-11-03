@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 /**
@@ -11,11 +12,12 @@ export function Dots({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
+  const t = useTranslations("common");
   const dot =
     size === "sm" ? "h-1.5 w-1.5" : size === "lg" ? "h-3 w-3" : "h-2.5 w-2.5";
 
   return (
-    <span className={cn("inline-flex items-center gap-1.5", className)} role="status" aria-label="Cargando">
+    <span className={cn("inline-flex items-center gap-1.5", className)} role="status" aria-label={t("loading")}>
       {[0, 1, 2].map((i) => (
         <span
           key={i}

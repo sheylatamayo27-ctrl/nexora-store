@@ -1,11 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, LayoutGrid, Zap, ArrowRight, Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import type { BlogPost, Category, Product } from "@/data/types";
+import { Link } from "@/i18n/navigation";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -19,22 +20,25 @@ export interface MegaMenuData {
   posts: Pick<BlogPost, "slug" | "title" | "category" | "cover" | "coverFolder" | "readingMinutes">[];
 }
 
-type MenuKey = "electronica" | "ofertas" | "blogs";
+/** Cada panel; también es la clave de su texto en el namespace "nav". */
+type MenuKey = "electronics" | "offers" | "blogs";
 
-const navItems: { key: MenuKey; label: string; href: string; hot?: boolean }[] = [
-  { key: "electronica", label: "Electrónica", href: "/category/headphones" },
-  { key: "ofertas", label: "Ofertas", href: "/offers", hot: true },
-  { key: "blogs", label: "Blogs", href: "/blog" },
+const navItems: { key: MenuKey; href: string; hot?: boolean }[] = [
+  { key: "electronics", href: "/category/headphones" },
+  { key: "offers", href: "/offers", hot: true },
+  { key: "blogs", href: "/blog" },
 ];
 
-// href "#": página pendiente de completar por el comprador (ver README).
+// `key`: texto en el namespace "nav". href "#": página pendiente de completar
+// por el comprador (ver README).
 const secondaryNav = [
-  { label: "FAQs", href: "#" },
-  { label: "Rastrear pedido", href: "/account" },
-  { label: "Nosotros", href: "#" },
-];
+  { key: "faqs", href: "#" },
+  { key: "trackOrder", href: "/account" },
+  { key: "about", href: "#" },
+] as const;
 
 export function MegaMenu({ data }: { data: MegaMenuData }) {
+  const t = useTranslations("nav");
   const [activeKey, setActiveKey] = useState<MenuKey | null>(null);
   const openTimer = useRef<ReturnType<typeof setTimeout>>();
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -58,7 +62,7 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
     <nav
       className="relative hidden border-b border-border bg-surface lg:block"
       onMouseLeave={scheduleClose}
-      aria-label="Navegación principal"
+      aria-label={t("main")}
     >
       <div className="container-page flex items-center justify-between py-3">
         <div className="flex items-center gap-8">
@@ -67,7 +71,7 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
             className="flex items-center gap-2 rounded-md bg-brand-100 px-4 py-2 text-label text-brand-800 transition-colors hover:bg-brand-500 hover:text-white"
           >
             <LayoutGrid className="h-[18px] w-[18px]" />
-            Comprar todo
+            {t("shopAll")}
             <ChevronDown className="h-3.5 w-3.5" />
           </Link>
 
@@ -88,7 +92,7 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
                   activeKey === item.key ? "text-brand-700" : "text-text-primary"
                 )}
               >
-                {item.label}
+                {t(item.key)}
                 <ChevronDown
                   className={cn(
                     "h-3.5 w-3.5 text-text-secondary transition-transform",
@@ -96,7 +100,9 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
                   )}
                 />
                 {item.hot && (
-                  <span className="rounded-sm bg-accent-500 px-1.5 py-0.5 text-label-xs text-brand-900">HOT</span>
+                  <span className="rounded-sm bg-accent-500 px-1.5 py-0.5 text-label-xs text-brand-900">
+                    {t("hot")}
+                  </span>
                 )}
               </Link>
             </div>
@@ -105,13 +111,13 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
 
         <div className="flex items-center gap-6">
           <Link href="/category/headphones" className="flex items-center gap-1.5 text-label text-brand-700">
-            <Zap className="h-4 w-4 text-accent-600" /> Todas las colecciones
+            <Zap className="h-4 w-4 text-accent-600" /> {t("allCollections")}
           </Link>
           {secondaryNav.map((item) => (
-            <div key={item.label} className="flex items-center gap-6">
+            <div key={item.key} className="flex items-center gap-6">
               <span className="h-4 w-px bg-border" />
               <Link href={item.href} className="text-label text-text-secondary hover:text-text-primary">
-                {item.label}
+                {t(item.key)}
               </Link>
             </div>
           ))}
@@ -131,8 +137,8 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
             className="absolute left-0 right-0 top-full z-40 border-b border-border bg-surface shadow-elevation-lg"
           >
             <div className="container-page py-8">
-              {activeKey === "electronica" && <ElectronicaPanel categories={data.categories} />}
-              {activeKey === "ofertas" && <OfertasPanel deals={data.deals} />}
+              {activeKey === "electronics" && <ElectronicaPanel categories={data.categories} />}
+              {activeKey === "offers" && <OfertasPanel deals={data.deals} />}
               {activeKey === "blogs" && <BlogsPanel posts={data.posts} />}
             </div>
           </motion.div>
@@ -143,15 +149,17 @@ export function MegaMenu({ data }: { data: MegaMenuData }) {
 }
 
 function ElectronicaPanel({ categories }: { categories: MegaMenuData["categories"] }) {
+  const t = useTranslations("megaMenu");
+  const tCommon = useTranslations("common");
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-label-lg text-text-primary">Compra por categoría</h3>
+        <h3 className="text-label-lg text-text-primary">{t("shopByCategory")}</h3>
         <Link
           href="/category/headphones"
           className="flex items-center gap-1 text-label-sm text-brand-700 hover:text-brand-800"
         >
-          Ver todas <ArrowRight className="h-3.5 w-3.5" />
+          {t("viewAllCategories")} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
       {/* Grilla de 5×2: las 10 primeras categorías. */}
@@ -169,7 +177,7 @@ function ElectronicaPanel({ categories }: { categories: MegaMenuData["categories
               <span className="truncate text-label-sm text-text-primary group-hover:text-brand-700">
                 {cat.name}
               </span>
-              <span className="text-body-sm text-text-muted">{cat.itemCount} artículos</span>
+              <span className="text-body-sm text-text-muted">{tCommon("itemCount", { count: cat.itemCount })}</span>
             </div>
           </Link>
         ))}
@@ -179,12 +187,13 @@ function ElectronicaPanel({ categories }: { categories: MegaMenuData["categories
 }
 
 function OfertasPanel({ deals }: { deals: MegaMenuData["deals"] }) {
+  const t = useTranslations("megaMenu");
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-label-lg text-text-primary">Descuentos destacados</h3>
+        <h3 className="text-label-lg text-text-primary">{t("topDiscounts")}</h3>
         <Link href="/offers" className="flex items-center gap-1 text-label-sm text-brand-700 hover:text-brand-800">
-          Ver todas las ofertas <ArrowRight className="h-3.5 w-3.5" />
+          {t("viewAllOffers")} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
       <div className="grid grid-cols-4 gap-4">
@@ -219,12 +228,14 @@ function OfertasPanel({ deals }: { deals: MegaMenuData["deals"] }) {
 }
 
 function BlogsPanel({ posts }: { posts: MegaMenuData["posts"] }) {
+  const t = useTranslations("megaMenu");
+  const tCommon = useTranslations("common");
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-label-lg text-text-primary">Últimos artículos</h3>
+        <h3 className="text-label-lg text-text-primary">{t("latestArticles")}</h3>
         <Link href="/blog" className="flex items-center gap-1 text-label-sm text-brand-700 hover:text-brand-800">
-          Ir al blog <ArrowRight className="h-3.5 w-3.5" />
+          {t("goToBlog")} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
       <div className="grid grid-cols-4 gap-3">
@@ -243,7 +254,7 @@ function BlogsPanel({ posts }: { posts: MegaMenuData["posts"] }) {
                 {post.title}
               </span>
               <span className="flex items-center gap-1 text-body-sm text-text-muted">
-                <Clock className="h-3 w-3" /> {post.readingMinutes} min
+                <Clock className="h-3 w-3" /> {tCommon("minutes", { minutes: post.readingMinutes })}
               </span>
             </div>
           </Link>

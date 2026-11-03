@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,6 +15,7 @@ export function Logo({
   className?: string;
   href?: string | null;
 }) {
+  const t = useTranslations("common");
   const wordColor = tone === "light" ? "text-text-inverse" : "text-brand-800";
 
   const content = (
@@ -44,7 +46,7 @@ export function Logo({
 
   if (href === null) return content;
   return (
-    <Link href={href} aria-label="Nexora — inicio">
+    <Link href={href} aria-label={t("logoHome")}>
       {content}
     </Link>
   );

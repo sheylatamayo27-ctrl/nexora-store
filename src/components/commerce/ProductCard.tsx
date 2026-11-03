@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/commerce/Rating";
 import { Price } from "@/components/commerce/Price";
+import { Link } from "@/i18n/navigation";
 import { useCart } from "@/store/cart";
 import { useFavorites } from "@/store/favorites";
 import { favoriteToast } from "@/lib/toast";
@@ -26,6 +27,8 @@ export function ProductCard({
   showDiscountPercent?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("common");
+  const tCard = useTranslations("productCard");
   const [mounted, setMounted] = useState(false);
   const add = useCart((s) => s.add);
   const toggleFavorite = useFavorites((s) => s.toggle);
@@ -79,13 +82,13 @@ export function ProductCard({
 
         {/* Quick look */}
         <span className="absolute right-2.5 top-2.5 hidden items-center gap-1 rounded-full bg-surface/95 px-2.5 py-1 text-label-sm text-text-primary shadow-elevation-sm backdrop-blur transition-opacity duration-300 sm:flex sm:opacity-0 sm:group-hover:opacity-100">
-          <Eye className="h-3.5 w-3.5" /> Vista rápida
+          <Eye className="h-3.5 w-3.5" /> {tCard("quickView")}
         </span>
 
         {/* Wishlist */}
         <button
           type="button"
-          aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+          aria-label={wished ? t("removeFromWishlist") : t("saveToWishlist")}
           aria-pressed={wished}
           onClick={handleWish}
           className="absolute bottom-2.5 right-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform duration-200 hover:scale-105"
@@ -101,7 +104,7 @@ export function ProductCard({
         {/* Add to cart */}
         <button
           type="button"
-          aria-label="Agregar al carrito"
+          aria-label={t("addToCart")}
           onClick={handleAdd}
           className="absolute bottom-2.5 left-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-md bg-brand-800 text-white shadow-elevation-sm transition-all duration-200 hover:bg-brand-900 hover:scale-105"
         >
@@ -125,7 +128,9 @@ export function ProductCard({
 
         {showColors && product.colors && product.colors.length > 0 && (
           <div className="mt-1 flex items-center gap-2">
-            <span className="text-body-sm text-text-secondary">Color: {product.colors[0].name}</span>
+            <span className="text-body-sm text-text-secondary">
+              {t("colorValue", { color: product.colors[0].name })}
+            </span>
             <div className="flex items-center gap-1">
               {product.colors.slice(0, 5).map((c, i) => (
                 <span

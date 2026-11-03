@@ -3,20 +3,29 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/data/types";
+import type { Locale } from "@/i18n/routing";
 
 export interface CartItem {
   key: string;
   product: Product;
   qty: number;
+  /** Nombre del color, en el idioma de `product`. */
   color?: string;
 }
 
 interface CartState {
   items: CartItem[];
+  /**
+   * Idioma de las copias de producto guardadas (nombre, color, badge). Si no
+   * coincide con el de la página, `StoreLocaleSync` las vuelve a pedir y llama a `relocalize`.
+   */
+  locale?: Locale;
   add: (product: Product, opts?: { qty?: number; color?: string }) => void;
   remove: (key: string) => void;
   setQty: (key: string, qty: number) => void;
   clear: () => void;
+  /** Sustituye las copias por `products` (mismo id, otro idioma); el color se conserva por posición. */
+  relocalize: (products: Product[], locale: Locale) => void;
   count: () => number;
   subtotal: () => number;
 }
@@ -49,6 +58,17 @@ export const useCart = create<CartState>()(
             .filter((i) => i.qty > 0),
         })),
       clear: () => set({ items: [] }),
+      relocalize: (products, locale) =>
+        set((state) => ({
+          locale,
+          items: state.items.map((item) => {
+            const next = products.find((p) => p.id === item.product.id);
+            if (!next) return item;
+            const colorIndex = item.product.colors?.findIndex((c) => c.name === item.color) ?? -1;
+            const color = colorIndex >= 0 ? next.colors?.[colorIndex]?.name ?? item.color : item.color;
+            return { ...item, product: next, color };
+          }),
+        })),
       count: () => get().items.reduce((n, i) => n + i.qty, 0),
       subtotal: () => get().items.reduce((s, i) => s + i.product.price * i.qty, 0),
     }),

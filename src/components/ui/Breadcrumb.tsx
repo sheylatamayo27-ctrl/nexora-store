@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { Home, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 export interface Crumb {
@@ -8,15 +9,16 @@ export interface Crumb {
 }
 
 export function Breadcrumb({ items, className }: { items: Crumb[]; className?: string }) {
+  const t = useTranslations("common");
   return (
     <nav
-      aria-label="Ruta de navegación"
+      aria-label={t("breadcrumb")}
       className={cn(
         "flex flex-wrap items-center gap-2 max-lg:flex-nowrap max-lg:overflow-hidden",
         className
       )}
     >
-      <Link href="/" className="shrink-0 text-text-secondary hover:text-text-primary" aria-label="Inicio">
+      <Link href="/" className="shrink-0 text-text-secondary hover:text-text-primary" aria-label={t("home")}>
         <Home className="h-4 w-4" />
       </Link>
       {items.map((item, i) => {

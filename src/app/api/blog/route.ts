@@ -1,10 +1,12 @@
+import type { NextRequest } from "next/server";
 import { getBlogPosts, getFeaturedPost, type BlogListResponse } from "@/server";
-import { handle, json } from "@/app/api/_lib";
+import { handle, json, localeParam } from "@/app/api/_lib";
 
-/** GET /api/blog → todos los artículos y el destacado. */
-export async function GET() {
+/** GET /api/blog?locale= → todos los artículos y el destacado. */
+export async function GET(request: NextRequest) {
   return handle(async () => {
-    const [items, featured] = await Promise.all([getBlogPosts(), getFeaturedPost()]);
+    const locale = localeParam(request.nextUrl.searchParams);
+    const [items, featured] = await Promise.all([getBlogPosts(locale), getFeaturedPost(locale)]);
     return json<BlogListResponse>({ items, featured });
   });
 }

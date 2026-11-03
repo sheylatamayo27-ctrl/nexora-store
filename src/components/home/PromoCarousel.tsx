@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { CarouselDots, useCarousel } from "@/components/ui/Carousel";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { PromoBanner } from "@/data/types";
@@ -15,20 +16,21 @@ import type { PromoBanner } from "@/data/types";
  * Tablet/escritorio (≥md): grilla, idéntica a la versión anterior.
  */
 export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
+  const t = useTranslations("home");
   const { scrollerRef, active, count, goTo } = useCarousel(banners.length);
 
   return (
     <>
       <div
         ref={scrollerRef}
-        aria-label="Explorar más"
+        aria-label={t("exploreMore")}
         className="flex snap-x gap-4 overflow-x-auto pb-2 no-scrollbar max-md:snap-mandatory max-md:overscroll-x-contain md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:pb-0 lg:grid-cols-3"
       >
         {banners.map((b, i) => (
           // En móvil el Reveal (que se activa al entrar en vertical) dejaría ocultos
           // los banners que esperan a la derecha: se muestran siempre.
           <Reveal
-            key={b.eyebrow}
+            key={b.href}
             delay={i * 0.08}
             className={cn(
               "w-full shrink-0 snap-start snap-always max-md:!transform-none max-md:!opacity-100 md:w-auto",
@@ -64,7 +66,7 @@ export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
                 <span className="max-w-[14rem] text-h3 text-text-inverse">{b.title}</span>
                 <span className="text-body text-white/80">{b.subtitle}</span>
                 <span className="mt-2 flex items-center gap-1.5 text-label text-text-inverse underline decoration-from-font underline-offset-4">
-                  Comprar ahora <ArrowRight className="h-4 w-4" />
+                  {t("bannerShopNow")} <ArrowRight className="h-4 w-4" />
                 </span>
               </div>
             </Link>
@@ -77,7 +79,7 @@ export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
         count={count}
         active={active}
         onSelect={goTo}
-        label={(i, n) => `Ir al banner ${i + 1} de ${n}`}
+        label={(i, n) => t("goToBanner", { number: i + 1, total: n })}
         className="-mt-2.5 md:hidden"
       />
     </>

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-type Unit = { v: string; l: string };
+/** Unidad: valor con dos dígitos y su clave de texto en "common.countdown". */
+type Unit = { v: string; l: "days" | "hours" | "minutes" | "seconds" };
 
 function split(ms: number): Unit[] {
   const clamp = Math.max(0, ms);
@@ -13,10 +15,10 @@ function split(ms: number): Unit[] {
   const secs = Math.floor((clamp % 60_000) / 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
   return [
-    { v: pad(days), l: "Días" },
-    { v: pad(hours), l: "Hs" },
-    { v: pad(mins), l: "Min" },
-    { v: pad(secs), l: "Seg" },
+    { v: pad(days), l: "days" },
+    { v: pad(hours), l: "hours" },
+    { v: pad(mins), l: "minutes" },
+    { v: pad(secs), l: "seconds" },
   ];
 }
 
@@ -37,6 +39,7 @@ export function Countdown({
   tone?: "light" | "dark";
   className?: string;
 }) {
+  const t = useTranslations("common.countdown");
   const [remaining, setRemaining] = useState<number | null>(null);
 
   useEffect(() => {
@@ -74,7 +77,7 @@ export function Countdown({
             <span className="font-semibold leading-none" suppressHydrationWarning>
               {u.v}
             </span>
-            <span className="text-body-sm text-white/70">{u.l}</span>
+            <span className="text-body-sm text-white/70">{t(u.l)}</span>
           </div>
         </div>
       ))}

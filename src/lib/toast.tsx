@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { toast } from "sonner";
 import { Heart, HeartOff, ArrowRight, ShoppingBag, type LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { assetSrc } from "@/components/media/AssetImage";
+import { Link } from "@/i18n/navigation";
 import type { Product } from "@/data/types";
 
 /** Un solo aviso a la vez: el nuevo reemplaza al anterior en vez de apilarse. */
@@ -12,54 +13,60 @@ function showToast(...args: Parameters<typeof toast.custom>) {
   toast.custom(...args);
 }
 
+/** Contenido del toast de favoritos (componente: así lee el idioma activo). */
+function FavoriteToast({ id, product, added }: { id: string | number; product: Product; added: boolean }) {
+  const t = useTranslations("toast");
+  return (
+    <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
+      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-subtle">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={assetSrc("products", product.image)}
+          alt={product.name}
+          className="h-full w-full object-cover"
+        />
+        <span
+          className={
+            "absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-surface " +
+            (added ? "bg-sale-500 text-white" : "bg-surface-muted text-text-secondary")
+          }
+        >
+          {added ? <Heart className="h-3.5 w-3.5 fill-current" /> : <HeartOff className="h-3.5 w-3.5" />}
+        </span>
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className="text-label text-text-primary">
+          {added ? t("addedToWishlist") : t("removedFromWishlist")}
+        </span>
+        <span className="truncate text-body-sm text-text-secondary">{product.name}</span>
+      </div>
+
+      {added && (
+        <Link
+          href="/wishlist"
+          onClick={() => toast.dismiss(id)}
+          className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-label-sm text-brand-700 transition-colors hover:bg-brand-100"
+        >
+          {t("view")} <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
 /**
  * Toast elegante y de marca para la lista de favoritos.
  * Muestra la miniatura del producto, el estado y un acceso directo a Favoritos.
  */
 export function favoriteToast(product: Product, added: boolean) {
-  showToast(
-    (id) => (
-      <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-subtle">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={assetSrc("products", product.image)}
-            alt={product.name}
-            className="h-full w-full object-cover"
-          />
-          <span
-            className={
-              "absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-surface " +
-              (added ? "bg-sale-500 text-white" : "bg-surface-muted text-text-secondary")
-            }
-          >
-            {added ? <Heart className="h-3.5 w-3.5 fill-current" /> : <HeartOff className="h-3.5 w-3.5" />}
-          </span>
-        </div>
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="text-label text-text-primary">
-            {added ? "Agregado a favoritos" : "Quitado de favoritos"}
-          </span>
-          <span className="truncate text-body-sm text-text-secondary">{product.name}</span>
-        </div>
-
-        {added && (
-          <Link
-            href="/wishlist"
-            onClick={() => toast.dismiss(id)}
-            className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-label-sm text-brand-700 transition-colors hover:bg-brand-100"
-          >
-            Ver <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        )}
-      </div>
-    ),
-    { duration: 3200, unstyled: true }
-  );
+  showToast((id) => <FavoriteToast id={id} product={product} added={added} />, {
+    duration: 3200,
+    unstyled: true,
+  });
 }
 
-/** Toast de marca genérico (mismo lenguaje visual que el de favoritos). */
+/** Toast de marca genérico (mismo lenguaje visual que el de favoritos). Recibe los textos ya traducidos. */
 export function notifyToast({
   title,
   description,

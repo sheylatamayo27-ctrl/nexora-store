@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/data/types";
+import type { Locale } from "@/i18n/routing";
 
 /**
  * Favoritos persistidos en localStorage (igual que el carrito), así que
@@ -11,11 +12,15 @@ import type { Product } from "@/data/types";
  */
 interface FavoritesState {
   items: Product[];
+  /** Idioma de las copias guardadas (ver `StoreLocaleSync`). */
+  locale?: Locale;
   /** Alterna el favorito y devuelve `true` si quedó agregado. */
   toggle: (product: Product) => boolean;
   has: (id: string) => boolean;
   remove: (id: string) => void;
   clear: () => void;
+  /** Sustituye las copias por `products` (mismo id, otro idioma). */
+  relocalize: (products: Product[], locale: Locale) => void;
 }
 
 export const useFavorites = create<FavoritesState>()(
@@ -34,6 +39,11 @@ export const useFavorites = create<FavoritesState>()(
       has: (id) => get().items.some((p) => p.id === id),
       remove: (id) => set((state) => ({ items: state.items.filter((p) => p.id !== id) })),
       clear: () => set({ items: [] }),
+      relocalize: (products, locale) =>
+        set((state) => ({
+          locale,
+          items: state.items.map((item) => products.find((p) => p.id === item.id) ?? item),
+        })),
     }),
     { name: "nexora-favorites" }
   )

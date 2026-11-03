@@ -12,128 +12,152 @@ import {
   MapPin,
   CreditCard,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type OrderStatus = "Procesando" | "Enviado" | "Entregado" | "Cancelado";
+type OrderStatus = "processing" | "shipped" | "delivered" | "cancelled";
+
+/*
+ * Pedidos de ejemplo. Los textos (fechas, resumen, productos, colores) son claves
+ * de "orders.demo"; dirección y medio de pago son datos del cliente y no se traducen.
+ */
+type DemoOrder = "o1" | "o2" | "o3" | "o4";
+type DemoProduct = "auraAnc" | "podsLite" | "soundGo" | "myBook" | "powerBank" | "keyPop" | "openEar" | "projector";
+type DemoColor = "midnightBlack" | "white" | "spaceGray";
 
 interface OrderItem {
-  name: string;
+  name: DemoProduct;
   image: string;
   qty: number;
   price: number;
-  color?: string;
+  color?: DemoColor;
 }
 
 interface Order {
   id: string;
-  date: string;
+  demo: DemoOrder;
   status: OrderStatus;
-  summary: string;
-  eta: string;
   items: OrderItem[];
   shipping: number;
   address: string;
   payment: string;
+  cta: "trackOrder" | "buyAgain";
+}
+
+/** Un pedido con sus textos ya en el idioma actual. */
+interface ResolvedOrder extends Omit<Order, "items" | "cta"> {
+  date: string;
+  summary: string;
+  eta: string;
   cta: string;
+  items: { name: string; image: string; qty: number; price: number; color?: string }[];
 }
 
 const stats = [
-  { icon: Package, n: "12", l: "Pedidos totales", bg: "bg-brand-100", fg: "text-brand-800" },
-  { icon: Truck, n: "2", l: "En tránsito", bg: "bg-accent-100", fg: "text-accent-700" },
-  { icon: CheckCircle2, n: "9", l: "Entregados", bg: "bg-success-100", fg: "text-success-700" },
-  { icon: Heart, n: "8", l: "Favoritos", bg: "bg-sale-100", fg: "text-sale-500" },
-];
+  { icon: Package, n: "12", l: "statTotal", bg: "bg-brand-100", fg: "text-brand-800" },
+  { icon: Truck, n: "2", l: "statInTransit", bg: "bg-accent-100", fg: "text-accent-700" },
+  { icon: CheckCircle2, n: "9", l: "statDelivered", bg: "bg-success-100", fg: "text-success-700" },
+  { icon: Heart, n: "8", l: "statWishlist", bg: "bg-sale-100", fg: "text-sale-500" },
+] as const;
 
 const statusStyles: Record<OrderStatus, string> = {
-  Procesando: "bg-accent-100 text-accent-700",
-  Enviado: "bg-brand-100 text-brand-700",
-  Entregado: "bg-success-100 text-success-700",
-  Cancelado: "bg-sale-100 text-sale-500",
+  processing: "bg-accent-100 text-accent-700",
+  shipped: "bg-brand-100 text-brand-700",
+  delivered: "bg-success-100 text-success-700",
+  cancelled: "bg-sale-100 text-sale-500",
 };
 
-const STEPS: { status: OrderStatus; label: string; icon: typeof Package }[] = [
-  { status: "Procesando", label: "Procesando", icon: Clock },
-  { status: "Enviado", label: "Enviado", icon: Truck },
-  { status: "Entregado", label: "Entregado", icon: CheckCircle2 },
+const STEPS: { status: OrderStatus; icon: typeof Package }[] = [
+  { status: "processing", icon: Clock },
+  { status: "shipped", icon: Truck },
+  { status: "delivered", icon: CheckCircle2 },
 ];
 
 const orders: Order[] = [
   {
     id: "#NX-482913",
-    date: "15 oct 2026",
-    status: "Procesando",
-    summary: "4 artículos · Llega el sáb 18 oct",
-    eta: "Entrega estimada: sáb 18 oct",
+    demo: "o1",
+    status: "processing",
     items: [
-      { name: "Auriculares Aura ANC", image: "headphones", qty: 1, price: 4999, color: "Negro medianoche" },
-      { name: "Pods Lite", image: "earbuds", qty: 2, price: 1299, color: "Blanco" },
-      { name: "Altavoz SoundGo", image: "speaker", qty: 1, price: 3499 },
+      { name: "auraAnc", image: "headphones", qty: 1, price: 4999, color: "midnightBlack" },
+      { name: "podsLite", image: "earbuds", qty: 2, price: 1299, color: "white" },
+      { name: "soundGo", image: "speaker", qty: 1, price: 3499 },
     ],
     shipping: 0,
     address: "Parque Tecnológico 221B, CDMX, 01090",
     payment: "VISA ·· 4821",
-    cta: "Rastrear pedido",
+    cta: "trackOrder",
   },
   {
     id: "#NX-479201",
-    date: "02 oct 2026",
-    status: "Enviado",
-    summary: "1 artículo · En reparto hoy",
-    eta: "En reparto hoy · Llega antes de las 21:00",
-    items: [{ name: 'MyBook Laptop 14"', image: "laptop", qty: 1, price: 85999, color: "Gris espacial" }],
+    demo: "o2",
+    status: "shipped",
+    items: [{ name: "myBook", image: "laptop", qty: 1, price: 85999, color: "spaceGray" }],
     shipping: 0,
     address: "Parque Tecnológico 221B, CDMX, 01090",
     payment: "Mastercard ·· 7390",
-    cta: "Rastrear pedido",
+    cta: "trackOrder",
   },
   {
     id: "#NX-471188",
-    date: "18 sep 2026",
-    status: "Entregado",
-    summary: "3 artículos · Entregado el 22 sep",
-    eta: "Entregado el 22 sep a las 14:12",
+    demo: "o3",
+    status: "delivered",
     items: [
-      { name: "Power Bank 20K", image: "powerbank", qty: 1, price: 1499 },
-      { name: "KeyPop Combo", image: "keyboard", qty: 1, price: 2999 },
-      { name: "Open Ear Sport", image: "openear", qty: 1, price: 1799 },
+      { name: "powerBank", image: "powerbank", qty: 1, price: 1499 },
+      { name: "keyPop", image: "keyboard", qty: 1, price: 2999 },
+      { name: "openEar", image: "openear", qty: 1, price: 1799 },
     ],
     shipping: 0,
     address: "Av. Reforma 88, CDMX, 06600",
     payment: "PayPal · sheyla@nexora.store",
-    cta: "Comprar de nuevo",
+    cta: "buyAgain",
   },
   {
     id: "#NX-462034",
-    date: "29 ago 2026",
-    status: "Cancelado",
-    summary: "1 artículo · Reembolsado el 31 ago",
-    eta: "Cancelado · Reembolso completado el 31 ago",
-    items: [{ name: "Proyector Multimedia Digital", image: "projector", qty: 1, price: 19100 }],
+    demo: "o4",
+    status: "cancelled",
+    items: [{ name: "projector", image: "projector", qty: 1, price: 19100 }],
     shipping: 0,
     address: "Parque Tecnológico 221B, CDMX, 01090",
     payment: "VISA ·· 4821",
-    cta: "Comprar de nuevo",
+    cta: "buyAgain",
   },
 ];
 
-const tabs: { label: string; status: OrderStatus | null }[] = [
-  { label: "Todos", status: null },
-  { label: "Procesando", status: "Procesando" },
-  { label: "Enviados", status: "Enviado" },
-  { label: "Entregados", status: "Entregado" },
-  { label: "Cancelados", status: "Cancelado" },
+const tabs: { key: "all" | OrderStatus; status: OrderStatus | null }[] = [
+  { key: "all", status: null },
+  { key: "processing", status: "processing" },
+  { key: "shipped", status: "shipped" },
+  { key: "delivered", status: "delivered" },
+  { key: "cancelled", status: "cancelled" },
 ];
 
-const subtotalOf = (o: Order) => o.items.reduce((s, i) => s + i.price * i.qty, 0);
+const subtotalOf = (o: { items: { price: number; qty: number }[] }) =>
+  o.items.reduce((s, i) => s + i.price * i.qty, 0);
 
 export function OrdersView() {
+  const t = useTranslations("orders");
+  const tCommon = useTranslations("common");
   const [active, setActive] = useState<OrderStatus | null>(null);
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Order | null>(null);
+  const [selected, setSelected] = useState<ResolvedOrder | null>(null);
+
+  const resolved = useMemo<ResolvedOrder[]>(
+    () =>
+      orders.map((o) => ({
+        ...o,
+        date: t(`demo.${o.demo}Date`),
+        summary: t(`demo.${o.demo}Summary`),
+        eta: t(`demo.${o.demo}Eta`),
+        cta: t(o.cta),
+        items: o.items.map((i) => ({ ...i, name: t(`demo.${i.name}`), color: i.color && t(`demo.${i.color}`) })),
+      })),
+    [t]
+  );
 
   const counts = useMemo(() => {
     const map = new Map<OrderStatus, number>();
@@ -143,7 +167,7 @@ export function OrdersView() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return orders.filter((o) => {
+    return resolved.filter((o) => {
       if (active && o.status !== active) return false;
       if (q) {
         const haystack = `${o.id} ${o.items.map((i) => i.name).join(" ")}`.toLowerCase();
@@ -151,14 +175,14 @@ export function OrdersView() {
       }
       return true;
     });
-  }, [active, query]);
+  }, [resolved, active, query]);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-h2 text-text-primary">Mis pedidos</h1>
-          <p className="text-body text-text-secondary">Rastrea, devuelve o vuelve a comprar.</p>
+          <h1 className="text-h2 text-text-primary">{t("title")}</h1>
+          <p className="text-body text-text-secondary">{t("subtitle")}</p>
         </div>
         {/* El buscador no aparece en M09/T09: solo escritorio. */}
         <div className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4 max-lg:hidden">
@@ -166,7 +190,7 @@ export function OrdersView() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por N.º de pedido o producto"
+            placeholder={t("searchPlaceholder")}
             className="h-full w-56 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
           />
         </div>
@@ -182,7 +206,7 @@ export function OrdersView() {
             </span>
             <div className="flex flex-col max-lg:min-w-0">
               <span className="text-h3 text-text-primary">{s.n}</span>
-              <span className="text-body-sm text-text-secondary">{s.l}</span>
+              <span className="text-body-sm text-text-secondary">{t(s.l)}</span>
             </div>
           </div>
         ))}
@@ -190,14 +214,14 @@ export function OrdersView() {
 
       {/* Tabs */}
       <div className="flex gap-6 overflow-x-auto border-b border-border no-scrollbar">
-        {tabs.map((t) => {
-          const count = t.status === null ? orders.length : counts.get(t.status) ?? 0;
-          const isActive = active === t.status;
+        {tabs.map((tab) => {
+          const count = tab.status === null ? orders.length : counts.get(tab.status) ?? 0;
+          const isActive = active === tab.status;
           return (
             <button
-              key={t.label}
+              key={tab.key}
               type="button"
-              onClick={() => setActive(t.status)}
+              onClick={() => setActive(tab.status)}
               className={cn(
                 "flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 py-3 text-label-lg transition-colors",
                 isActive
@@ -205,7 +229,7 @@ export function OrdersView() {
                   : "border-transparent text-text-secondary hover:text-text-primary"
               )}
             >
-              {t.label}
+              {t(`tabs.${tab.key}`)}
               {/* <lg: conteo en gris junto al nombre, sin chip. */}
               <span
                 className={cn(
@@ -238,7 +262,7 @@ export function OrdersView() {
                       )}
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                      {o.status}
+                      {t(`status.${o.status}`)}
                     </span>
                   </div>
                   <span className="truncate text-body-sm text-text-secondary">
@@ -261,7 +285,7 @@ export function OrdersView() {
                   </div>
                   <div className="grid grid-cols-2 gap-3 md:flex md:shrink-0">
                     <Button variant="secondary" fullWidth onClick={() => setSelected(o)} className="md:w-auto max-md:px-3 max-[359px]:px-2 max-[359px]:text-label-sm">
-                      Ver detalles
+                      {t("viewDetails")}
                     </Button>
                     <Button variant="primary" fullWidth className="md:w-auto max-md:px-3 max-[359px]:px-2 max-[359px]:text-label-sm">
                       {o.cta}
@@ -275,20 +299,20 @@ export function OrdersView() {
               <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-subtle px-5 py-4">
                 <div className="flex flex-wrap gap-8">
                   <div className="flex flex-col">
-                    <span className="text-body-sm text-text-muted">Pedido</span>
+                    <span className="text-body-sm text-text-muted">{t("order")}</span>
                     <span className="text-label text-text-primary">{o.id}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-body-sm text-text-muted">Fecha</span>
+                    <span className="text-body-sm text-text-muted">{t("date")}</span>
                     <span className="text-label text-text-primary">{o.date}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-body-sm text-text-muted">Total</span>
+                    <span className="text-body-sm text-text-muted">{tCommon("total")}</span>
                     <span className="text-label text-text-primary">{formatPrice(subtotalOf(o) + o.shipping)}</span>
                   </div>
                 </div>
                 <span className={cn("rounded-full px-3 py-1.5 text-label-sm", statusStyles[o.status])}>
-                  {o.status}
+                  {t(`status.${o.status}`)}
                 </span>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-4 p-5">
@@ -309,7 +333,7 @@ export function OrdersView() {
                 </div>
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={() => setSelected(o)}>
-                    Ver detalles
+                    {t("viewDetails")}
                   </Button>
                   <Button variant="primary">{o.cta}</Button>
                 </div>
@@ -323,9 +347,9 @@ export function OrdersView() {
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-subtle">
             <Package className="h-7 w-7 text-text-muted" />
           </span>
-          <p className="text-h4 text-text-primary">No hay pedidos en esta categoría</p>
+          <p className="text-h4 text-text-primary">{t("emptyTitle")}</p>
           <button onClick={() => { setActive(null); setQuery(""); }} className="text-label text-brand-700">
-            Ver todos los pedidos
+            {t("viewAllOrders")}
           </button>
         </div>
       )}
@@ -335,24 +359,26 @@ export function OrdersView() {
   );
 }
 
-function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: () => void }) {
+function OrderDetailsModal({ order, onClose }: { order: ResolvedOrder | null; onClose: () => void }) {
+  const t = useTranslations("orders");
+  const tCommon = useTranslations("common");
   const subtotal = order ? subtotalOf(order) : 0;
   const total = order ? subtotal + order.shipping : 0;
-  const cancelled = order?.status === "Cancelado";
+  const cancelled = order?.status === "cancelled";
   const currentStep = order ? STEPS.findIndex((s) => s.status === order.status) : -1;
 
   return (
     <Modal
       open={!!order}
       onClose={onClose}
-      title={order ? `Pedido ${order.id}` : ""}
-      description={order ? `Realizado el ${order.date}` : undefined}
+      title={order ? t("modalTitle", { id: order.id }) : ""}
+      description={order ? t("placedOn", { date: order.date }) : undefined}
       className="sm:max-w-3xl"
       footer={
         order && (
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Button variant="outline" onClick={onClose} className="sm:w-auto">
-              Cerrar
+              {tCommon("close")}
             </Button>
             <Button variant="primary" className="sm:w-auto">
               {order.cta}
@@ -370,16 +396,16 @@ function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: (
             <div className="flex items-center gap-3 rounded-lg bg-sale-100 p-4">
               <XCircle className="h-5 w-5 shrink-0 text-sale-500" />
               <div className="flex flex-col">
-                <span className="text-label text-text-primary">Pedido cancelado</span>
+                <span className="text-label text-text-primary">{t("cancelledTitle")}</span>
                 <span className="text-body-sm text-text-secondary">{order.eta}</span>
               </div>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-label text-text-primary">Estado del pedido</span>
+                <span className="text-label text-text-primary">{t("orderStatus")}</span>
                 <span className={cn("rounded-full px-3 py-1 text-label-sm", statusStyles[order.status])}>
-                  {order.status}
+                  {t(`status.${order.status}`)}
                 </span>
               </div>
               <div className="flex items-start">
@@ -410,7 +436,7 @@ function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: (
                         />
                       </div>
                       <span className={cn("text-label-sm", done ? "text-text-primary" : "text-text-muted")}>
-                        {step.label}
+                        {t(`status.${step.status}`)}
                       </span>
                     </div>
                   );
@@ -423,7 +449,7 @@ function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: (
           {/* Artículos */}
           <div className="flex flex-col gap-3">
             <span className="text-label text-text-primary">
-              Artículos ({order.items.reduce((n, i) => n + i.qty, 0)})
+              {t("items", { count: order.items.reduce((n, i) => n + i.qty, 0) })}
             </span>
             <div className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border">
               {order.items.map((item) => (
@@ -434,7 +460,8 @@ function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: (
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-label text-text-primary">{item.name}</span>
                     <span className="text-body-sm text-text-secondary">
-                      {item.color ? `${item.color} · ` : ""}Cantidad: {item.qty}
+                      {item.color ? `${item.color} · ` : ""}
+                      {t("quantity", { qty: item.qty })}
                     </span>
                   </div>
                   <span className="shrink-0 text-label text-text-primary">{formatPrice(item.price * item.qty)}</span>
@@ -449,15 +476,15 @@ function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: (
           {/* Totales */}
           <div className="flex flex-col gap-2 rounded-lg bg-surface-subtle p-4">
             <div className="flex justify-between text-body text-text-secondary">
-              <span>Subtotal</span>
+              <span>{tCommon("subtotal")}</span>
               <span className="text-text-primary">{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between text-body text-text-secondary">
-              <span>Envío</span>
-              <span className="text-success-700">{order.shipping === 0 ? "Gratis" : formatPrice(order.shipping)}</span>
+              <span>{tCommon("shipping")}</span>
+              <span className="text-success-700">{order.shipping === 0 ? tCommon("free") : formatPrice(order.shipping)}</span>
             </div>
             <div className="mt-1 flex justify-between border-t border-border pt-3 text-label-lg text-text-primary">
-              <span>Total</span>
+              <span>{tCommon("total")}</span>
               <span>{formatPrice(total)}</span>
             </div>
           </div>
@@ -467,14 +494,14 @@ function OrderDetailsModal({ order, onClose }: { order: Order | null; onClose: (
             <div className="flex gap-3 rounded-lg border border-border p-4">
               <MapPin className="h-5 w-5 shrink-0 text-brand-700" />
               <div className="flex flex-col">
-                <span className="text-label-sm text-text-secondary">Dirección de envío</span>
+                <span className="text-label-sm text-text-secondary">{t("shippingAddress")}</span>
                 <span className="text-body text-text-primary">{order.address}</span>
               </div>
             </div>
             <div className="flex gap-3 rounded-lg border border-border p-4">
               <CreditCard className="h-5 w-5 shrink-0 text-brand-700" />
               <div className="flex flex-col">
-                <span className="text-label-sm text-text-secondary">Método de pago</span>
+                <span className="text-label-sm text-text-secondary">{t("paymentMethod")}</span>
                 <span className="text-body text-text-primary">{order.payment}</span>
               </div>
             </div>

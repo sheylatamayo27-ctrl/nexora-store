@@ -1,12 +1,14 @@
 import { Zap } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /** Franja animada de ofertas (desplazamiento continuo). */
 export function Marquee() {
+  const t = useTranslations("marquee");
   const item = (
     <span className="flex items-center gap-3 px-6">
       <Zap className="h-4 w-4 shrink-0 text-accent-500" />
-      <span className="text-label-lg text-text-inverse">Ofertas Jackpot</span>
-      <span className="text-body text-white/75">Toca para obtener 50% de descuento</span>
+      <span className="text-label-lg text-text-inverse">{t("title")}</span>
+      <span className="text-body text-white/75">{t("cta")}</span>
     </span>
   );
 

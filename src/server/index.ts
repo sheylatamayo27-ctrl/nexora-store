@@ -2,6 +2,7 @@
  * Fuente de datos de la tienda: el ÚNICO lugar que sabe de dónde salen los datos.
  * Todas las funciones son async; hoy leen del catálogo local (`./db`) y mañana
  * harán fetch al backend real (`./config`) sin que cambie quien las llama.
+ * Todas reciben el idioma (`Locale`) y devuelven los textos ya en ese idioma.
  */
 export * from "./products";
 export * from "./categories";

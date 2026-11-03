@@ -3,6 +3,7 @@
 import { useRef, type ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,7 +20,7 @@ export function Modal({
   description,
   footer,
   className,
-  srTitle = "Ventana",
+  srTitle,
 }: {
   open: boolean;
   onClose: () => void;
@@ -28,11 +29,13 @@ export function Modal({
   description?: ReactNode;
   footer?: ReactNode;
   className?: string;
-  /** Título solo para lectores de pantalla cuando no hay `title` visible. */
+  /** Título solo para lectores de pantalla cuando no hay `title` visible (por defecto, "Ventana"). */
   srTitle?: string;
 }) {
   // Mientras se anima el cierre, el padre suele vaciar las props (p. ej.
   // order = null); conservamos el último contenido para que no "salte".
+  const t = useTranslations("common");
+  const a11yTitle = srTitle ?? t("dialog");
   const last = useRef({ title, description, children, footer });
   if (open) last.current = { title, description, children, footer };
   const view = open ? { title, description, children, footer } : last.current;
@@ -67,7 +70,7 @@ export function Modal({
                 {view.title ? (
                   <Dialog.Title className="text-h4 text-text-primary">{view.title}</Dialog.Title>
                 ) : (
-                  <Dialog.Title className="sr-only">{srTitle}</Dialog.Title>
+                  <Dialog.Title className="sr-only">{a11yTitle}</Dialog.Title>
                 )}
                 {view.description && (
                   <Dialog.Description className="text-body-sm text-text-secondary">
@@ -76,14 +79,14 @@ export function Modal({
                 )}
               </div>
               <Dialog.Close
-                aria-label="Cerrar"
+                aria-label={t("close")}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-subtle hover:text-text-primary"
               >
                 <X className="h-5 w-5" />
               </Dialog.Close>
             </div>
           ) : (
-            <Dialog.Title className="sr-only">{srTitle}</Dialog.Title>
+            <Dialog.Title className="sr-only">{a11yTitle}</Dialog.Title>
           )}
           <div className="min-h-0 flex-1 overflow-y-auto">{view.children}</div>
           {view.footer && <div className="border-t border-border bg-surface px-6 py-4">{view.footer}</div>}

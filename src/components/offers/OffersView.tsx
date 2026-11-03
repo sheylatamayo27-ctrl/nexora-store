@@ -1,24 +1,26 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { Flame, Zap, Tag, ChevronDown, TrendingDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { Countdown } from "@/components/commerce/Countdown";
 import { StockBar } from "@/components/commerce/StockBar";
 import { Price } from "@/components/commerce/Price";
 import { AssetImage } from "@/components/media/AssetImage";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/lib/motion";
 import { discountPercent } from "@/lib/format";
 import type { Product } from "@/data/types";
 
+/** `label`: texto en "common.sort". */
 const sortOptions = [
-  { id: "discount", label: "Mayor descuento" },
-  { id: "price-asc", label: "Precio: menor a mayor" },
-  { id: "price-desc", label: "Precio: mayor a menor" },
-  { id: "rating", label: "Mejor valorados" },
-];
+  { id: "discount", label: "discount" },
+  { id: "price-asc", label: "priceAsc" },
+  { id: "price-desc", label: "priceDesc" },
+  { id: "rating", label: "rating" },
+] as const;
 
 export function OffersView({
   products,
@@ -27,7 +29,9 @@ export function OffersView({
   products: Product[];
   flashDeals: Product[];
 }) {
-  const [sort, setSort] = useState("discount");
+  const t = useTranslations("offers");
+  const tCommon = useTranslations("common");
+  const [sort, setSort] = useState<string>("discount");
 
   const sorted = useMemo(() => {
     const list = [...products];
@@ -54,35 +58,32 @@ export function OffersView({
         <Container className="relative flex flex-col gap-6 py-12 text-white sm:py-16">
           <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
             <Flame className="h-3.5 w-3.5 text-accent-500" />
-            <span className="text-label-xs tracking-wide text-accent-500">OFERTAS POR TIEMPO LIMITADO</span>
+            <span className="text-label-xs tracking-wide text-accent-500">{t("badge")}</span>
           </span>
 
           <div className="flex flex-col gap-3">
             <h1 className="text-balance text-[2.25rem] font-semibold leading-[1.1] tracking-tight sm:text-display-l">
-              Ofertas Nexora
+              {t("title")}
             </h1>
-            <p className="max-w-xl text-body-lg text-white/80">
-              Los mejores descuentos en tecnología, seleccionados y por tiempo limitado.
-              Apúrate antes de que se agoten.
-            </p>
+            <p className="max-w-xl text-body-lg text-white/80">{t("subtitle")}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <div className="flex flex-col gap-1">
-              <span className="text-label-sm text-white/70">Termina en</span>
+              <span className="text-label-sm text-white/70">{tCommon("endsIn")}</span>
               <Countdown endsInHours={47} tone="dark" />
             </div>
             <div className="flex items-center gap-6">
               <div className="flex flex-col">
                 <span className="text-h2 text-white">{products.length}</span>
-                <span className="text-body-sm text-white/70">ofertas activas</span>
+                <span className="text-body-sm text-white/70">{t("activeDeals")}</span>
               </div>
               <span className="h-10 w-px bg-white/20" />
               <div className="flex flex-col">
                 <span className="flex items-center gap-1 text-h2 text-accent-500">
                   <TrendingDown className="h-6 w-6" />−{maxDiscount}%
                 </span>
-                <span className="text-body-sm text-white/70">hasta de descuento</span>
+                <span className="text-body-sm text-white/70">{t("maxDiscount")}</span>
               </div>
             </div>
           </div>
@@ -96,7 +97,7 @@ export function OffersView({
             <Reveal>
               <div className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-accent-600" />
-                <h2 className="text-h3 text-text-primary sm:text-h2">Ofertas relámpago</h2>
+                <h2 className="text-h3 text-text-primary sm:text-h2">{t("flashDeals")}</h2>
               </div>
             </Reveal>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -136,14 +137,12 @@ export function OffersView({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Tag className="h-5 w-5 text-brand-700" />
-              <h2 className="text-h3 text-text-primary sm:text-h2">Todas las ofertas</h2>
-              <span className="text-body text-text-secondary">
-                ({products.length} producto{products.length !== 1 && "s"})
-              </span>
+              <h2 className="text-h3 text-text-primary sm:text-h2">{t("allDeals")}</h2>
+              <span className="text-body text-text-secondary">{t("productCount", { count: products.length })}</span>
             </div>
             <div className="relative">
               <label htmlFor="offers-sort" className="sr-only">
-                Ordenar ofertas
+                {t("sortLabel")}
               </label>
               <select
                 id="offers-sort"
@@ -153,7 +152,7 @@ export function OffersView({
               >
                 {sortOptions.map((o) => (
                   <option key={o.id} value={o.id}>
-                    {o.label}
+                    {tCommon(`sort.${o.label}`)}
                   </option>
                 ))}
               </select>

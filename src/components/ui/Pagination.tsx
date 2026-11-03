@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 function buildPages(current: number, total: number): (number | "…")[] {
@@ -29,6 +30,7 @@ export function Pagination({
   onChange?: (page: number) => void;
   className?: string;
 }) {
+  const t = useTranslations("common");
   if (total <= 1) return null;
 
   const pages = buildPages(current, total);
@@ -40,8 +42,8 @@ export function Pagination({
     "flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-text-primary transition-colors hover:bg-surface-subtle disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40";
 
   return (
-    <nav className={cn("flex items-center gap-2", className)} aria-label="Paginación">
-      <button className={edgeBtn} aria-label="Página anterior" onClick={() => go(current - 1)} disabled={current === 1}>
+    <nav className={cn("flex items-center gap-2", className)} aria-label={t("pagination")}>
+      <button className={edgeBtn} aria-label={t("previousPage")} onClick={() => go(current - 1)} disabled={current === 1}>
         <ChevronLeft className="h-[18px] w-[18px]" />
       </button>
       {pages.map((p, i) =>
@@ -65,7 +67,7 @@ export function Pagination({
           </button>
         )
       )}
-      <button className={edgeBtn} aria-label="Página siguiente" onClick={() => go(current + 1)} disabled={current === total}>
+      <button className={edgeBtn} aria-label={t("nextPage")} onClick={() => go(current + 1)} disabled={current === total}>
         <ChevronRight className="h-[18px] w-[18px]" />
       </button>
     </nav>

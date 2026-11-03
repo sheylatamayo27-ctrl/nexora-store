@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Heart, Share2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,8 @@ export function MobileGallery({
   wished: boolean;
   onWish: () => void;
 }) {
+  const t = useTranslations("product");
+  const tCommon = useTranslations("common");
   const [index, setIndex] = useState(0);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +69,7 @@ export function MobileGallery({
           <button
             type="button"
             onClick={onWish}
-            aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+            aria-label={wished ? tCommon("removeFromWishlist") : tCommon("saveToWishlist")}
             aria-pressed={wished}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform active:scale-95"
           >
@@ -79,7 +82,7 @@ export function MobileGallery({
           </button>
           <button
             type="button"
-            aria-label="Compartir"
+            aria-label={tCommon("share")}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform active:scale-95"
           >
             <Share2 className="h-[18px] w-[18px] text-text-primary" />
@@ -98,7 +101,7 @@ export function MobileGallery({
             key={i}
             type="button"
             onClick={() => goTo(i)}
-            aria-label={`Ver imagen ${i + 1}`}
+            aria-label={t("viewImage", { number: i + 1 })}
             className={cn(
               "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-subtle sm:h-20 sm:w-20",
               i === index ? "ring-2 ring-brand-800" : "ring-1 ring-border"

@@ -1,21 +1,24 @@
-import Link from "next/link";
 import { ChevronLeft, Star, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { AssetImage } from "@/components/media/AssetImage";
+import { Link } from "@/i18n/navigation";
 
-const perks = ["Precios de miembro", "Envío gratis en tu primer pedido", "Acceso anticipado a ofertas"];
+/** Claves del namespace "auth". */
+const perks = ["memberPrices", "firstOrderShipping", "earlyAccess"] as const;
 
 const stats = [
-  { value: "50k+", label: "Clientes felices" },
-  { value: "4.9★", label: "Valoración media" },
-  { value: "24h", label: "Entrega exprés" },
-];
+  { value: "50k+", label: "happyCustomers" },
+  { value: "4.9★", label: "averageRating" },
+  { value: "24h", label: "expressDelivery" },
+] as const;
 
 /**
  * Marco de las pantallas de acceso: panel de marca y columna del formulario
  * con "Volver a la tienda". El formulario de cada pantalla va en `children`.
  */
 export function AuthShell({ variant, children }: { variant: "signin" | "signup"; children: React.ReactNode }) {
+  const t = useTranslations("auth");
   const isSignup = variant === "signup";
 
   return (
@@ -58,7 +61,7 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
           <Link
             href="/"
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-text-inverse lg:hidden"
-            aria-label="Volver a la tienda"
+            aria-label={t("backToStore")}
           >
             <ChevronLeft className="h-[18px] w-[18px]" />
           </Link>
@@ -70,13 +73,11 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
         <div className="relative flex flex-col gap-6 text-text-inverse">
           {isSignup ? (
             <>
-              <h2 className="max-w-md text-h3 lg:text-h2">
-                Únete a Nexora y desbloquea beneficios de miembro
-              </h2>
+              <h2 className="max-w-md text-h3 lg:text-h2">{t("joinTitle")}</h2>
               <div className="flex flex-col gap-2">
                 {perks.map((p) => (
                   <span key={p} className="flex items-center gap-2 text-body-lg text-white/90">
-                    <Check className="h-4 w-4 text-accent-500" /> {p}
+                    <Check className="h-4 w-4 text-accent-500" /> {t(p)}
                   </span>
                 ))}
               </div>
@@ -85,14 +86,14 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
             <>
               {/* Móvil: titular + valoración (como en Figma móvil) */}
               <div className="flex flex-col gap-4 lg:hidden">
-                <h2 className="max-w-md text-h3">Tecnología que te encantará, entregada mañana</h2>
+                <h2 className="max-w-md text-h3">{t("signInHeadline")}</h2>
                 <div className="flex items-center gap-2">
                   <div className="flex gap-0.5">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-accent-500 text-accent-500" />
                     ))}
                   </div>
-                  <span className="text-body text-white/85">4.9 de más de 50 mil clientes</span>
+                  <span className="text-body text-white/85">{t("ratingLine")}</span>
                 </div>
               </div>
 
@@ -104,17 +105,14 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
                       <Star key={i} className="h-4 w-4 fill-accent-500 text-accent-500" />
                     ))}
                   </div>
-                  <blockquote className="text-body-lg text-white/90">
-                    “El mejor lugar para comprar tecnología online. Productos genuinos, entrega al
-                    día siguiente y un equipo de soporte que de verdad ayuda.”
-                  </blockquote>
+                  <blockquote className="text-body-lg text-white/90">{t("testimonial")}</blockquote>
                   <figcaption className="flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-label-sm text-text-inverse">
                       AM
                     </span>
                     <span className="flex flex-col">
                       <span className="text-label text-text-inverse">Aarav Mehta</span>
-                      <span className="text-body-sm text-white/70">Cliente desde 2023</span>
+                      <span className="text-body-sm text-white/70">{t("customerSince")}</span>
                     </span>
                   </figcaption>
                 </figure>
@@ -122,7 +120,7 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
                   {stats.map((s) => (
                     <div key={s.label} className="flex flex-col gap-0.5">
                       <span className="text-h3 text-text-inverse">{s.value}</span>
-                      <span className="text-body-sm text-white/70">{s.label}</span>
+                      <span className="text-body-sm text-white/70">{t(s.label)}</span>
                     </div>
                   ))}
                 </div>
@@ -141,7 +139,7 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
             href="/"
             className="hidden items-center gap-1 text-label text-text-secondary transition-colors hover:text-text-primary lg:flex"
           >
-            <ChevronLeft className="h-4 w-4" /> Volver a la tienda
+            <ChevronLeft className="h-4 w-4" /> {t("backToStore")}
           </Link>
           {children}
         </div>

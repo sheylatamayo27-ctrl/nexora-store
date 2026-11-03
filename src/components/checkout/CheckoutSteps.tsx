@@ -1,16 +1,19 @@
 import { Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const steps = ["Carrito", "Información", "Envío", "Pago"];
+/** Claves de cada paso en el namespace "checkout". */
+const steps = ["stepCart", "stepInformation", "stepShipping", "stepPayment"] as const;
 
 export function CheckoutSteps({ current = 1 }: { current?: number }) {
+  const t = useTranslations("checkout");
   return (
     <div className="flex items-center gap-2">
-      {steps.map((label, i) => {
+      {steps.map((step, i) => {
         const done = i < current;
         const active = i === current;
         return (
-          <div key={label} className="flex items-center gap-2">
+          <div key={step} className="flex items-center gap-2">
             {i > 0 && (
               <span className={cn("h-0.5 w-6 sm:w-10", i <= current ? "bg-brand-800" : "bg-border-strong")} />
             )}
@@ -30,7 +33,7 @@ export function CheckoutSteps({ current = 1 }: { current?: number }) {
                 active ? "text-text-primary" : "text-text-secondary"
               )}
             >
-              {label}
+              {t(step)}
             </span>
           </div>
         );

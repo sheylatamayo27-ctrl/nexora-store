@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Lock,
@@ -19,12 +18,14 @@ import {
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { Input, Select } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ButtonLink } from "@/components/ui/Button";
 import { AssetImage } from "@/components/media/AssetImage";
+import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/store/cart";
 import { cn } from "@/lib/utils";
@@ -98,23 +99,26 @@ function Section({ title, children, right }: { title: string; children: React.Re
   );
 }
 
+// `title` y `desc`: claves del namespace "checkout".
 const shippingOptions = [
-  { id: "standard", icon: Truck, title: "Envío estándar", desc: "3–5 días hábiles · Llega el mar 21 oct", price: 0 },
-  { id: "express", icon: Zap, title: "Envío exprés", desc: "1–2 días hábiles · Llega el sáb 18 oct", price: 199 },
-  { id: "sameday", icon: Clock, title: "Entrega el mismo día", desc: "Solo CDMX · Antes de las 2:00 PM", price: 349 },
-];
+  { id: "standard", icon: Truck, title: "standardShipping", desc: "standardShippingDesc", price: 0 },
+  { id: "express", icon: Zap, title: "expressShipping", desc: "expressShippingDesc", price: 199 },
+  { id: "sameday", icon: Clock, title: "sameDay", desc: "sameDayDesc", price: 349 },
+] as const;
 
 const paymentOptions = [
-  { id: "card", icon: CreditCard, title: "Tarjeta de crédito / débito", desc: "Visa, Mastercard, Amex" },
-  { id: "upi", icon: Phone, title: "Billetera / UPI", desc: "Google Pay, Mercado Pago y más" },
-  { id: "bank", icon: Home, title: "Transferencia bancaria", desc: "Todos los bancos principales" },
-  { id: "cod", icon: Package, title: "Pago contra entrega", desc: "Paga al recibir · Cargo de Rs. 49" },
-];
+  { id: "card", icon: CreditCard, title: "card", desc: "cardDesc" },
+  { id: "upi", icon: Phone, title: "wallet", desc: "walletDesc" },
+  { id: "bank", icon: Home, title: "bankTransfer", desc: "bankTransferDesc" },
+  { id: "cod", icon: Package, title: "cashOnDelivery", desc: "cashOnDeliveryDesc" },
+] as const;
 
 export function CheckoutView() {
+  const t = useTranslations("checkout");
+  const tCommon = useTranslations("common");
   const [mounted, setMounted] = useState(false);
   const items = useCart((s) => s.items);
-  const [shipping, setShipping] = useState("express");
+  const [shipping, setShipping] = useState<string>("express");
   const [payment, setPayment] = useState("card");
   const [summaryOpen, setSummaryOpen] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -136,7 +140,7 @@ export function CheckoutView() {
             <CheckoutSteps current={1} />
           </div>
           <span className="flex items-center gap-1.5 rounded-full bg-success-100 px-3 py-1.5 text-label-sm text-success-700">
-            <Lock className="h-3.5 w-3.5" /> Pago seguro
+            <Lock className="h-3.5 w-3.5" /> {t("securePayment")}
           </span>
         </div>
       </header>
@@ -147,8 +151,8 @@ export function CheckoutView() {
           {/* Móvil (<md): "Paso 2 de 4" + barra de 4 segmentos */}
           <div className="md:hidden">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-label text-text-primary">Paso 2 de 4 · Información</span>
-              <span className="shrink-0 text-label-sm text-text-muted">Siguiente: Envío</span>
+              <span className="text-label text-text-primary">{t("stepProgress")}</span>
+              <span className="shrink-0 text-label-sm text-text-muted">{t("nextStep")}</span>
             </div>
             <div className="mt-3 flex gap-1.5">
               {[0, 1, 2, 3].map((i) => (
@@ -173,7 +177,7 @@ export function CheckoutView() {
         className="flex items-center justify-between gap-3 border-b border-border bg-brand-100 px-4 py-3.5 lg:hidden"
       >
         <span className="flex items-center gap-2 text-label text-brand-800">
-          <ShoppingBag className="h-[18px] w-[18px] shrink-0" /> Ver resumen del pedido ({count})
+          <ShoppingBag className="h-[18px] w-[18px] shrink-0" /> {t("viewSummary", { count })}
           <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", summaryOpen && "rotate-180")} />
         </span>
         <span className="shrink-0 text-price-sm text-brand-800">{formatPrice(total)}</span>
@@ -203,7 +207,7 @@ export function CheckoutView() {
                   </span>
                 </div>
               ))}
-              {count === 0 && <p className="text-body text-text-secondary">Tu carrito está vacío.</p>}
+              {count === 0 && <p className="text-body text-text-secondary">{t("emptyCart")}</p>}
               <div className="h-px bg-border" />
               <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
             </div>
@@ -214,13 +218,13 @@ export function CheckoutView() {
       <div className="container-page grid flex-1 gap-10 py-8 lg:grid-cols-[1.5fr_1fr]">
         {/* Formularios */}
         <div className="flex flex-col gap-5">
-          <Section title="Pago exprés">
+          <Section title={t("expressCheckout")}>
             {/* Móvil (<md): 2 botones (UPI, PayPal). Tablet/escritorio (≥md): 3. */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {[
                 { l: "UPI", c: "bg-brand-800 text-white" },
                 { l: "PayPal", c: "bg-accent-500 text-brand-900" },
-                { l: "Transferencia", c: "bg-surface text-text-primary border border-border-strong", hide: true },
+                { l: t("transfer"), c: "bg-surface text-text-primary border border-border-strong", hide: true },
               ].map((b) => (
                 <button
                   key={b.l}
@@ -237,60 +241,60 @@ export function CheckoutView() {
           </Section>
 
           <Section
-            title="Contacto"
+            title={t("contact")}
             right={
               <Link href="/login" className="text-label-sm text-brand-700 underline underline-offset-2">
-                Iniciar sesión
+                {tCommon("signIn")}
               </Link>
             }
           >
             <Input
-              label="Correo electrónico"
+              label={tCommon("fields.email")}
               icon={Mail}
               type="email"
               inputMode="email"
               autoComplete="email"
               defaultValue="sheyla@nexora.store"
-              placeholder="tu@correo.com"
+              placeholder={t("emailPlaceholder")}
             />
-            <Checkbox checked onChange={() => {}} label="Enviarme ofertas y novedades por correo" />
+            <Checkbox checked onChange={() => {}} label={t("newsletterOptIn")} />
           </Section>
 
-          <Section title="Dirección de envío">
+          <Section title={t("shippingAddress")}>
             {/* <md: una columna (salvo Estado + CP). ≥md: grilla tipo T05. */}
             <div className="grid gap-4 md:grid-cols-2">
-              <Input label="Nombre" defaultValue="Sheyla" autoComplete="given-name" />
-              <Input label="Apellidos" defaultValue="Tamayo" autoComplete="family-name" />
+              <Input label={tCommon("fields.firstName")} defaultValue="Sheyla" autoComplete="given-name" />
+              <Input label={tCommon("fields.lastName")} defaultValue="Tamayo" autoComplete="family-name" />
             </div>
-            <Input label="Dirección" icon={MapPin} defaultValue="Parque Tecnológico 221B" autoComplete="address-line1" />
-            <Input label="Depto., suite (opcional)" placeholder="Piso, referencia…" autoComplete="address-line2" />
+            <Input label={t("address")} icon={MapPin} defaultValue="Parque Tecnológico 221B" autoComplete="address-line1" />
+            <Input label={t("apartment")} placeholder={t("apartmentPlaceholder")} autoComplete="address-line2" />
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {/* Ciudad a ancho completo en móvil; Estado + CP lado a lado. */}
-              <Input label="Ciudad" defaultValue="CDMX" autoComplete="address-level2" className="col-span-2 md:col-span-1" />
+              <Input label={t("city")} defaultValue="CDMX" autoComplete="address-level2" className="col-span-2 md:col-span-1" />
               <Select
-                label="Estado"
+                label={t("state")}
                 defaultValue="cdmx"
                 autoComplete="address-level1"
                 options={[
-                  { value: "cdmx", label: "Ciudad de México" },
-                  { value: "jal", label: "Jalisco" },
-                  { value: "nl", label: "Nuevo León" },
+                  { value: "cdmx", label: t("stateCdmx") },
+                  { value: "jal", label: t("stateJalisco") },
+                  { value: "nl", label: t("stateNuevoLeon") },
                 ]}
               />
-              <Input label="Código postal" defaultValue="06000" inputMode="numeric" autoComplete="postal-code" />
+              <Input label={t("postalCode")} defaultValue="06000" inputMode="numeric" autoComplete="postal-code" />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <Select
-                label="País"
+                label={t("country")}
                 defaultValue="mx"
                 autoComplete="country-name"
                 options={[
-                  { value: "mx", label: "México" },
-                  { value: "us", label: "Estados Unidos" },
+                  { value: "mx", label: t("countryMexico") },
+                  { value: "us", label: t("countryUs") },
                 ]}
               />
               <Input
-                label="Teléfono"
+                label={tCommon("fields.phone")}
                 icon={Phone}
                 type="tel"
                 inputMode="tel"
@@ -300,7 +304,7 @@ export function CheckoutView() {
             </div>
           </Section>
 
-          <Section title="Método de envío">
+          <Section title={t("shippingMethod")}>
             <div className="flex flex-col gap-3">
               {shippingOptions.map((o) => (
                 <RadioCard
@@ -308,9 +312,9 @@ export function CheckoutView() {
                   selected={shipping === o.id}
                   onSelect={() => setShipping(o.id)}
                   icon={o.icon}
-                  title={o.title}
-                  desc={o.desc}
-                  price={o.price ? formatPrice(o.price) : "Gratis"}
+                  title={t(o.title)}
+                  desc={t(o.desc)}
+                  price={o.price ? formatPrice(o.price) : tCommon("free")}
                   priceHighlight={!o.price}
                 />
               ))}
@@ -318,10 +322,10 @@ export function CheckoutView() {
           </Section>
 
           <Section
-            title="Pago"
+            title={t("payment")}
             right={
               <span className="flex items-center gap-1.5 text-body-sm text-text-muted">
-                <Lock className="h-3.5 w-3.5" /> Cifrado
+                <Lock className="h-3.5 w-3.5" /> {t("encrypted")}
               </span>
             }
           >
@@ -332,56 +336,54 @@ export function CheckoutView() {
                     selected={payment === o.id}
                     onSelect={() => setPayment(o.id)}
                     icon={o.icon}
-                    title={o.title}
-                    desc={o.desc}
+                    title={t(o.title)}
+                    desc={t(o.desc)}
                   />
                   {o.id === "card" && payment === "card" && (
                     <div className="flex flex-col gap-4 rounded-lg bg-surface-subtle p-4">
                       <Input
-                        label="Número de tarjeta"
+                        label={t("cardNumber")}
                         icon={CreditCard}
                         inputMode="numeric"
                         autoComplete="cc-number"
                         defaultValue="4417 1234 5678 9010"
                       />
                       <div className="grid grid-cols-2 gap-4">
-                        <Input label="Vencimiento" inputMode="numeric" autoComplete="cc-exp" defaultValue="08 / 29" />
-                        <Input label="CVV" icon={Lock} inputMode="numeric" autoComplete="cc-csc" defaultValue="•••" />
+                        <Input label={t("expiry")} inputMode="numeric" autoComplete="cc-exp" defaultValue="08 / 29" />
+                        <Input label={t("cvv")} icon={Lock} inputMode="numeric" autoComplete="cc-csc" defaultValue="•••" />
                       </div>
-                      <Input label="Nombre en la tarjeta" icon={User} autoComplete="cc-name" defaultValue="SHEYLA TAMAYO" />
+                      <Input label={t("nameOnCard")} icon={User} autoComplete="cc-name" defaultValue="SHEYLA TAMAYO" />
                     </div>
                   )}
                 </div>
               ))}
             </div>
-            <Checkbox checked onChange={() => {}} label="La dirección de facturación es la misma que la de envío" />
+            <Checkbox checked onChange={() => {}} label={t("billingSame")} />
           </Section>
 
           {/* Resumen del pedido a ancho completo — solo tablet (T05), antes de pagar. */}
           <div className="hidden flex-col gap-4 rounded-xl border border-border bg-surface p-6 md:flex lg:hidden">
-            <h2 className="text-h4 text-text-primary">Resumen del pedido</h2>
+            <h2 className="text-h4 text-text-primary">{tCommon("orderSummary")}</h2>
             <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
-            <p className="text-body-sm text-text-muted">Impuestos incluidos</p>
+            <p className="text-body-sm text-text-muted">{t("taxesIncluded")}</p>
             <span className="flex items-center justify-center gap-1.5 text-body-sm text-text-muted">
-              <Lock className="h-3.5 w-3.5" /> Pago seguro · Cifrado SSL de 256 bits
+              <Lock className="h-3.5 w-3.5" /> {tCommon("securePaymentSsl")}
             </span>
           </div>
 
           <ButtonLink href="/order-confirmation" variant="primary" size="lg" fullWidth className="justify-center">
-            Pagar {formatPrice(total)} de forma segura
+            {t("payAmount", { amount: formatPrice(total) })}
           </ButtonLink>
-          <p className="text-center text-body-sm text-text-muted">
-            Al realizar tu pedido aceptas los Términos y la Política de Privacidad de Nexora.
-          </p>
+          <p className="text-center text-body-sm text-text-muted">{t("terms")}</p>
         </div>
 
         {/* Resumen (escritorio) */}
         <aside className="hidden lg:block">
           <div className="sticky top-8 flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-h4 text-text-primary">Tu pedido ({count})</h2>
+              <h2 className="text-h4 text-text-primary">{t("yourOrder", { count })}</h2>
               <Link href="/cart" className="text-label-sm text-brand-700 underline underline-offset-2">
-                Editar
+                {t("edit")}
               </Link>
             </div>
             <div className="flex flex-col gap-4">
@@ -397,7 +399,7 @@ export function CheckoutView() {
                   <span className="text-label text-text-primary">{formatPrice(item.product.price * item.qty)}</span>
                 </div>
               ))}
-              {count === 0 && <p className="text-body text-text-secondary">Tu carrito está vacío.</p>}
+              {count === 0 && <p className="text-body text-text-secondary">{t("emptyCart")}</p>}
             </div>
             <div className="h-px bg-border" />
             <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
@@ -409,12 +411,12 @@ export function CheckoutView() {
           izquierda y copyright a la derecha (T05); escritorio intacto. */}
       <footer className="border-t border-border bg-surface py-5">
         <div className="container-page flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
-          <p className="order-2 text-body-sm text-text-muted lg:order-1">© 2026 Nexora Electronics</p>
+          <p className="order-2 text-body-sm text-text-muted lg:order-1">{t("copyright")}</p>
           <div className="order-1 flex gap-4 text-label-sm text-text-secondary lg:order-2">
-            <span>Reembolsos</span>
-            <span>Envíos</span>
-            <span>Privacidad</span>
-            <span>Términos</span>
+            <span>{t("refunds")}</span>
+            <span>{t("shippingLink")}</span>
+            <span>{t("privacy")}</span>
+            <span>{t("termsLink")}</span>
           </div>
         </div>
       </footer>
@@ -437,11 +439,13 @@ function SummaryRows({
   total: number;
   count: number;
 }) {
+  const t = useTranslations("checkout");
+  const tCommon = useTranslations("common");
   const rows = [
-    { l: `Subtotal (${count} artículos)`, v: formatPrice(subtotal) },
-    { l: "Envío", v: shipCost ? formatPrice(shipCost) : "Gratis", h: !shipCost },
-    { l: "Impuestos (IVA 16%)", v: formatPrice(tax) },
-    { l: "Descuento (NEXORA10)", v: `−${formatPrice(discount)}`, h: true },
+    { l: t("subtotalItems", { count }), v: formatPrice(subtotal) },
+    { l: tCommon("shipping"), v: shipCost ? formatPrice(shipCost) : tCommon("free"), h: !shipCost },
+    { l: tCommon("taxVat"), v: formatPrice(tax) },
+    { l: tCommon("discountCode"), v: `−${formatPrice(discount)}`, h: true },
   ];
   return (
     <div className="flex flex-col gap-3">
@@ -453,7 +457,7 @@ function SummaryRows({
       ))}
       <div className="h-px bg-border" />
       <div className="flex items-center justify-between">
-        <span className="text-label-lg text-text-primary">Total</span>
+        <span className="text-label-lg text-text-primary">{tCommon("total")}</span>
         <span className="text-h3 text-brand-800">{formatPrice(total)}</span>
       </div>
     </div>

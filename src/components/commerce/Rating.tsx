@@ -1,4 +1,6 @@
 import { Star } from "lucide-react";
+import { useLocale } from "next-intl";
+import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export function Rating({
@@ -14,6 +16,7 @@ export function Rating({
   className?: string;
   showCount?: boolean;
 }) {
+  const locale = useLocale();
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <div className="flex items-center gap-0.5">
@@ -31,7 +34,7 @@ export function Rating({
       </div>
       {showCount && reviews !== undefined && (
         <span className="text-body-sm text-text-secondary">
-          {rating.toFixed(1)} ({reviews.toLocaleString("es-MX")})
+          {rating.toFixed(1)} ({formatNumber(reviews, locale)})
         </span>
       )}
     </div>

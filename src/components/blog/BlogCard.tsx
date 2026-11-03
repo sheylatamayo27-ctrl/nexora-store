@@ -1,11 +1,15 @@
-import Link from "next/link";
 import { Clock, ArrowRight } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
+import { Link } from "@/i18n/navigation";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { BlogPost } from "@/data/types";
 
 export function BlogCard({ post, className }: { post: BlogPost; className?: string }) {
+  const t = useTranslations("blog");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
   return (
     <article
       className={cn(
@@ -28,9 +32,9 @@ export function BlogCard({ post, className }: { post: BlogPost; className?: stri
 
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-center gap-3 text-body-sm text-text-muted">
-          <span>{formatDate(post.date)}</span>
+          <span>{formatDate(post.date, locale)}</span>
           <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" /> {post.readingMinutes} min
+            <Clock className="h-3.5 w-3.5" /> {tCommon("minutes", { minutes: post.readingMinutes })}
           </span>
         </div>
         <Link
@@ -46,7 +50,7 @@ export function BlogCard({ post, className }: { post: BlogPost; className?: stri
             href={`/blog/${post.slug}`}
             className="flex items-center gap-1 text-label-sm text-brand-700 transition-colors hover:text-brand-800"
           >
-            Leer <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            {t("read")} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
       </div>

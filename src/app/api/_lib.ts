@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { routing, type Locale } from "@/i18n/routing";
 import type { ApiError } from "@/server/api-types";
 
 /*
@@ -87,6 +88,11 @@ export function enumParam<T extends string>(
   const isAllowed = (value: string): value is T => (allowed as readonly string[]).includes(value);
   if (isAllowed(raw)) return raw;
   throw new BadRequestError(`El parámetro "${name}" debe ser uno de: ${allowed.join(", ")}.`);
+}
+
+/** Idioma de los textos de la respuesta (`?locale=es|en`); ausente → el idioma por defecto. */
+export function localeParam(params: URLSearchParams): Locale {
+  return enumParam(params, "locale", routing.locales, routing.defaultLocale);
 }
 
 /**

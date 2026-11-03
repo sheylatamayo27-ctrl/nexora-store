@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   Heart,
   Share2,
@@ -16,6 +15,7 @@ import {
   ThumbsUp,
   ArrowRight,
 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/commerce/Rating";
@@ -29,61 +29,48 @@ import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
 import { Accordion } from "@/components/ui/Accordion";
 import { MobileGallery } from "@/components/product/MobileGallery";
 import { Container } from "@/components/ui/Container";
-import { formatPrice, discountPercent } from "@/lib/format";
+import { Link } from "@/i18n/navigation";
+import { formatPrice, formatNumber, discountPercent } from "@/lib/format";
 import { useCart } from "@/store/cart";
 import { useFavorites } from "@/store/favorites";
 import { favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
 
-const editions = [
-  { label: "Estándar", value: "estandar", delta: -1500 },
-  { label: "Pro · +Rs. 1,500", value: "pro", delta: 0 },
-  { label: "Max · Agotado", value: "max", disabled: true, delta: 0 },
+// Contenido de ejemplo de la ficha. Los textos son claves del namespace "product".
+const editions: {
+  label: "editionStandard" | "editionPro" | "editionMax";
+  value: string;
+  delta: number;
+  disabled?: boolean;
+}[] = [
+  { label: "editionStandard", value: "estandar", delta: -1500 },
+  { label: "editionPro", value: "pro", delta: 0 },
+  { label: "editionMax", value: "max", disabled: true, delta: 0 },
 ];
 
 const highlights = [
-  { icon: BatteryCharging, title: "40 h de batería", sub: "Carga de 10 min = 5 h" },
-  { icon: Headphones, title: "ANC híbrido", sub: "Hasta 98% menos ruido" },
-  { icon: Zap, title: "Baja latencia", sub: "Ideal para gaming y video" },
-  { icon: Cpu, title: "Multipunto", sub: "Conecta dos equipos a la vez" },
-];
+  { icon: BatteryCharging, title: "highlightBattery", sub: "highlightBatterySub" },
+  { icon: Headphones, title: "highlightAnc", sub: "highlightAncSub" },
+  { icon: Zap, title: "highlightLatency", sub: "highlightLatencySub" },
+  { icon: Cpu, title: "highlightMultipoint", sub: "highlightMultipointSub" },
+] as const;
 
 const specTable = [
-  ["Driver", "40 mm dinámico, ajuste personalizado"],
-  ["Respuesta de frecuencia", "20 Hz – 40 kHz (Hi-Res)"],
-  ["Batería", "Hasta 40 h (ANC on), 60 h (ANC off)"],
-  ["Carga", "USB-C, 10 min = 5 h de reproducción"],
-  ["Conectividad", "Bluetooth 5.3, multipunto, LDAC"],
-  ["Peso", "250 g"],
-];
+  ["specDriver", "specDriverValue"],
+  ["specFrequency", "specFrequencyValue"],
+  ["specBattery", "specBatteryValue"],
+  ["specCharging", "specChargingValue"],
+  ["specConnectivity", "specConnectivityValue"],
+  ["specWeight", "specWeightValue"],
+] as const;
 
+// Nombres de quien reseña: no se traducen.
 const reviews = [
-  {
-    initials: "AS",
-    name: "Ana Sánchez",
-    meta: "Compra verificada · 12 sep 2026",
-    title: "La mejor cancelación de ruido a este precio",
-    body: "El sonido es cálido y detallado, el ANC bloquea por completo el metro y la batería dura toda la semana.",
-    helpful: 24,
-  },
-  {
-    initials: "RK",
-    name: "Roberto Cano",
-    meta: "Compra verificada · 28 ago 2026",
-    title: "Cómodos para largas jornadas",
-    body: "Los uso más de 8 horas en llamadas. Las almohadillas se mantienen frescas y el micrófono es claro.",
-    helpful: 17,
-  },
-  {
-    initials: "MP",
-    name: "María Pérez",
-    meta: "Compra verificada · 03 ago 2026",
-    title: "Sensación premium, gran app",
-    body: "La calidad de construcción se siente mucho más cara de lo que cuesta. El ecualizador de la app es excelente.",
-    helpful: 9,
-  },
-];
+  { initials: "AS", name: "Ana Sánchez", meta: "review1Meta", title: "review1Title", body: "review1Body", helpful: 24 },
+  { initials: "RK", name: "Roberto Cano", meta: "review2Meta", title: "review2Title", body: "review2Body", helpful: 17 },
+  { initials: "MP", name: "María Pérez", meta: "review3Meta", title: "review3Title", body: "review3Body", helpful: 9 },
+] as const;
 
 const distribution = [
   { stars: 5, pct: 86, count: 1066 },
@@ -94,6 +81,10 @@ const distribution = [
 ];
 
 export function ProductView({ product, related }: { product: Product; related: Product[] }) {
+  const t = useTranslations("product");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const reviewCount = { count: product.reviews, formatted: formatNumber(product.reviews, locale) };
   const [mounted, setMounted] = useState(false);
   const add = useCart((s) => s.add);
   const toggleFavorite = useFavorites((s) => s.toggle);
@@ -117,7 +108,7 @@ export function ProductView({ product, related }: { product: Product; related: P
         <Container className="flex flex-col gap-6 py-6 max-lg:gap-4 max-lg:pt-4">
           <Breadcrumb
             items={[
-              { label: "Tienda", href: "/category/headphones" },
+              { label: tCommon("shop"), href: "/category/headphones" },
               { label: product.name },
             ]}
           />
@@ -166,7 +157,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                   <button
                     type="button"
                     onClick={handleWish}
-                    aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+                    aria-label={wished ? tCommon("removeFromWishlist") : tCommon("saveToWishlist")}
                     aria-pressed={wished}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform hover:scale-105"
                   >
@@ -179,7 +170,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                   </button>
                   <button
                     type="button"
-                    aria-label="Compartir"
+                    aria-label={tCommon("share")}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-elevation-sm transition-transform hover:scale-105"
                   >
                     <Share2 className="h-[18px] w-[18px]" />
@@ -191,9 +182,9 @@ export function ProductView({ product, related }: { product: Product; related: P
             {/* Info */}
             <div className="flex flex-col gap-5">
               <div className="flex items-center gap-3">
-                <Badge type="hot">Más vendido</Badge>
+                <Badge type="hot">{tCommon("bestSeller")}</Badge>
                 <span className="text-label-sm tracking-wide text-brand-700">
-                  {product.vendor.toUpperCase()} AUDIO
+                  {t("brandLine", { vendor: product.vendor.toUpperCase() })}
                 </span>
               </div>
               <h1 className="text-h2 text-text-primary sm:text-display-l">{product.name}</h1>
@@ -201,7 +192,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                 <Rating rating={product.rating} showCount={false} size={16} />
                 <span className="text-label text-text-primary">{product.rating.toFixed(1)}</span>
                 <span className="text-label-sm text-brand-700 underline underline-offset-2">
-                  {product.reviews.toLocaleString("es-MX")} reseñas
+                  {t("reviewCount", reviewCount)}
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -213,13 +204,11 @@ export function ProductView({ product, related }: { product: Product; related: P
                 )}
                 {discount && (
                   <span className="rounded-sm bg-sale-100 px-2 py-1 text-label-sm text-sale-500">
-                    {discount}% OFF
+                    {tCommon("percentOff", { percent: discount })}
                   </span>
                 )}
               </div>
-              <p className="text-body-sm text-text-muted">
-                Impuestos incluidos · Mensualidades desde Rs. 667/mes · Envío gratis
-              </p>
+              <p className="text-body-sm text-text-muted">{t("taxLine")}</p>
 
               <div className="h-px bg-border" />
 
@@ -231,7 +220,10 @@ export function ProductView({ product, related }: { product: Product; related: P
               {product.colors && (
                 <div className="flex flex-col gap-3">
                   <span className="text-label text-text-secondary">
-                    Color: <span className="text-text-primary">{color}</span>
+                    {t.rich("colorSelected", {
+                      color: color ?? "",
+                      value: (chunks) => <span className="text-text-primary">{chunks}</span>,
+                    })}
                   </span>
                   <div className="flex items-center gap-3">
                     {product.colors.map((c) => (
@@ -255,7 +247,7 @@ export function ProductView({ product, related }: { product: Product; related: P
 
               {/* Edición */}
               <div className="flex flex-col gap-3">
-                <span className="text-label text-text-secondary">Edición</span>
+                <span className="text-label text-text-secondary">{t("edition")}</span>
                 <div className="flex flex-wrap gap-2">
                   {editions.map((e) => (
                     <OptionChip
@@ -264,7 +256,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                       disabled={e.disabled}
                       onClick={() => !e.disabled && setEdition(e.value)}
                     >
-                      {e.label}
+                      {t(e.label)}
                     </OptionChip>
                   ))}
                 </div>
@@ -279,15 +271,15 @@ export function ProductView({ product, related }: { product: Product; related: P
                   className="flex-1"
                   onClick={() => add(product, { qty, color })}
                 >
-                  Agregar al carrito
+                  {tCommon("addToCart")}
                 </Button>
                 <ButtonLink href="/cart" variant="accent" size="lg" className="flex-1">
-                  Comprar ahora
+                  {tCommon("buyNow")}
                 </ButtonLink>
                 <button
                   type="button"
                   onClick={handleWish}
-                  aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+                  aria-label={wished ? tCommon("removeFromWishlist") : tCommon("saveToWishlist")}
                   aria-pressed={wished}
                   className={cn(
                     "flex h-14 w-14 items-center justify-center rounded-md border transition-colors max-lg:hidden",
@@ -305,11 +297,13 @@ export function ProductView({ product, related }: { product: Product; related: P
 
               {/* Entrega */}
               <div className="overflow-hidden rounded-lg border border-border">
-                {[
-                  { icon: Truck, t: "Entrega gratis el vie 17 oct", s: "Haz tu pedido en las próximas 4 h 20 min" },
-                  { icon: RotateCcw, t: "Devoluciones fáciles en 30 días", s: "Sin preguntas, recogida gratuita" },
-                  { icon: ShieldCheck, t: "Garantía Nexora de 2 años", s: "Cubre defectos de fabricación" },
-                ].map((r, i, arr) => (
+                {(
+                  [
+                    { icon: Truck, t: "freeDeliveryDate", s: "orderWithin" },
+                    { icon: RotateCcw, t: "easyReturns", s: "easyReturnsSub" },
+                    { icon: ShieldCheck, t: "warranty", s: "warrantySub" },
+                  ] as const
+                ).map((r, i, arr) => (
                   <div
                     key={i}
                     className={`flex items-center gap-4 p-4 ${i < arr.length - 1 ? "border-b border-border" : ""}`}
@@ -318,8 +312,8 @@ export function ProductView({ product, related }: { product: Product; related: P
                       <r.icon className="h-5 w-5 text-brand-800" />
                     </span>
                     <div className="flex flex-col">
-                      <span className="text-label text-text-primary">{r.t}</span>
-                      <span className="text-body-sm text-text-secondary">{r.s}</span>
+                      <span className="text-label text-text-primary">{t(r.t)}</span>
+                      <span className="text-body-sm text-text-secondary">{t(r.s)}</span>
                     </div>
                   </div>
                 ))}
@@ -335,17 +329,12 @@ export function ProductView({ product, related }: { product: Product; related: P
           items={[
             {
               id: "desc",
-              label: "Descripción",
+              label: t("tabDescription"),
               content: (
                 <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
                   <div className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-6 sm:p-8">
-                    <h3 className="text-h3 text-text-primary">Sonido envolvente, cero distracciones</h3>
-                    <p className="text-body-lg text-text-secondary">
-                      Aura usa seis micrófonos y un motor de ANC híbrido adaptativo para cancelar hasta
-                      el 98% del ruido ambiental. Los drivers de 40 mm ofrecen graves profundos y voces
-                      nítidas, mientras el Bluetooth 5.3 multipunto te deja cambiar entre laptop y
-                      teléfono al instante.
-                    </p>
+                    <h3 className="text-h3 text-text-primary">{t("descriptionTitle")}</h3>
+                    <p className="text-body-lg text-text-secondary">{t("descriptionBody")}</p>
                     <div className="grid gap-4 sm:grid-cols-2">
                       {highlights.map((h) => (
                         <div key={h.title} className="flex gap-3 rounded-lg bg-surface-subtle p-4">
@@ -353,8 +342,8 @@ export function ProductView({ product, related }: { product: Product; related: P
                             <h.icon className="h-5 w-5 text-brand-700" />
                           </span>
                           <div className="flex flex-col">
-                            <span className="text-label text-text-primary">{h.title}</span>
-                            <span className="text-body-sm text-text-secondary">{h.sub}</span>
+                            <span className="text-label text-text-primary">{t(h.title)}</span>
+                            <span className="text-body-sm text-text-secondary">{t(h.sub)}</span>
                           </div>
                         </div>
                       ))}
@@ -366,13 +355,13 @@ export function ProductView({ product, related }: { product: Product; related: P
             },
             {
               id: "specs",
-              label: "Especificaciones",
+              label: t("tabSpecs"),
               content: (
                 <div className="overflow-hidden rounded-xl border border-border">
                   {specTable.map(([k, v], i) => (
                     <div key={k} className={`flex gap-4 px-5 py-3 ${i % 2 === 0 ? "bg-surface-subtle" : "bg-surface"}`}>
-                      <span className="w-48 shrink-0 text-label text-text-secondary">{k}</span>
-                      <span className="text-body text-text-primary">{v}</span>
+                      <span className="w-48 shrink-0 text-label text-text-secondary">{t(k)}</span>
+                      <span className="text-body text-text-primary">{t(v)}</span>
                     </div>
                   ))}
                 </div>
@@ -380,7 +369,7 @@ export function ProductView({ product, related }: { product: Product; related: P
             },
             {
               id: "reviews",
-              label: `Reseñas (${product.reviews.toLocaleString("es-MX")})`,
+              label: t("tabReviews", { count: reviewCount.formatted }),
               content: (
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-6 lg:grid-cols-3">
@@ -393,7 +382,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                             </span>
                             <div className="flex flex-col">
                               <span className="text-label text-text-primary">{r.name}</span>
-                              <span className="text-body-sm text-text-muted">{r.meta}</span>
+                              <span className="text-body-sm text-text-muted">{t(r.meta)}</span>
                             </div>
                           </div>
                           <div className="flex gap-0.5">
@@ -402,10 +391,10 @@ export function ProductView({ product, related }: { product: Product; related: P
                             ))}
                           </div>
                         </div>
-                        <h4 className="text-label-lg text-text-primary">{r.title}</h4>
-                        <p className="text-body text-text-secondary">{r.body}</p>
+                        <h4 className="text-label-lg text-text-primary">{t(r.title)}</h4>
+                        <p className="text-body text-text-secondary">{t(r.body)}</p>
                         <span className="flex items-center gap-2 text-label-sm text-text-secondary">
-                          <ThumbsUp className="h-3.5 w-3.5" /> Útil ({r.helpful})
+                          <ThumbsUp className="h-3.5 w-3.5" /> {t("helpful", { count: r.helpful })}
                         </span>
                       </article>
                     ))}
@@ -419,14 +408,10 @@ export function ProductView({ product, related }: { product: Product; related: P
 
       {/* Acordeones + reseñas (móvil) — M03 */}
       <Container className="flex flex-col gap-4 py-10 md:hidden">
-        <Accordion title="Descripción" defaultOpen>
+        <Accordion title={t("tabDescription")} defaultOpen>
           <div className="flex flex-col gap-4">
-            <h3 className="text-h4 text-text-primary">Sonido envolvente, cero distracciones</h3>
-            <p className="text-body text-text-secondary">
-              Aura usa seis micrófonos y un motor de ANC híbrido adaptativo para cancelar hasta el
-              98% del ruido ambiental. Los drivers de 40 mm ofrecen graves profundos y voces nítidas,
-              mientras el Bluetooth 5.3 multipunto te deja cambiar entre laptop y teléfono al instante.
-            </p>
+            <h3 className="text-h4 text-text-primary">{t("descriptionTitle")}</h3>
+            <p className="text-body text-text-secondary">{t("descriptionBody")}</p>
             <div className="grid grid-cols-2 gap-3">
               {highlights.map((h) => (
                 <div key={h.title} className="flex flex-col gap-2 rounded-lg bg-surface-subtle p-3">
@@ -434,8 +419,8 @@ export function ProductView({ product, related }: { product: Product; related: P
                     <h.icon className="h-[18px] w-[18px] text-brand-700" />
                   </span>
                   <div className="flex flex-col">
-                    <span className="text-label-sm text-text-primary">{h.title}</span>
-                    <span className="text-body-sm text-text-secondary">{h.sub}</span>
+                    <span className="text-label-sm text-text-primary">{t(h.title)}</span>
+                    <span className="text-body-sm text-text-secondary">{t(h.sub)}</span>
                   </div>
                 </div>
               ))}
@@ -443,25 +428,25 @@ export function ProductView({ product, related }: { product: Product; related: P
           </div>
         </Accordion>
 
-        <Accordion title="Especificaciones">
+        <Accordion title={t("tabSpecs")}>
           <div className="overflow-hidden rounded-lg border border-border">
             {specTable.map(([k, v], i) => (
               <div
                 key={k}
                 className={`flex flex-col gap-0.5 px-4 py-3 ${i % 2 === 0 ? "bg-surface-subtle" : "bg-surface"}`}
               >
-                <span className="text-label-sm text-text-secondary">{k}</span>
-                <span className="text-body text-text-primary">{v}</span>
+                <span className="text-label-sm text-text-secondary">{t(k)}</span>
+                <span className="text-body text-text-primary">{t(v)}</span>
               </div>
             ))}
           </div>
         </Accordion>
 
-        <Accordion title="Envío y devoluciones">
+        <Accordion title={t("shippingAndReturns")}>
           <div className="flex flex-col gap-3 text-body text-text-secondary">
-            <p>Envío gratis en todos los pedidos, con entrega estimada en 24–48 h y seguimiento en tiempo real.</p>
-            <p>Devoluciones sin complicaciones durante 30 días: recogida gratuita a domicilio y reembolso al método de pago original.</p>
-            <p>Todos los productos incluyen la garantía Nexora de 2 años contra defectos de fabricación.</p>
+            <p>{t("shippingInfo")}</p>
+            <p>{t("returnsInfo")}</p>
+            <p>{t("warrantyInfo")}</p>
           </div>
         </Accordion>
 
@@ -475,13 +460,11 @@ export function ProductView({ product, related }: { product: Product; related: P
                   <Star key={i} className="h-4 w-4 fill-accent-500 text-accent-500" />
                 ))}
               </div>
-              <span className="text-body-sm text-text-secondary">
-                Basado en {product.reviews.toLocaleString("es-MX")} reseñas
-              </span>
+              <span className="text-body-sm text-text-secondary">{t("basedOn", reviewCount)}</span>
             </div>
           </div>
           <Button variant="outline" className="shrink-0">
-            Escribir reseña
+            {t("writeReviewShort")}
           </Button>
         </div>
 
@@ -494,7 +477,7 @@ export function ProductView({ product, related }: { product: Product; related: P
               </span>
               <div className="flex flex-col">
                 <span className="text-label text-text-primary">{reviews[0].name}</span>
-                <span className="text-body-sm text-text-muted">{reviews[0].meta}</span>
+                <span className="text-body-sm text-text-muted">{t(reviews[0].meta)}</span>
               </div>
             </div>
             <div className="flex shrink-0 gap-0.5">
@@ -503,10 +486,10 @@ export function ProductView({ product, related }: { product: Product; related: P
               ))}
             </div>
           </div>
-          <h4 className="text-label-lg text-text-primary">{reviews[0].title}</h4>
-          <p className="text-body text-text-secondary">{reviews[0].body}</p>
+          <h4 className="text-label-lg text-text-primary">{t(reviews[0].title)}</h4>
+          <p className="text-body text-text-secondary">{t(reviews[0].body)}</p>
           <span className="flex items-center gap-2 text-label-sm text-text-secondary">
-            <ThumbsUp className="h-3.5 w-3.5" /> Útil ({reviews[0].helpful})
+            <ThumbsUp className="h-3.5 w-3.5" /> {t("helpful", { count: reviews[0].helpful })}
           </span>
         </article>
       </Container>
@@ -516,13 +499,13 @@ export function ProductView({ product, related }: { product: Product; related: P
         <div className="flex flex-col gap-8">
           <div className="flex items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h2 className="text-h3 text-text-primary sm:text-h2">También te puede gustar</h2>
+              <h2 className="text-h3 text-text-primary sm:text-h2">{t("youMayAlsoLike")}</h2>
             </div>
             <Link
               href="/category/headphones"
               className="flex shrink-0 items-center gap-1.5 text-label text-brand-700 transition-colors hover:text-brand-800 lg:hidden"
             >
-              Ver todo <ArrowRight className="h-4 w-4" />
+              {tCommon("viewAll")} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
@@ -566,7 +549,7 @@ export function ProductView({ product, related }: { product: Product; related: P
             className="flex-1 px-4"
             onClick={() => add(product, { qty, color })}
           >
-            Agregar · Rs. {(unitPrice * qty).toLocaleString("es-MX")}
+            {t("addWithPrice", { amount: formatNumber(unitPrice * qty, locale) })}
           </Button>
         </div>
       </div>
@@ -575,9 +558,11 @@ export function ProductView({ product, related }: { product: Product; related: P
 }
 
 function ReviewSummary({ rating, reviews }: { rating: number; reviews: number }) {
+  const t = useTranslations("product");
+  const locale = useLocale();
   return (
     <div className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-6 sm:p-8">
-      <h4 className="text-h4 text-text-primary">Reseñas de clientes</h4>
+      <h4 className="text-h4 text-text-primary">{t("customerReviews")}</h4>
       <div className="flex items-center gap-4">
         <span className="text-display-l text-text-primary">{rating.toFixed(1)}</span>
         <div className="flex flex-col gap-1">
@@ -587,7 +572,7 @@ function ReviewSummary({ rating, reviews }: { rating: number; reviews: number })
             ))}
           </div>
           <span className="text-body-sm text-text-secondary">
-            Basado en {reviews.toLocaleString("es-MX")} reseñas
+            {t("basedOn", { count: reviews, formatted: formatNumber(reviews, locale) })}
           </span>
         </div>
       </div>
@@ -606,7 +591,7 @@ function ReviewSummary({ rating, reviews }: { rating: number; reviews: number })
         ))}
       </div>
       <Button variant="outline" fullWidth>
-        Escribir una reseña
+        {t("writeReview")}
       </Button>
     </div>
   );

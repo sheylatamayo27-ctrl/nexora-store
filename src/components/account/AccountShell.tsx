@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   LayoutGrid,
   Package,
@@ -10,21 +9,24 @@ import {
   LogOut,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 type ActiveId = "dashboard" | "orders" | "wishlist" | "addresses" | "payments" | "notifications" | "settings";
 
-// `desktopOnly`: no aparece en las pestañas de móvil/tablet (M09/T09 muestran 6).
-const navItems: { id: ActiveId; label: string; href: string; icon: LucideIcon; desktopOnly?: boolean }[] = [
-  { id: "dashboard", label: "Panel", href: "/account", icon: LayoutGrid },
-  { id: "orders", label: "Mis pedidos", href: "/account", icon: Package },
-  { id: "wishlist", label: "Favoritos", href: "/wishlist", icon: Heart },
-  { id: "addresses", label: "Direcciones", href: "/account/addresses", icon: MapPin },
-  { id: "payments", label: "Métodos de pago", href: "/account/payments", icon: CreditCard },
-  { id: "notifications", label: "Notificaciones", href: "/account/notifications", icon: Mail, desktopOnly: true },
-  { id: "settings", label: "Configuración", href: "/account/settings", icon: Settings },
+// El id es también la clave de su texto en "account". `desktopOnly`: no aparece
+// en las pestañas de móvil/tablet (M09/T09 muestran 6).
+const navItems: { id: ActiveId; href: string; icon: LucideIcon; desktopOnly?: boolean }[] = [
+  { id: "dashboard", href: "/account", icon: LayoutGrid },
+  { id: "orders", href: "/account", icon: Package },
+  { id: "wishlist", href: "/wishlist", icon: Heart },
+  { id: "addresses", href: "/account/addresses", icon: MapPin },
+  { id: "payments", href: "/account/payments", icon: CreditCard },
+  { id: "notifications", href: "/account/notifications", icon: Mail, desktopOnly: true },
+  { id: "settings", href: "/account/settings", icon: Settings },
 ];
 
 export function AccountShell({
@@ -36,12 +38,13 @@ export function AccountShell({
   crumb: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("account");
   return (
     <Container className="flex flex-col gap-6 py-8 lg:flex-row lg:gap-8">
       {/* <lg (M09/T09): banda blanca a todo el ancho con el perfil horizontal y
           las pestañas en chips; sin migas de pan. Escritorio: columna lateral intacta. */}
       <aside className="flex w-full shrink-0 flex-col gap-4 max-lg:-mx-4 max-lg:-mt-8 max-lg:w-auto max-lg:border-b max-lg:border-border max-lg:bg-surface max-lg:px-4 max-lg:pb-4 max-lg:pt-4 sm:max-lg:-mx-6 sm:max-lg:px-6 md:max-lg:pt-5 lg:w-72">
-        <Breadcrumb items={[{ label: "Mi cuenta" }, { label: crumb }]} className="max-lg:hidden" />
+        <Breadcrumb items={[{ label: t("myAccount") }, { label: crumb }]} className="max-lg:hidden" />
 
         {/* Perfil */}
         <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-gradient-to-b from-brand-100 to-surface p-6 text-center max-lg:flex-row max-lg:gap-3 max-lg:rounded-none max-lg:border-0 max-lg:bg-none max-lg:p-0 max-lg:text-left md:max-lg:gap-4">
@@ -53,13 +56,13 @@ export function AccountShell({
             <div className="contents max-lg:flex max-lg:items-center max-lg:gap-2">
               <span className="text-label-lg text-text-primary max-lg:truncate max-lg:font-semibold">Sheyla Tamayo</span>
               <span className="shrink-0 rounded-sm bg-accent-500 px-1.5 py-0.5 text-label-xs uppercase text-brand-900 lg:hidden">
-                Gold
+                {t("gold")}
               </span>
             </div>
             <span className="text-body-sm text-text-secondary max-lg:truncate">sheyla@nexora.store</span>
           </div>
           <span className="rounded-sm bg-accent-500 px-2 py-1 text-label-xs uppercase text-brand-900 max-lg:hidden">
-            Miembro Gold
+            {t("goldMember")}
           </span>
         </div>
 
@@ -80,7 +83,7 @@ export function AccountShell({
               )}
             >
               <item.icon className="h-5 w-5 max-md:h-4 max-md:w-4 md:max-lg:hidden" />
-              {item.label}
+              {t(item.id)}
             </Link>
           ))}
           <div className="my-1 hidden h-px bg-border lg:block" />
@@ -89,7 +92,7 @@ export function AccountShell({
             className="flex shrink-0 items-center gap-3 rounded-md px-4 py-3 text-label text-sale-500 hover:bg-surface-subtle max-lg:hidden"
           >
             <LogOut className="h-5 w-5" />
-            Cerrar sesión
+            {t("signOut")}
           </Link>
         </nav>
       </aside>

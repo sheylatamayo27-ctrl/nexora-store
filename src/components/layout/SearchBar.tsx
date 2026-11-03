@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Search, ChevronDown, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Price } from "@/components/commerce/Price";
 import { Button } from "@/components/ui/Button";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useSearch } from "@/hooks/useSearch";
+import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const MAX_SUGGESTIONS = 6;
@@ -24,6 +24,8 @@ export function SearchBar({
   /** Se llama tras navegar (p. ej. para cerrar el drawer móvil). */
   onNavigate?: () => void;
 }) {
+  const t = useTranslations("search");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const listId = useId();
   const [query, setQuery] = useState("");
@@ -109,17 +111,13 @@ export function SearchBar({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder={
-            variant === "desktop"
-              ? "Busca auriculares, laptops, accesorios…"
-              : "Busca auriculares, laptops…"
-          }
+          placeholder={variant === "desktop" ? t("placeholder") : t("placeholderShort")}
           className="h-11 min-w-0 flex-1 bg-transparent px-3 text-body text-text-primary placeholder:text-text-muted focus:outline-none"
         />
         {query && (
           <button
             type="button"
-            aria-label="Limpiar búsqueda"
+            aria-label={t("clear")}
             onClick={() => {
               setQuery("");
               setActive(-1);
@@ -132,11 +130,11 @@ export function SearchBar({
         {variant === "desktop" && (
           <>
             <div className="flex shrink-0 items-center gap-1 border-l border-border px-3 text-text-secondary">
-              <span className="text-label-sm">Todas las categorías</span>
+              <span className="text-label-sm">{t("allCategories")}</span>
               <ChevronDown className="h-3.5 w-3.5" />
             </div>
             <Button variant="accent" className="ml-1 shrink-0" onClick={submit}>
-              Buscar
+              {t("submit")}
             </Button>
           </>
         )}
@@ -151,14 +149,14 @@ export function SearchBar({
         >
           {error && !pending ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-label text-text-primary">No pudimos cargar los resultados</p>
-              <p className="mt-1 text-body-sm text-text-secondary">Revisa tu conexión e inténtalo de nuevo.</p>
+              <p className="text-label text-text-primary">{t("loadError")}</p>
+              <p className="mt-1 text-body-sm text-text-secondary">{t("checkConnection")}</p>
               <button
                 type="button"
                 onClick={() => mutate()}
                 className="mt-3 text-label-sm text-brand-700 hover:text-brand-800"
               >
-                Reintentar
+                {tCommon("retry")}
               </button>
             </div>
           ) : results.length > 0 && !error ? (
@@ -193,12 +191,12 @@ export function SearchBar({
                 onClick={submit}
                 className="flex w-full items-center justify-center gap-1.5 border-t border-border px-3 py-3 text-label-sm text-brand-700 transition-colors hover:bg-surface-subtle"
               >
-                Ver todos los resultados para “{query.trim()}”
+                {t("viewAllResults", { query: query.trim() })}
               </button>
             </>
           ) : pending ? (
             <>
-              <span className="sr-only">Buscando…</span>
+              <span className="sr-only">{t("searching")}</span>
               <ul aria-hidden className="py-1">
                 {Array.from({ length: 3 }, (_, i) => (
                   <li key={i} className="flex items-center gap-3 px-3 py-2.5">
@@ -214,10 +212,8 @@ export function SearchBar({
             </>
           ) : (
             <div className="px-4 py-8 text-center">
-              <p className="text-label text-text-primary">Sin resultados para “{query.trim()}”</p>
-              <p className="mt-1 text-body-sm text-text-secondary">
-                Prueba con otro término o revisa la ortografía.
-              </p>
+              <p className="text-label text-text-primary">{t("noResultsFor", { query: query.trim() })}</p>
+              <p className="mt-1 text-body-sm text-text-secondary">{t("tryAnother")}</p>
             </div>
           )}
         </div>

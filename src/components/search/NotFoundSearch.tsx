@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
+import { getPathname, useRouter } from "@/i18n/navigation";
 
 /** Buscador de la página 404: lleva a /search?q=… (sin JS, el form hace lo mismo). */
 export function NotFoundSearch() {
+  const t = useTranslations("search");
+  const locale = useLocale();
   const router = useRouter();
   const [query, setQuery] = useState("");
 
   return (
     <form
-      action="/search"
+      action={getPathname({ href: "/search", locale })}
       role="search"
       onSubmit={(e) => {
         e.preventDefault();
@@ -28,12 +31,12 @@ export function NotFoundSearch() {
         enterKeyHint="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Busca productos…"
-        aria-label="Buscar productos"
+        placeholder={t("placeholderProducts")}
+        aria-label={t("searchProducts")}
         className="h-10 min-w-0 flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none max-lg:text-body-lg"
       />
       <Button type="submit" variant="accent" className="shrink-0 max-sm:px-4">
-        Buscar
+        {t("submit")}
       </Button>
     </form>
   );

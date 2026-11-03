@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { getImageProps } from "next/image";
 import { Zap, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { assetSrc } from "@/components/media/AssetImage";
 import { REAL_IMAGES } from "@/lib/assets.generated";
 import { ButtonLink } from "@/components/ui/Button";
 import { motion } from "@/lib/motion";
 import type { HeroSlide } from "@/data/types";
 
-const perks = ["Garantía de 2 años", "Entrega gratis", "Calificación 4.9★"];
+const perks = ["warranty", "freeDelivery", "rating"] as const;
 
 const AUTO_ROTATE_MS = 6000;
 
@@ -46,6 +47,7 @@ function HeroImage({ name, alt }: { name: string; alt: string }) {
 }
 
 export function Hero({ slides }: { slides: HeroSlide[] }) {
+  const t = useTranslations("hero");
   const [activeIndex, setActiveIndex] = useState(0);
   const hasMultipleSlides = slides.length > 1;
 
@@ -103,7 +105,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
             {perks.map((p) => (
               <span key={p} className="flex items-center gap-2 text-body text-white/85">
                 <Check className="h-4 w-4 text-accent-500" />
-                {p}
+                {t(p)}
               </span>
             ))}
           </div>
@@ -116,7 +118,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
             <button
               key={i}
               type="button"
-              aria-label={`Ir a la diapositiva ${i + 1}`}
+              aria-label={t("goToSlide", { number: i + 1 })}
               onClick={() => setActiveIndex(i)}
               className="h-2 rounded-full transition-all"
               style={{

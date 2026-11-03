@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Mail, MailCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { Input } from "@/components/ui/Input";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { Link } from "@/i18n/navigation";
 import { notifyToast } from "@/lib/toast";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,24 +17,28 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * marcado en `handleSubmit` por la llamada real (p. ej. POST /api/auth/forgot-password).
  */
 export function ForgotPasswordView() {
+  const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
+  const tValidation = useTranslations("validation");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  /** Clave del error en "validation". */
+  const [error, setError] = useState<"emailRequired" | "email" | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const value = email.trim();
     if (!value) {
-      setError("Escribe tu correo electrónico.");
+      setError("emailRequired");
       return;
     }
     if (!EMAIL_RE.test(value)) {
-      setError("Escribe un correo válido, p. ej. nombre@correo.com.");
+      setError("email");
       return;
     }
     // Envío simulado: aquí iría la petición al backend.
     setSentTo(value);
-    notifyToast({ title: "Te enviamos un enlace", description: "Revisa tu bandeja de entrada", icon: MailCheck });
+    notifyToast({ title: t("linkSentTitle"), description: t("linkSentDescription"), icon: MailCheck });
   };
 
   if (sentTo) {
@@ -43,25 +48,27 @@ export function ForgotPasswordView() {
           <MailCheck className="h-7 w-7 text-brand-800" />
         </span>
         <div className="flex flex-col gap-1">
-          <h1 className="text-h2 text-text-primary">Revisa tu correo</h1>
+          <h1 className="text-h2 text-text-primary">{t("checkEmail")}</h1>
           <p className="text-body text-text-secondary">
-            Te enviamos un enlace a <span className="text-label text-text-primary">{sentTo}</span> para crear
-            una contraseña nueva. Si no lo ves, revisa la carpeta de spam.
+            {t.rich("sentTo", {
+              email: sentTo,
+              highlight: (chunks) => <span className="text-label text-text-primary">{chunks}</span>,
+            })}
           </p>
         </div>
 
         <ButtonLink href="/login" variant="primary" size="lg" fullWidth icon className="justify-center">
-          Volver a iniciar sesión
+          {t("backToSignIn")}
         </ButtonLink>
 
         <div className="flex items-center justify-center gap-1.5">
-          <span className="text-body text-text-secondary">¿No es tu correo?</span>
+          <span className="text-body text-text-secondary">{t("notYourEmail")}</span>
           <button
             type="button"
             onClick={() => setSentTo(null)}
             className="text-label text-brand-700 underline underline-offset-2"
           >
-            Usar otro
+            {t("useAnother")}
           </button>
         </div>
       </AuthShell>
@@ -71,20 +78,18 @@ export function ForgotPasswordView() {
   return (
     <AuthShell variant="signin">
       <div className="flex flex-col gap-1">
-        <h1 className="text-h2 text-text-primary">¿Olvidaste tu contraseña?</h1>
-        <p className="text-body text-text-secondary">
-          Escribe el correo de tu cuenta y te enviaremos un enlace para crear una nueva.
-        </p>
+        <h1 className="text-h2 text-text-primary">{t("forgotPassword")}</h1>
+        <p className="text-body text-text-secondary">{t("forgotSubtitle")}</p>
       </div>
 
       <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Input
-          label="Correo electrónico"
+          label={tCommon("fields.email")}
           icon={Mail}
           type="email"
           name="email"
           autoComplete="email"
-          placeholder="nombre@correo.com"
+          placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -92,17 +97,17 @@ export function ForgotPasswordView() {
           }}
           error={error !== null}
           aria-invalid={error !== null}
-          helper={error ?? undefined}
+          helper={error ? tValidation(error) : undefined}
         />
         <Button type="submit" variant="primary" size="lg" fullWidth icon className="justify-center">
-          Enviar enlace
+          {t("sendLink")}
         </Button>
       </form>
 
       <div className="flex items-center justify-center gap-1.5">
-        <span className="text-body text-text-secondary">¿La recordaste?</span>
+        <span className="text-body text-text-secondary">{t("remembered")}</span>
         <Link href="/login" className="text-label text-brand-700 underline underline-offset-2">
-          Iniciar sesión
+          {tCommon("signIn")}
         </Link>
       </div>
     </AuthShell>

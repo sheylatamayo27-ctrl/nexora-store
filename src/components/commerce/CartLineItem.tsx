@@ -2,6 +2,7 @@
 
 import { Heart, Trash2, Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { QuantityStepper } from "@/components/commerce/QuantityStepper";
 import { formatPrice } from "@/lib/format";
@@ -11,6 +12,8 @@ import { favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 export function CartLineItem({ item }: { item: CartItem }) {
+  const t = useTranslations("cart");
+  const tCommon = useTranslations("common");
   const setQty = useCart((s) => s.setQty);
   const remove = useCart((s) => s.remove);
   const toggleFavorite = useFavorites((s) => s.toggle);
@@ -35,7 +38,9 @@ export function CartLineItem({ item }: { item: CartItem }) {
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h3 className="line-clamp-2 text-label-lg text-text-primary">{product.name}</h3>
-          {item.color && <span className="text-body-sm text-text-secondary">Color: {item.color}</span>}
+          {item.color && (
+            <span className="text-body-sm text-text-secondary">{tCommon("colorValue", { color: item.color })}</span>
+          )}
           <div className="flex flex-wrap items-center gap-2 pt-0.5">
             <span className="text-price text-text-primary">{formatPrice(product.price * item.qty)}</span>
             {product.compareAt && (
@@ -50,7 +55,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
               <button
                 type="button"
                 onClick={handleWish}
-                aria-label={wished ? "Quitar de favoritos" : "Guardar en favoritos"}
+                aria-label={wished ? tCommon("removeFromWishlist") : tCommon("saveToWishlist")}
                 aria-pressed={wished}
                 className="flex h-9 w-9 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-surface-subtle"
               >
@@ -59,7 +64,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
               <button
                 type="button"
                 onClick={() => remove(item.key)}
-                aria-label="Eliminar"
+                aria-label={t("remove")}
                 className="flex h-9 w-9 items-center justify-center rounded-md text-sale-500 transition-colors hover:bg-sale-100"
               >
                 <Trash2 className="h-[18px] w-[18px]" />
@@ -78,9 +83,11 @@ export function CartLineItem({ item }: { item: CartItem }) {
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="text-label-sm uppercase tracking-wide text-text-muted">{product.vendor}</span>
           <h3 className="text-label-lg text-text-primary">{product.name}</h3>
-          {item.color && <span className="text-body-sm text-text-secondary">Color: {item.color}</span>}
+          {item.color && (
+            <span className="text-body-sm text-text-secondary">{tCommon("colorValue", { color: item.color })}</span>
+          )}
           <span className="flex items-center gap-1.5 pt-1 text-body-sm text-success-700">
-            <Check className="h-3.5 w-3.5 text-success-500" /> En stock · Envío mañana
+            <Check className="h-3.5 w-3.5 text-success-500" /> {t("inStockShipsTomorrow")}
           </span>
           <div className="mt-2 flex items-center gap-5">
             <QuantityStepper value={item.qty} onChange={(q) => setQty(item.key, q)} size="sm" />
@@ -88,14 +95,14 @@ export function CartLineItem({ item }: { item: CartItem }) {
               onClick={() => remove(item.key)}
               className="flex items-center gap-1.5 text-label-sm text-sale-500"
             >
-              <Trash2 className="h-4 w-4" /> Quitar
+              <Trash2 className="h-4 w-4" /> {t("removeShort")}
             </button>
             <button
               onClick={handleWish}
               className="hidden items-center gap-1.5 text-label-sm text-text-secondary sm:flex"
             >
               <Heart className={cn("h-4 w-4", wished && "fill-sale-500 text-sale-500")} />
-              Guardar<span className="lg:hidden"> para después</span>
+              {t.rich("saveForLater", { later: (chunks) => <span className="lg:hidden">{chunks}</span> })}
             </button>
           </div>
         </div>
@@ -108,7 +115,9 @@ export function CartLineItem({ item }: { item: CartItem }) {
             </span>
           )}
           {savings > 0 && (
-            <span className="text-body-sm text-success-700 lg:hidden">Ahorras {formatPrice(savings)}</span>
+            <span className="text-body-sm text-success-700 lg:hidden">
+              {t("youSave", { amount: formatPrice(savings) })}
+            </span>
           )}
         </div>
       </div>

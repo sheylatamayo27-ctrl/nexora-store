@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { CarouselDots, useCarousel } from "@/components/ui/Carousel";
 import type { Product } from "@/data/types";
@@ -10,6 +11,7 @@ import type { Product } from "@/data/types";
  * tablet — con puntos indicadores. Escritorio (≥lg): grilla de 5, intacta.
  */
 export function FeaturedCarousel({ products }: { products: Product[] }) {
+  const t = useTranslations("home");
   // En SSR se asume móvil (2 por vista); el hook recalcula al montar.
   const { scrollerRef, active, count, goTo } = useCarousel(Math.ceil(products.length / 2));
 
@@ -17,7 +19,7 @@ export function FeaturedCarousel({ products }: { products: Product[] }) {
     <div>
       <div
         ref={scrollerRef}
-        aria-label="Colección destacada"
+        aria-label={t("featuredTitle")}
         className="flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2 no-scrollbar md:gap-4 lg:grid lg:snap-none lg:grid-cols-5 lg:overflow-visible"
       >
         {products.map((p) => (
@@ -37,7 +39,7 @@ export function FeaturedCarousel({ products }: { products: Product[] }) {
         count={count}
         active={active}
         onSelect={goTo}
-        label={(i, n) => `Ir a la página ${i + 1} de ${n}`}
+        label={(i, n) => t("goToPage", { page: i + 1, total: n })}
         className="-mt-2.5 lg:hidden"
       />
     </div>

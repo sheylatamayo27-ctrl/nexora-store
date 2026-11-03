@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export function OptionChip({
@@ -40,10 +41,11 @@ export function FilterChip({
   children: React.ReactNode;
   onRemove?: () => void;
 }) {
+  const t = useTranslations("common");
   return (
     <span className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1.5 text-label-sm text-brand-800">
       {children}
-      <button type="button" onClick={onRemove} aria-label="Quitar filtro">
+      <button type="button" onClick={onRemove} aria-label={t("removeFilter")}>
         <X className="h-3.5 w-3.5" />
       </button>
     </span>

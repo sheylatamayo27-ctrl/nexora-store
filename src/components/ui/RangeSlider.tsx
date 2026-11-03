@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 /**
@@ -24,6 +25,7 @@ export function RangeSlider({
   format?: (n: number) => string;
   className?: string;
 }) {
+  const t = useTranslations("common");
   const [lo, hi] = value;
   const pct = (n: number) => ((n - min) / (max - min)) * 100;
 
@@ -43,7 +45,7 @@ export function RangeSlider({
           value={lo}
           onChange={(e) => onChange([Math.min(Number(e.target.value), hi - step), hi])}
           className="range-thumb absolute inset-0 w-full"
-          aria-label="Precio mínimo"
+          aria-label={t("minPrice")}
         />
         <input
           type="range"
@@ -53,7 +55,7 @@ export function RangeSlider({
           value={hi}
           onChange={(e) => onChange([lo, Math.max(Number(e.target.value), lo + step)])}
           className="range-thumb absolute inset-0 w-full"
-          aria-label="Precio máximo"
+          aria-label={t("maxPrice")}
         />
       </div>
       <div className="flex items-center justify-between gap-2">

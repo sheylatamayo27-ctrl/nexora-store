@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SlidersHorizontal, ChevronDown, LayoutGrid, List, Check } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { ProductCardSkeletons } from "@/components/commerce/ProductCardSkeleton";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
@@ -35,20 +36,18 @@ const PRICE_STEP = 500;
 /** Espera tras mover el slider de precio o tocar la hoja de filtros antes de pedir a la API. */
 const DEBOUNCE_MS = 250;
 
-const sortOptions: { id: ProductSort; label: string }[] = [
-  { id: "popular", label: "Más populares" },
-  { id: "price-asc", label: "Precio: menor a mayor" },
-  { id: "price-desc", label: "Precio: mayor a menor" },
-  { id: "rating", label: "Mejor valorados" },
-];
+/** `label`: texto en "common.sort". */
+const sortOptions = [
+  { id: "popular", label: "popular" },
+  { id: "price-asc", label: "priceAsc" },
+  { id: "price-desc", label: "priceDesc" },
+  { id: "rating", label: "rating" },
+] as const satisfies readonly { id: ProductSort; label: string }[];
 
 const toSort = (id: string): ProductSort => sortOptions.find((o) => o.id === id)?.id ?? "popular";
 
-const availabilityOptions = [
-  { id: "inStock", label: "Solo en stock" },
-  { id: "onSale", label: "En oferta" },
-  { id: "freeDelivery", label: "Envío gratis" },
-] as const;
+/** El id es también la clave de su texto en "category". */
+const availabilityOptions = ["inStock", "onSale", "freeDelivery"] as const;
 
 /**
  * Listado de una categoría. Filtros, orden y páginas se piden a GET /api/products
@@ -76,6 +75,10 @@ export function CategoryView({
   /** Primera página con los filtros iniciales, calculada en el servidor (SEO, sin parpadeo). */
   initialData: ProductListResponse;
 }) {
+  const t = useTranslations("category");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const sortLabels = sortOptions.map((o) => ({ id: o.id, label: tCommon(`sort.${o.label}`) }));
   const [initial] = useState(() => defaultFilters(initialCategories));
   const [cats, setCats] = useState<string[]>(initial.cats);
   const [price, setPrice] = useState<[number, number]>(initial.price);
@@ -131,7 +134,7 @@ export function CategoryView({
       },
       saleOnly
     );
-  const draftIsApplied = !draftQuery || productsKey(draftQuery) === productsKey(query);
+  const draftIsApplied = !draftQuery || productsKey(draftQuery, locale) === productsKey(query, locale);
   const draftList = useProducts(draftIsApplied ? null : draftQuery);
   const sheetCount = draftIsApplied
     ? total
@@ -174,7 +177,7 @@ export function CategoryView({
   const Facets = (
     <div className="flex flex-col gap-5">
       <section className="flex flex-col gap-3">
-        <h3 className="text-label-lg text-text-primary">Categoría</h3>
+        <h3 className="text-label-lg text-text-primary">{t("category")}</h3>
         {categories
           .filter((c) => counts[c.slug])
           .map((c) => (
@@ -190,7 +193,7 @@ export function CategoryView({
 
       <div className="h-px bg-border" />
       <section className="flex flex-col gap-3">
-        <h3 className="text-label-lg text-text-primary">Precio</h3>
+        <h3 className="text-label-lg text-text-primary">{t("price")}</h3>
         <RangeSlider
           min={PRICE_MIN}
           max={PRICE_MAX}
@@ -203,7 +206,7 @@ export function CategoryView({
 
       <div className="h-px bg-border" />
       <section className="flex flex-col gap-3">
-        <h3 className="text-label-lg text-text-primary">Marca</h3>
+        <h3 className="text-label-lg text-text-primary">{t("brand")}</h3>
         {brandList.map(([brand, count]) => (
           <Checkbox
             key={brand}
@@ -217,20 +220,20 @@ export function CategoryView({
 
       <div className="h-px bg-border" />
       <section className="flex flex-col gap-3">
-        <h3 className="text-label-lg text-text-primary">Valoración</h3>
+        <h3 className="text-label-lg text-text-primary">{t("rating")}</h3>
         {ratings.map((r) => (
           <Radio
             key={r}
             selected={rating === r}
             onChange={() => setRating(rating === r ? null : r)}
-            label={`${r}★ o más`}
+            label={t("ratingOrMore", { stars: r })}
           />
         ))}
       </section>
 
       <div className="h-px bg-border" />
       <section className="flex flex-col gap-3">
-        <h3 className="text-label-lg text-text-primary">Color</h3>
+        <h3 className="text-label-lg text-text-primary">{t("color")}</h3>
         <div className="flex flex-wrap gap-2.5">
           {colorList.map(([name, hex]) => {
             const active = colors.includes(name);
@@ -259,13 +262,13 @@ export function CategoryView({
 
       <div className="h-px bg-border" />
       <section className="flex flex-col gap-3">
-        <h3 className="text-label-lg text-text-primary">Disponibilidad</h3>
-        {availabilityOptions.map((o) => (
+        <h3 className="text-label-lg text-text-primary">{t("availability")}</h3>
+        {availabilityOptions.map((id) => (
           <Checkbox
-            key={o.id}
-            checked={avail[o.id]}
-            onChange={() => setAvail((a) => ({ ...a, [o.id]: !a[o.id] }))}
-            label={o.label}
+            key={id}
+            checked={avail[id]}
+            onChange={() => setAvail((a) => ({ ...a, [id]: !a[id] }))}
+            label={t(id)}
           />
         ))}
       </section>
@@ -277,14 +280,12 @@ export function CategoryView({
       {/* Encabezado de categoría */}
       <div className="bg-surface">
         <Container className="flex flex-col gap-5 py-8">
-          <Breadcrumb items={[{ label: "Tienda", href: "/category/headphones" }, { label: title }]} />
+          <Breadcrumb items={[{ label: tCommon("shop"), href: "/category/headphones" }, { label: title }]} />
           <div className="flex flex-col gap-2">
             <h1 className="text-h2 text-text-primary sm:text-display-l">{title}</h1>
             {/* Escritorio: descripción (intacta). Móvil/tablet: conteo real · entrega. */}
             <p className="hidden max-w-2xl text-body-lg text-text-secondary lg:block">{description}</p>
-            <p className="text-body text-text-secondary lg:hidden">
-              {total} productos · Entrega al día siguiente
-            </p>
+            <p className="text-body text-text-secondary lg:hidden">{t("productsDelivery", { count: total })}</p>
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
             <OptionChip
@@ -292,7 +293,7 @@ export function CategoryView({
               onClick={() => setCats([])}
               className="max-lg:shrink-0 max-lg:whitespace-nowrap"
             >
-              Todo
+              {t("all")}
             </OptionChip>
             {categories.slice(0, 7).map((c) => (
               <OptionChip
@@ -314,10 +315,10 @@ export function CategoryView({
           <div className="sticky top-28 rounded-xl border border-border bg-surface p-6">
             <div className="mb-4 flex items-center justify-between">
               <span className="flex items-center gap-2 text-h4 text-text-primary">
-                <SlidersHorizontal className="h-[18px] w-[18px]" /> Filtros
+                <SlidersHorizontal className="h-[18px] w-[18px]" /> {t("filters")}
               </span>
               <button onClick={clearAll} className="text-label-sm text-brand-700 hover:text-brand-800">
-                Limpiar todo
+                {t("clearAll")}
               </button>
             </div>
             {Facets}
@@ -329,21 +330,21 @@ export function CategoryView({
           {/* Barra de herramientas (móvil <768): dos botones al 50% */}
           <div className="flex gap-3 md:hidden">
             <Button variant="primary" className="flex-1" onClick={() => setSheetOpen(true)}>
-              <SlidersHorizontal className="h-[18px] w-[18px]" /> Filtros
+              <SlidersHorizontal className="h-[18px] w-[18px]" /> {t("filters")}
               {activeCount > 0 && (
                 <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-label-xs text-brand-900">
                   {activeCount}
                 </span>
               )}
             </Button>
-            <SortMenu value={sort} options={sortOptions} onChange={(id) => setSort(toSort(id))} className="flex-1" />
+            <SortMenu value={sort} options={sortLabels} onChange={(id) => setSort(toSort(id))} className="flex-1" />
           </div>
 
           {/* Barra de herramientas (tablet + escritorio) — en escritorio es idéntica */}
           <div className="hidden flex-wrap items-center justify-between gap-3 md:flex">
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="primary" className="lg:hidden" onClick={() => setSheetOpen(true)}>
-                <SlidersHorizontal className="h-[18px] w-[18px]" /> Filtros
+                <SlidersHorizontal className="h-[18px] w-[18px]" /> {t("filters")}
                 {activeCount > 0 && (
                   <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-label-xs text-brand-900">
                     {activeCount}
@@ -351,13 +352,13 @@ export function CategoryView({
                 )}
               </Button>
               <span className="text-body text-text-secondary">
-                {total > 0 ? (
-                  <>
-                    Mostrando <span className="text-text-primary">1–{shownTo}</span> de {total}
-                  </>
-                ) : (
-                  "Sin resultados"
-                )}
+                {total > 0
+                  ? t.rich("showing", {
+                      shown: shownTo,
+                      total,
+                      range: (chunks) => <span className="text-text-primary">{chunks}</span>,
+                    })
+                  : t("noResults")}
               </span>
               <div className="hidden flex-wrap items-center gap-2 lg:flex">
                 {cats.map((slug) => (
@@ -372,7 +373,7 @@ export function CategoryView({
                 ))}
                 {priceChanged && (
                   <FilterChip onRemove={() => setPrice([PRICE_MIN, PRICE_MAX])}>
-                    Hasta {formatPriceShort(price[1])}
+                    {t("upTo", { price: formatPriceShort(price[1]) })}
                   </FilterChip>
                 )}
               </div>
@@ -382,10 +383,10 @@ export function CategoryView({
                 <select
                   value={sort}
                   onChange={(e) => setSort(toSort(e.target.value))}
-                  aria-label="Ordenar por"
+                  aria-label={t("sortBy")}
                   className="h-10 appearance-none rounded-md border border-border-strong bg-surface pl-4 pr-9 text-label-sm text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 >
-                  {sortOptions.map((o) => (
+                  {sortLabels.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.label}
                     </option>
@@ -396,14 +397,14 @@ export function CategoryView({
               <div className="hidden items-center gap-1 sm:flex">
                 <button
                   onClick={() => setView("grid")}
-                  aria-label="Cuadrícula"
+                  aria-label={t("gridView")}
                   className={`flex h-10 w-10 items-center justify-center rounded-md ${view === "grid" ? "bg-brand-800 text-white" : "border border-border-strong text-text-secondary"}`}
                 >
                   <LayoutGrid className="h-[18px] w-[18px]" />
                 </button>
                 <button
                   onClick={() => setView("list")}
-                  aria-label="Lista"
+                  aria-label={t("listView")}
                   className={`flex h-10 w-10 items-center justify-center rounded-md ${view === "list" ? "bg-brand-800 text-white" : "border border-border-strong text-text-secondary"}`}
                 >
                   <List className="h-[18px] w-[18px]" />
@@ -427,7 +428,7 @@ export function CategoryView({
               ))}
               {priceChanged && (
                 <FilterChip onRemove={() => setPrice([PRICE_MIN, PRICE_MAX])}>
-                  Hasta {formatPriceShort(price[1])}
+                  {t("upTo", { price: formatPriceShort(price[1]) })}
                 </FilterChip>
               )}
             </div>
@@ -436,9 +437,9 @@ export function CategoryView({
           {/* Grid */}
           {failed ? (
             <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface py-20 text-center">
-              <p className="text-h4 text-text-primary">No pudimos cargar los productos</p>
+              <p className="text-h4 text-text-primary">{t("loadError")}</p>
               <button onClick={() => mutate()} className="text-label text-brand-700">
-                Reintentar
+                {tCommon("retry")}
               </button>
             </div>
           ) : isLoading || total > 0 ? (
@@ -467,9 +468,9 @@ export function CategoryView({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface py-20 text-center">
-              <p className="text-h4 text-text-primary">No hay productos con estos filtros</p>
+              <p className="text-h4 text-text-primary">{t("noMatches")}</p>
               <button onClick={clearAll} className="text-label text-brand-700">
-                Limpiar filtros
+                {t("clearFilters")}
               </button>
             </div>
           )}
@@ -479,7 +480,7 @@ export function CategoryView({
               {/* Móvil (<768): resumen + barra de progreso + "Cargar más" */}
               <div className="flex w-full flex-col items-center gap-3 md:hidden">
                 <span className="text-body-sm text-text-secondary">
-                  Mostrando {shownTo} de {total} productos
+                  {t("showingOf", { shown: shownTo, total })}
                 </span>
                 <div
                   className="h-1 w-40 overflow-hidden rounded-full bg-surface-muted"
@@ -495,7 +496,7 @@ export function CategoryView({
                 </div>
                 {shownTo < total && (
                   <Button variant="outline" fullWidth onClick={() => setPage((p) => p + 1)}>
-                    Cargar más productos
+                    {t("loadMore")}
                   </Button>
                 )}
               </div>
@@ -505,7 +506,7 @@ export function CategoryView({
                 <div className="hidden flex-col items-center gap-3 md:flex lg:hidden">
                   <Pagination current={currentPage} total={totalPages} onChange={setPage} />
                   <span className="text-body text-text-secondary">
-                    Página {currentPage} de {totalPages}
+                    {t("pageOf", { page: currentPage, total: totalPages })}
                   </span>
                 </div>
               )}
@@ -514,12 +515,12 @@ export function CategoryView({
               {totalPages > 1 && (
                 <div className="hidden w-full items-center justify-between gap-3 lg:flex">
                   <span className="block text-body text-text-secondary">
-                    Página {currentPage} de {totalPages}
+                    {t("pageOf", { page: currentPage, total: totalPages })}
                   </span>
                   <Pagination current={currentPage} total={totalPages} onChange={setPage} className="mx-0" />
                   {currentPage < totalPages ? (
                     <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
-                      Cargar más productos
+                      {t("loadMore")}
                     </Button>
                   ) : (
                     <span className="block w-[180px]" />
@@ -547,8 +548,8 @@ export function CategoryView({
         priceStep={PRICE_STEP}
         priceFormat={formatPriceShort}
         availabilityOptions={availabilityOptions
-          .filter((o) => o.id === "inStock" || o.id === "onSale")
-          .map((o) => ({ id: o.id, label: o.label }))}
+          .filter((id) => id === "inStock" || id === "onSale")
+          .map((id) => ({ id, label: t(id) }))}
         initial={{ cats, price, brands, avail }}
         resultCount={sheetCount}
         onDraftChange={setSheetDraft}
@@ -560,15 +561,17 @@ export function CategoryView({
 
 /** Página 2 en adelante del listado: se pide al pulsar "Cargar más" o elegir una página. */
 function ProductPage({ query, page, expected }: { query: ProductListQuery; page: number; expected: number }) {
+  const t = useTranslations("category");
+  const tCommon = useTranslations("common");
   const { items, isLoading, error, mutate } = useProducts({ ...query, page });
 
   if (isLoading) return <ProductCardSkeletons count={expected} />;
   if (error) {
     return (
       <div className="col-span-full flex items-center justify-center gap-2 py-6 text-body text-text-secondary">
-        No pudimos cargar más productos.
+        {t("loadMoreError")}
         <button onClick={() => mutate()} className="text-label text-brand-700">
-          Reintentar
+          {tCommon("retry")}
         </button>
       </div>
     );

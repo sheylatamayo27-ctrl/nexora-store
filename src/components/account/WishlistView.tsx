@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Heart, Share2, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { useFavorites } from "@/store/favorites";
@@ -10,6 +11,8 @@ import { notifyToast } from "@/lib/toast";
 
 /** Favoritos. El contenido sale del store del navegador (localStorage). */
 export function WishlistView() {
+  const t = useTranslations("wishlist");
+  const tCommon = useTranslations("common");
   const [mounted, setMounted] = useState(false);
   const items = useFavorites((s) => s.items);
   const addToCart = useCart((s) => s.add);
@@ -18,15 +21,15 @@ export function WishlistView() {
   const addAll = () => {
     items.forEach((p) => addToCart(p));
     notifyToast({
-      title: `${items.length} ${items.length === 1 ? "producto añadido" : "productos añadidos"} al carrito`,
-      description: "Ya puedes finalizar tu compra",
+      title: t("addedToCart", { count: items.length }),
+      description: t("readyToCheckout"),
     });
   };
 
   const share = () =>
     notifyToast({
-      title: "Enlace de tu lista copiado",
-      description: "Compártelo con quien quieras",
+      title: t("linkCopied"),
+      description: t("shareWithAnyone"),
       icon: Share2,
     });
 
@@ -39,17 +42,15 @@ export function WishlistView() {
           <Heart className="h-9 w-9 text-sale-500" />
         </span>
         <div className="flex flex-col gap-2">
-          <h1 className="text-h3 text-text-primary">Tu lista de favoritos está vacía</h1>
-          <p className="max-w-md text-body-lg text-text-secondary">
-            Toca el corazón de cualquier producto para guardarlo aquí y no perderlo de vista.
-          </p>
+          <h1 className="text-h3 text-text-primary">{t("emptyTitle")}</h1>
+          <p className="max-w-md text-body-lg text-text-secondary">{t("emptyDescription")}</p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <ButtonLink href="/category/headphones" variant="primary" size="lg">
-            Explorar productos
+            {t("explore")}
           </ButtonLink>
           <ButtonLink href="/offers" variant="outline" size="lg">
-            <Sparkles className="h-[18px] w-[18px]" /> Ver ofertas
+            <Sparkles className="h-[18px] w-[18px]" /> {tCommon("viewOffers")}
           </ButtonLink>
         </div>
       </div>
@@ -60,18 +61,15 @@ export function WishlistView() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-h2 text-text-primary">Mis favoritos</h1>
-          <p className="text-body text-text-secondary">
-            {items.length} {items.length === 1 ? "artículo guardado" : "artículos guardados"} · Los precios se
-            actualizan en tiempo real
-          </p>
+          <h1 className="text-h2 text-text-primary">{t("title")}</h1>
+          <p className="text-body text-text-secondary">{t("savedCount", { count: items.length })}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={share}>
-            Compartir lista
+            {t("shareList")}
           </Button>
           <Button variant="primary" onClick={addAll}>
-            Agregar todo al carrito
+            {t("addAll")}
           </Button>
         </div>
       </div>
@@ -82,10 +80,7 @@ export function WishlistView() {
         ))}
       </div>
 
-      <p className="text-body-sm text-text-muted">
-        Los artículos permanecen en tu lista durante 90 días. Te avisaremos cuando bajen de precio o queden
-        pocas existencias.
-      </p>
+      <p className="text-body-sm text-text-muted">{t("footnote")}</p>
     </div>
   );
 }

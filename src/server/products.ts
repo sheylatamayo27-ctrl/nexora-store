@@ -1,46 +1,49 @@
 import type { Product } from "@/data/types";
+import type { Locale } from "@/i18n/routing";
 import type { ProductFacets, ProductListQuery, ProductListResponse, ProductSort } from "./api-types";
 import { products } from "./db/products.data";
+import { toProduct } from "./localize";
 import { searchProducts } from "./search";
 
 /*
  * Acceso a productos. Hoy lee del catálogo local (`./db`); el día del backend
  * real, cada función cambia su cuerpo por el fetch indicado (con `apiBase` de
- * `./config`) y quien la llama no se entera.
+ * `./config`) y quien la llama no se entera. Todas devuelven los textos en `locale`.
  */
 
 /** Todo el catálogo. */
-export async function getProducts(): Promise<Product[]> {
-  // Backend real: fetch(apiBase + "/products")
-  return products;
+export async function getProducts(locale: Locale): Promise<Product[]> {
+  // Backend real: fetch(apiBase + "/products?locale=" + locale)
+  return products.map((p) => toProduct(p, locale));
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  // Backend real: fetch(apiBase + "/products/" + slug) — un 404 devuelve undefined.
-  return products.find((p) => p.slug === slug);
+export async function getProductBySlug(slug: string, locale: Locale): Promise<Product | undefined> {
+  // Backend real: fetch(apiBase + "/products/" + slug + "?locale=" + locale) — un 404 devuelve undefined.
+  const record = products.find((p) => p.slug === slug);
+  return record && toProduct(record, locale);
 }
 
-export async function getProductsByCategory(categorySlug: string): Promise<Product[]> {
-  // Backend real: fetch(apiBase + "/products?category=" + categorySlug)
-  return products.filter((p) => p.categorySlug === categorySlug);
+export async function getProductsByCategory(categorySlug: string, locale: Locale): Promise<Product[]> {
+  // Backend real: fetch(apiBase + "/products?category=" + categorySlug + "&locale=" + locale)
+  return (await getProducts(locale)).filter((p) => p.categorySlug === categorySlug);
 }
 
 /** Productos destacados para la home. */
-export async function getFeaturedProducts(): Promise<Product[]> {
-  // Backend real: fetch(apiBase + "/products?featured=true")
-  return products.slice(0, 6);
+export async function getFeaturedProducts(locale: Locale): Promise<Product[]> {
+  // Backend real: fetch(apiBase + "/products?featured=true&locale=" + locale)
+  return (await getProducts(locale)).slice(0, 6);
 }
 
 /** Ofertas del día: los productos con barra de progreso de stock. */
-export async function getDealProducts(): Promise<Product[]> {
-  // Backend real: fetch(apiBase + "/products?deals=true")
-  return products.filter((p) => p.sold);
+export async function getDealProducts(locale: Locale): Promise<Product[]> {
+  // Backend real: fetch(apiBase + "/products?deals=true&locale=" + locale)
+  return (await getProducts(locale)).filter((p) => p.sold);
 }
 
 /** Todos los productos en descuento (tienen precio de comparación). */
-export async function getSaleProducts(): Promise<Product[]> {
-  // Backend real: fetch(apiBase + "/products?onSale=true")
-  return products.filter((p) => p.compareAt && p.compareAt > p.price);
+export async function getSaleProducts(locale: Locale): Promise<Product[]> {
+  // Backend real: fetch(apiBase + "/products?onSale=true&locale=" + locale)
+  return (await getProducts(locale)).filter((p) => p.compareAt && p.compareAt > p.price);
 }
 
 /** Valores por defecto y tope del listado paginado. */
@@ -58,27 +61,30 @@ const sorters: Record<ProductSort, ((a: Product, b: Product) => number) | undefi
 export const PRODUCT_SORTS = Object.keys(sorters) as ProductSort[];
 
 /** Productos que cumplen la búsqueda y los filtros, ya ordenados (sin paginar). */
-async function filterProducts(query: ProductListQuery): Promise<Product[]> {
-  const { q, category, brand, color, minPrice, maxPrice, minRating, sale, deal, featured } = query;
+async function filterProducts(query: ProductListQuery, locale: Locale): Promise<Product[]> {
+  const { ids, q, category, brand, color, minPrice, maxPrice, minRating, sale, deal, featured } = query;
 
-  let items = q ? await searchProducts(q) : await getProducts();
+  let items = q ? await searchProducts(q, locale) : await getProducts(locale);
 
   // Cada filtro activo se cruza con su selector, conservando el orden actual.
   const subsets = await Promise.all([
-    category?.length ? Promise.all(category.map(getProductsByCategory)).then((lists) => lists.flat()) : undefined,
-    sale ? getSaleProducts() : undefined,
-    deal ? getDealProducts() : undefined,
-    featured ? getFeaturedProducts() : undefined,
+    category?.length
+      ? Promise.all(category.map((slug) => getProductsByCategory(slug, locale))).then((lists) => lists.flat())
+      : undefined,
+    sale ? getSaleProducts(locale) : undefined,
+    deal ? getDealProducts(locale) : undefined,
+    featured ? getFeaturedProducts(locale) : undefined,
   ]);
   for (const subset of subsets) {
     if (!subset) continue;
-    const ids = new Set(subset.map((p) => p.id));
-    items = items.filter((p) => ids.has(p.id));
+    const subsetIds = new Set(subset.map((p) => p.id));
+    items = items.filter((p) => subsetIds.has(p.id));
   }
 
-  // Filtros sobre atributos del propio producto.
+  // Filtros sobre atributos del propio producto. Los colores van por nombre en `locale`.
   items = items.filter(
     (p) =>
+      (!ids?.length || ids.includes(p.id)) &&
       (!brand?.length || brand.includes(p.vendor)) &&
       (!color?.length || (p.colors ?? []).some((c) => color.includes(c.name))) &&
       (minPrice === undefined || p.price >= minPrice) &&
@@ -91,12 +97,12 @@ async function filterProducts(query: ProductListQuery): Promise<Product[]> {
 }
 
 /** Listado paginado con búsqueda, filtros y orden (lo que sirve GET /api/products). */
-export async function listProducts(query: ProductListQuery = {}): Promise<ProductListResponse> {
-  // Backend real: fetch(apiBase + "/products?" + new URLSearchParams(query))
+export async function listProducts(query: ProductListQuery, locale: Locale): Promise<ProductListResponse> {
+  // Backend real: fetch(apiBase + "/products?" + new URLSearchParams({ ...query, locale }))
   const page = query.page ?? PRODUCT_LIST_DEFAULTS.page;
   const pageSize = query.pageSize ?? PRODUCT_LIST_DEFAULTS.pageSize;
 
-  const items = await filterProducts(query);
+  const items = await filterProducts(query, locale);
   const total = items.length;
   const start = (page - 1) * pageSize;
   return {
@@ -109,9 +115,9 @@ export async function listProducts(query: ProductListQuery = {}): Promise<Produc
 }
 
 /** Facetas (categorías, marcas y colores con sus conteos) del conjunto que describe `query`. */
-export async function getProductFacets(query: ProductListQuery = {}): Promise<ProductFacets> {
+export async function getProductFacets(query: ProductListQuery, locale: Locale): Promise<ProductFacets> {
   // Backend real: vendrían junto al listado (fetch(apiBase + "/products?...")) o de un endpoint de facetas.
-  const items = await filterProducts(query);
+  const items = await filterProducts(query, locale);
   const categories: Record<string, number> = {};
   const brandCounts: Record<string, number> = {};
   const colors = new Map<string, string>();

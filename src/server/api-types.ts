@@ -6,10 +6,15 @@ export type { BlogPost, Category, HeroSlide, Product, PromoBanner };
 /** Criterios de orden de GET /api/products. `popular`: más reseñas primero. */
 export type ProductSort = "relevance" | "popular" | "price-asc" | "price-desc" | "rating";
 
-/** Parámetros (ya validados) del listado de productos. */
+/**
+ * Parámetros (ya validados) del listado de productos. El idioma no va aquí: es un
+ * argumento aparte de `listProducts` y el parámetro `locale` de la API.
+ */
 export interface ProductListQuery {
   page?: number;
   pageSize?: number;
+  /** Solo estos productos (por `id`); lo usa el carrito para traducir sus copias. */
+  ids?: string[];
   /** Slugs de categoría: basta con que coincida uno. */
   category?: string[];
   q?: string;

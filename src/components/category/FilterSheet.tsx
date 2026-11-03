@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { OptionChip } from "@/components/ui/Chip";
@@ -55,6 +56,7 @@ export function FilterSheet({
   onDraftChange: (draft: SheetFilters | null) => void;
   onApply: (next: SheetFilters) => void;
 }) {
+  const t = useTranslations("category");
   const [draft, setDraft] = useState<SheetFilters>(initial);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -152,7 +154,7 @@ export function FilterSheet({
             ref={panelRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Filtros"
+            aria-label={t("filters")}
             tabIndex={-1}
             onKeyDown={onKeyDown}
             className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[85vh] flex-col rounded-t-3xl bg-surface outline-none md:max-w-lg lg:hidden"
@@ -168,11 +170,11 @@ export function FilterSheet({
 
             {/* Encabezado */}
             <div className="flex items-center justify-between border-b border-border px-5 pb-4 pt-3">
-              <h2 className="text-h4 text-text-primary">Filtros</h2>
+              <h2 className="text-h4 text-text-primary">{t("filters")}</h2>
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Cerrar filtros"
+                aria-label={t("closeFilters")}
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-subtle text-text-secondary transition-colors hover:bg-surface-muted"
               >
                 <X className="h-5 w-5" />
@@ -183,7 +185,7 @@ export function FilterSheet({
             <div className="flex-1 overflow-y-auto px-5 py-5">
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-3">
-                  <h3 className="text-label-lg text-text-primary">Categoría</h3>
+                  <h3 className="text-label-lg text-text-primary">{t("category")}</h3>
                   <div className="flex flex-wrap gap-2.5">
                     {categories.map((c) => (
                       <OptionChip
@@ -199,7 +201,7 @@ export function FilterSheet({
 
                 <div className="h-px bg-border" />
                 <section className="flex flex-col gap-3">
-                  <h3 className="text-label-lg text-text-primary">Rango de precio</h3>
+                  <h3 className="text-label-lg text-text-primary">{t("priceRange")}</h3>
                   <RangeSlider
                     min={priceMin}
                     max={priceMax}
@@ -212,7 +214,7 @@ export function FilterSheet({
 
                 <div className="h-px bg-border" />
                 <section className="flex flex-col gap-3">
-                  <h3 className="text-label-lg text-text-primary">Marca</h3>
+                  <h3 className="text-label-lg text-text-primary">{t("brand")}</h3>
                   {brands.map(([brand, n]) => (
                     <Checkbox
                       key={brand}
@@ -226,7 +228,7 @@ export function FilterSheet({
 
                 <div className="h-px bg-border" />
                 <section className="flex flex-col gap-3">
-                  <h3 className="text-label-lg text-text-primary">Disponibilidad</h3>
+                  <h3 className="text-label-lg text-text-primary">{t("availability")}</h3>
                   {availabilityOptions.map((o) => (
                     <Checkbox
                       key={o.id}
@@ -244,7 +246,7 @@ export function FilterSheet({
             {/* Pie fijo */}
             <div className="flex gap-3 border-t border-border p-4">
               <Button variant="outline" fullWidth onClick={reset}>
-                Restablecer
+                {t("reset")}
               </Button>
               <Button
                 variant="primary"
@@ -254,7 +256,7 @@ export function FilterSheet({
                   onClose();
                 }}
               >
-                Mostrar {count} resultados
+                {t("showResults", { count })}
               </Button>
             </div>
           </motion.div>

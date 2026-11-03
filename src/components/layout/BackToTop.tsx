@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 const SHOW_AFTER = 400; // px de scroll antes de mostrarse
@@ -35,6 +36,7 @@ const easeIn = cubicBezier(0.55, 0, 1, 0.45);
  * (ver globals.css), que lo sube por encima de las barras fijas de compra/pago.
  */
 export function BackToTop() {
+  const t = useTranslations("common");
   const [visible, setVisible] = useState(false);
   const frame = useRef(0);
 
@@ -84,7 +86,7 @@ export function BackToTop() {
     <button
       type="button"
       onClick={scrollToTop}
-      aria-label="Volver arriba"
+      aria-label={t("backToTop")}
       data-back-to-top
       data-visible={visible}
       className={cn(

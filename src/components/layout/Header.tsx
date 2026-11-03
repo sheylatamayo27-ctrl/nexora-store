@@ -1,34 +1,39 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, User, Menu, X, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { CartButton } from "@/components/layout/CartButton";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { LanguageSelector } from "@/components/layout/LanguageSelector";
 import { MegaMenu, type MegaMenuData } from "@/components/layout/MegaMenu";
+import { Link, usePathname } from "@/i18n/navigation";
 
-// href "#": página pendiente de completar por el comprador (ver README).
+// `key`: texto en el namespace "nav". href "#": página pendiente de completar
+// por el comprador (ver README).
 const primaryNav = [
-  { label: "Electrónica", href: "/category/headphones" },
-  { label: "Ofertas", href: "/offers", hot: true },
-  { label: "Blogs", href: "/blog" },
-  { label: "Contacto", href: "#" },
-  { label: "Novedades", href: "#" },
-];
+  { key: "electronics", href: "/category/headphones" },
+  { key: "offers", href: "/offers" },
+  { key: "blogs", href: "/blog" },
+  { key: "contact", href: "#" },
+  { key: "whatsNew", href: "#" },
+] as const;
 
 const secondaryNav = [
-  { label: "FAQs", href: "#" },
-  { label: "Rastrear pedido", href: "/account" },
-  { label: "Nosotros", href: "#" },
-];
+  { key: "faqs", href: "#" },
+  { key: "trackOrder", href: "/account" },
+  { key: "about", href: "#" },
+] as const;
 
 export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuData; mobileSearch?: boolean }) {
+  const t = useTranslations("header");
+  const tNav = useTranslations("nav");
+  const tCommon = useTranslations("common");
   const [menuOpen, setMenuOpen] = useState(false);
+  // Sin prefijo de idioma: "/cart" tanto en /cart como en /en/cart.
   const pathname = usePathname();
   // El producto, el carrito, la confirmación de pedido, ofertas, el blog y la 404
   // (que trae su propio buscador) no llevan buscador bajo el header
@@ -52,7 +57,7 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
           <button
             type="button"
             className="lg:hidden"
-            aria-label="Abrir menú"
+            aria-label={t("openMenu")}
             onClick={() => setMenuOpen(true)}
           >
             <Menu className="h-6 w-6" />
@@ -73,8 +78,8 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
                 <User className="h-5 w-5 text-brand-800" />
               </span>
               <span className="flex flex-col leading-tight">
-                <span className="text-body-sm text-text-secondary">Hola, entra</span>
-                <span className="text-label text-text-primary">Cuenta y pedidos</span>
+                <span className="text-body-sm text-text-secondary">{t("greeting")}</span>
+                <span className="text-label text-text-primary">{t("accountAndOrders")}</span>
               </span>
             </Link>
             <span className="h-8 w-px bg-border" />
@@ -83,10 +88,10 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
 
           {/* Iconos (móvil) */}
           <div className="ml-auto flex items-center gap-4 lg:hidden">
-            <Link href="/wishlist" aria-label="Favoritos">
+            <Link href="/wishlist" aria-label={t("wishlist")}>
               <Heart className="h-[22px] w-[22px]" />
             </Link>
-            <Link href="/account" aria-label="Cuenta">
+            <Link href="/account" aria-label={t("account")}>
               <User className="h-[22px] w-[22px]" />
             </Link>
             <CartButton compact />
@@ -124,12 +129,15 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
             >
               <div className="flex items-center justify-between border-b border-border p-4">
                 <Logo />
-                <button aria-label="Cerrar menú" onClick={() => setMenuOpen(false)}>
+                <button aria-label={t("closeMenu")} onClick={() => setMenuOpen(false)}>
                   <X className="h-6 w-6" />
                 </button>
               </div>
               <nav className="flex flex-col gap-1 p-4">
-                {[{ label: "Inicio", href: "/" }, ...primaryNav].map((item) => (
+                {[
+                  { label: tCommon("home"), href: "/" },
+                  ...primaryNav.map((item) => ({ label: tNav(item.key), href: item.href })),
+                ].map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}
@@ -143,12 +151,12 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
                 <div className="my-2 h-px bg-border" />
                 {secondaryNav.map((item) => (
                   <Link
-                    key={item.label}
+                    key={item.key}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
                     className="rounded-md px-3 py-2.5 text-label text-text-secondary hover:bg-surface-subtle"
                   >
-                    {item.label}
+                    {tNav(item.key)}
                   </Link>
                 ))}
               </nav>
