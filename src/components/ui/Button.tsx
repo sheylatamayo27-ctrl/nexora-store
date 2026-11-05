@@ -60,10 +60,12 @@ export function ButtonLink({
   className,
   children,
   href,
-}: BaseProps & { href: string }) {
+  onClick,
+}: BaseProps & { href: string; onClick?: React.MouseEventHandler<HTMLAnchorElement> }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={cn(base, variants[variant], sizes[size], fullWidth && "w-full", className)}
     >
       {children}

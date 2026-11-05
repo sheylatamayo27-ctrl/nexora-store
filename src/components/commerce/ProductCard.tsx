@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
@@ -10,10 +11,15 @@ import { Price } from "@/components/commerce/Price";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/store/cart";
 import { useFavorites } from "@/store/favorites";
-import { favoriteToast } from "@/lib/toast";
+import { cartToast, favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { discountPercent } from "@/lib/format";
 import type { Product } from "@/data/types";
+
+// La vista rápida (Radix Dialog + framer-motion) se carga aparte, al primer uso:
+// así no pesa en cada página con tarjetas. Al pasar el cursor por el botón ya se pide.
+const loadQuickView = () => import("@/components/commerce/QuickView").then((m) => m.QuickView);
+const QuickView = dynamic(loadQuickView, { ssr: false });
 
 export function ProductCard({
   product,
@@ -34,6 +40,9 @@ export function ProductCard({
   const toggleFavorite = useFavorites((s) => s.toggle);
   const favorites = useFavorites((s) => s.items);
   useEffect(() => setMounted(true), []);
+  const [quickOpen, setQuickOpen] = useState(false);
+  // El modal se monta la primera vez que se abre y luego se queda (para animar el cierre).
+  const [quickUsed, setQuickUsed] = useState(false);
   // Hasta el montaje se pinta como en el servidor (favoritos vienen de localStorage).
   const wished = mounted && favorites.some((p) => p.id === product.id);
   const href = `/product/${product.slug}`;
@@ -49,6 +58,15 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     add(product);
+    cartToast(product);
+  };
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    // El botón está sobre el enlace de la imagen: que no navegue.
+    e.preventDefault();
+    e.stopPropagation();
+    setQuickUsed(true);
+    setQuickOpen(true);
   };
 
   return (
@@ -80,11 +98,6 @@ export function ProductCard({
           )
         )}
 
-        {/* Quick look */}
-        <span className="absolute right-2.5 top-2.5 hidden items-center gap-1 rounded-full bg-surface/95 px-2.5 py-1 text-label-sm text-text-primary shadow-elevation-sm backdrop-blur transition-opacity duration-300 sm:flex sm:opacity-0 sm:group-hover:opacity-100">
-          <Eye className="h-3.5 w-3.5" /> {tCard("quickView")}
-        </span>
-
         {/* Wishlist */}
         <button
           type="button"
@@ -112,6 +125,19 @@ export function ProductCard({
         </button>
 
         <Link href={href} className="absolute inset-0" aria-label={product.name} />
+
+        {/* Vista rápida: aparece al pasar el cursor (o con el foco del teclado). En
+            pantallas sin cursor no se muestra nunca, así que tampoco ocupa el toque.
+            Va después del enlace de la imagen para quedar encima sin z-index. */}
+        <button
+          type="button"
+          onClick={handleQuickView}
+          onPointerEnter={() => void loadQuickView()}
+          aria-haspopup="dialog"
+          className="absolute right-2.5 top-2.5 hidden items-center gap-1 rounded-full bg-surface/95 px-2.5 py-1 text-label-sm text-text-primary shadow-elevation-sm backdrop-blur transition-opacity duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 sm:flex sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 [@media(hover:none)]:hidden"
+        >
+          <Eye className="h-3.5 w-3.5" /> {tCard("quickView")}
+        </button>
       </div>
 
       {/* Info */}
@@ -147,6 +173,8 @@ export function ProductCard({
           </div>
         )}
       </div>
+
+      {quickUsed && <QuickView product={product} open={quickOpen} onOpenChange={setQuickOpen} />}
     </article>
   );
 }

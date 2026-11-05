@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { Heart, HeartOff, ArrowRight, ShoppingBag, type LucideIcon } from "lucide-react";
+import { Heart, HeartOff, ArrowRight, Check, ShoppingBag, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Link } from "@/i18n/navigation";
@@ -59,6 +59,46 @@ export function favoriteToast(product: Product, added: boolean) {
     duration: 3200,
     unstyled: true,
   });
+}
+
+/** Recorta `text` a `max` caracteres con "…" (los nombres de producto pueden ser largos). */
+function truncate(text: string, max: number) {
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+}
+
+/** Contenido del toast del carrito: miniatura con check verde, nombre y acceso al carrito. */
+function CartToast({ id, product }: { id: string | number; product: Product }) {
+  const t = useTranslations("toast");
+  return (
+    <div className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-elevation-lg">
+      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-subtle">
+        <AssetImage folder="products" name={product.image} alt="" sizes="48px" />
+        <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-success-500 text-white ring-2 ring-surface">
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </span>
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-label text-text-primary" title={product.name}>
+          {truncate(product.name, 40)}
+        </span>
+        <span className="text-body-sm text-text-secondary">{t("addedToCart")}</span>
+      </div>
+
+      <Link
+        href="/cart"
+        onClick={() => toast.dismiss(id)}
+        className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-label-sm text-brand-700 transition-colors hover:bg-brand-100"
+      >
+        {t("viewCart")} <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
+    </div>
+  );
+}
+
+/** Aviso al agregar un producto al carrito (tarjetas y vista rápida), con acceso a /cart. */
+export function cartToast(product: Product) {
+  showToast((id) => <CartToast id={id} product={product} />, { duration: 3000, unstyled: true });
 }
 
 /**

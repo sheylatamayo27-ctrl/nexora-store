@@ -227,7 +227,9 @@
   "toast": {
     "addedToWishlist": "Agregado a favoritos",
     "removedFromWishlist": "Quitado de favoritos",
-    "view": "Ver"
+    "view": "Ver",
+    "addedToCart": "Agregado al carrito",
+    "viewCart": "Ver carrito"
   },
   "home": {
     "collectionsTitle": "Compra por colección",
@@ -275,6 +277,12 @@
   },
   "productCard": {
     "quickView": "Vista rápida"
+  },
+  "quickView": {
+    "descriptionFallback": "Descubre la calidad y el rendimiento de {name}. Envío exprés disponible.",
+    "color": "Color",
+    "quantity": "Cantidad",
+    "viewDetails": "Ver detalles completos"
   },
   "product": {
     "brandLine": "{vendor} AUDIO",

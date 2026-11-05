@@ -227,7 +227,9 @@
   "toast": {
     "addedToWishlist": "Added to wishlist",
     "removedFromWishlist": "Removed from wishlist",
-    "view": "View"
+    "view": "View",
+    "addedToCart": "Added to cart",
+    "viewCart": "View cart"
   },
   "home": {
     "collectionsTitle": "Shop by collection",
@@ -275,6 +277,12 @@
   },
   "productCard": {
     "quickView": "Quick view"
+  },
+  "quickView": {
+    "descriptionFallback": "Discover the quality and performance of {name}. Express shipping available.",
+    "color": "Color",
+    "quantity": "Quantity",
+    "viewDetails": "View full details"
   },
   "product": {
     "brandLine": "{vendor} AUDIO",
