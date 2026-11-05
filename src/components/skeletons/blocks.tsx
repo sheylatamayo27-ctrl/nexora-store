@@ -287,3 +287,63 @@ export function AuthSkeleton({
     </SkeletonRegion>
   );
 }
+
+/** Banner azul de las páginas de contenido (`ContentPageBanner`): migas, título y subtítulo centrados. */
+export function ContentBannerSkeleton() {
+  return (
+    <section className="bg-brand-900">
+      <Container className="flex flex-col items-center gap-4 py-16 max-md:py-12 max-sm:py-10">
+        <div className="flex items-center gap-2">
+          <Skeleton className={cn("h-4 w-4", onDark)} />
+          <Skeleton className={cn("h-3 w-24", onDark)} />
+        </div>
+        <Skeleton className={cn("h-14 w-[28rem] max-w-full max-sm:h-10 max-sm:w-64", onDark)} />
+        <Skeleton className={cn("h-5 w-[32rem] max-w-full max-sm:w-72", onDark)} />
+      </Container>
+    </section>
+  );
+}
+
+const LINE_WIDTHS = ["w-full", "w-11/12", "w-4/5", "w-full", "w-3/4", "w-5/6", "w-2/3", "w-full", "w-3/5", "w-4/5"];
+
+/** `count` renglones de texto de anchos variados. */
+export function TextLinesSkeleton({ count }: { count: number }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {Array.from({ length: count }, (_, i) => (
+        <Skeleton key={i} variant="text" width={LINE_WIDTHS[i % LINE_WIDTHS.length]} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Página de contenido (`ContentPageLayout`): banner + cuerpo. Sin `children`, la
+ * tarjeta de lectura de las páginas legales con `lines` renglones.
+ */
+export function ContentPageSkeleton({
+  lines = 8,
+  wide = false,
+  children,
+}: {
+  lines?: number;
+  wide?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <SkeletonRegion className="flex flex-col">
+      <ContentBannerSkeleton />
+      <Container className="py-14 max-md:py-10">
+        <div className={cn("mx-auto", wide ? "max-w-5xl" : "max-w-3xl")}>
+          {children ?? (
+            <div className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-10 shadow-elevation-sm max-md:p-8 max-sm:px-5 max-sm:py-6">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton variant="title" className="w-64 max-w-full" />
+              <TextLinesSkeleton count={lines} />
+            </div>
+          )}
+        </div>
+      </Container>
+    </SkeletonRegion>
+  );
+}

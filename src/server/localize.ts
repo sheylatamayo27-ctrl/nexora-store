@@ -1,8 +1,10 @@
-import type { BlogPost, Category, HeroSlide, Product, PromoBanner } from "@/data/types";
+import type { BlogPost, Category, ContentPage, FaqGroup, HeroSlide, Product, PromoBanner } from "@/data/types";
 import { routing, type Locale } from "@/i18n/routing";
 import type {
   BlogPostRecord,
   CategoryRecord,
+  ContentPageRecord,
+  FaqGroupRecord,
   HeroSlideRecord,
   Localized,
   ProductRecord,
@@ -62,5 +64,23 @@ export function toBlogPost(record: BlogPostRecord, locale: Locale): BlogPost {
     category: localize(record.category, locale),
     author: { name: record.author.name, role: localize(record.author.role, locale) },
     content: localize(record.content, locale),
+  };
+}
+
+export function toContentPage(record: ContentPageRecord, locale: Locale): ContentPage {
+  const { title, subtitle, description, blocks, ...rest } = record;
+  return {
+    ...rest,
+    title: localize(title, locale),
+    ...(subtitle && { subtitle: localize(subtitle, locale) }),
+    description: localize(description, locale),
+    blocks: localize(blocks, locale),
+  };
+}
+
+export function toFaqGroup(record: FaqGroupRecord, locale: Locale): FaqGroup {
+  return {
+    title: localize(record.title, locale),
+    items: record.items.map((i) => ({ question: localize(i.question, locale), answer: localize(i.answer, locale) })),
   };
 }

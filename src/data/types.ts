@@ -75,3 +75,42 @@ export interface BlogPost {
   featured?: boolean;
   content: BlogBlock[];
 }
+
+/** Páginas de contenido estático (legales e informativas). */
+export type ContentPageSlug = "terms" | "privacy" | "shipping" | "returns" | "warranty" | "about";
+
+/** Ícono de una tarjeta de contenido; `ContentBlocks` lo resuelve a lucide. */
+export type ContentIcon = "quality" | "service" | "innovation" | "trust";
+
+/**
+ * Bloques de una página de contenido. En los textos, `[texto](/ruta)` es un
+ * enlace (interno si empieza por "/"; si no, p. ej. `mailto:`, externo).
+ */
+export type ContentBlock =
+  | { type: "heading"; text: string }
+  | { type: "paragraph"; text: string }
+  /** `check`/`cross`: lista de lo que sí/no incluye algo (p. ej. la garantía). */
+  | { type: "list"; items: string[]; tone?: "check" | "cross" }
+  /** Pasos numerados (proceso de devolución). */
+  | { type: "steps"; items: { title: string; text: string }[] }
+  | { type: "cards"; items: { icon: ContentIcon; title: string; text: string }[] }
+  | { type: "stats"; items: { value: string; label: string }[] }
+  /** Tabla de métodos y tarifas de envío; se pinta con los precios de `src/lib/shipping.ts`. */
+  | { type: "shippingRates" };
+
+export interface ContentPage {
+  slug: ContentPageSlug;
+  title: string;
+  subtitle?: string;
+  /** Meta description. */
+  description: string;
+  /** Última actualización (ISO, YYYY-MM-DD); solo en las páginas legales. */
+  updated?: string;
+  blocks: ContentBlock[];
+}
+
+export interface FaqGroup {
+  title: string;
+  /** Respuestas con la misma sintaxis de enlaces que `ContentBlock`. */
+  items: { question: string; answer: string }[];
+}

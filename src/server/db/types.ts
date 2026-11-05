@@ -3,6 +3,8 @@ import type {
   BlogBlock,
   BlogPost,
   Category,
+  ContentBlock,
+  ContentPage,
   HeroSlide,
   Product,
   PromoBanner,
@@ -50,3 +52,17 @@ export interface BlogPostRecord extends Omit<BlogPost, "title" | "excerpt" | "ca
   /** Cada idioma tiene su propio cuerpo de artículo. */
   content: Localized<BlogBlock[]>;
 }
+
+export interface ContentPageRecord extends Omit<ContentPage, "title" | "subtitle" | "description" | "blocks"> {
+  title: Localized;
+  subtitle?: Localized;
+  description: Localized;
+  /** Cada idioma tiene su propio cuerpo. */
+  blocks: Localized<ContentBlock[]>;
+}
+
+export interface FaqGroupRecord {
+  title: Localized;
+  items: { question: Localized; answer: Localized }[];
+}
+

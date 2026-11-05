@@ -687,6 +687,15 @@
     "productCount": "({count, plural, one {# product} other {# products}})",
     "sortLabel": "Sort deals"
   },
+  "contentPage": {
+    "updated": "Last updated: {date}",
+    "method": "Method",
+    "deliveryTime": "Delivery time",
+    "cost": "Cost",
+    "standardTime": "3–5 business days",
+    "expressTime": "1–2 business days",
+    "sameDayTime": "Same day · Mexico City only"
+  },
   "notFound": {
     "title": "Oops! This page got lost",
     "description": "The page you’re looking for doesn’t exist or has been moved. Try searching for a product or head back home.",

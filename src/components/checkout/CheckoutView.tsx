@@ -34,6 +34,7 @@ import { couponDiscount, couponFreeShipping } from "@/lib/coupons";
 import { formatPrice } from "@/lib/format";
 import { FORM_OPTIONS, focusFirstError, useErrorText } from "@/lib/forms";
 import { checkoutSchema, type CheckoutData } from "@/lib/schemas/checkout";
+import { SHIPPING_RATES } from "@/lib/shipping";
 import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
 import { useCart } from "@/store/cart";
@@ -109,9 +110,9 @@ function Section({ title, children, right }: { title: string; children: React.Re
 
 // `title` y `desc`: claves del namespace "checkout".
 const shippingOptions = [
-  { id: "standard", icon: Truck, title: "standardShipping", desc: "standardShippingDesc", price: 0 },
-  { id: "express", icon: Zap, title: "expressShipping", desc: "expressShippingDesc", price: 199 },
-  { id: "sameday", icon: Clock, title: "sameDay", desc: "sameDayDesc", price: 349 },
+  { id: "standard", icon: Truck, title: "standardShipping", desc: "standardShippingDesc", price: SHIPPING_RATES.standard },
+  { id: "express", icon: Zap, title: "expressShipping", desc: "expressShippingDesc", price: SHIPPING_RATES.express },
+  { id: "sameday", icon: Clock, title: "sameDay", desc: "sameDayDesc", price: SHIPPING_RATES.sameday },
 ] as const;
 
 const paymentOptions = [

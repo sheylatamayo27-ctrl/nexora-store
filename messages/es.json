@@ -687,6 +687,15 @@
     "productCount": "({count, plural, one {# producto} other {# productos}})",
     "sortLabel": "Ordenar ofertas"
   },
+  "contentPage": {
+    "updated": "Última actualización: {date}",
+    "method": "Método",
+    "deliveryTime": "Plazo de entrega",
+    "cost": "Costo",
+    "standardTime": "3–5 días hábiles",
+    "expressTime": "1–2 días hábiles",
+    "sameDayTime": "Mismo día · solo CDMX"
+  },
   "notFound": {
     "title": "¡Ups! Esta página se perdió",
     "description": "La página que buscas no existe o fue movida. Intenta buscar un producto o vuelve al inicio.",

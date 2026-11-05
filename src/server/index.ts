@@ -7,6 +7,7 @@
 export * from "./products";
 export * from "./categories";
 export * from "./blog";
+export * from "./pages";
 export * from "./hero";
 export * from "./search";
 export type * from "./api-types";
