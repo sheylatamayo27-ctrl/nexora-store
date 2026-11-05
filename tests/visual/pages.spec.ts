@@ -5,8 +5,10 @@ import { test, expect, type Page } from "@playwright/test";
  * del catálogo (ver build: /category/[slug], /product/[slug], /blog/[slug]).
  * `name` es el nombre del archivo de la línea base: se conserva aunque la URL
  * haya pasado a inglés, para comparar contra las mismas capturas de siempre.
+ * `session`: entra con la cuenta de demostración (Mi cuenta exige sesión y
+ * Favoritos muestra su perfil); el header pasa a saludar por su nombre.
  */
-const routes: { name: string; path: string }[] = [
+const routes: { name: string; path: string; session?: boolean }[] = [
   { name: "home", path: "/" },
   { name: "categoria", path: "/category/earbuds" },
   { name: "producto", path: "/product/nexora-aura-anc-wireless-headphones" },
@@ -15,8 +17,8 @@ const routes: { name: string; path: string }[] = [
   { name: "pedido-confirmado", path: "/order-confirmation" },
   { name: "entrar", path: "/login" },
   { name: "crear-cuenta", path: "/register" },
-  { name: "cuenta", path: "/account" },
-  { name: "favoritos", path: "/wishlist" },
+  { name: "cuenta", path: "/account", session: true },
+  { name: "favoritos", path: "/wishlist", session: true },
   { name: "ofertas", path: "/offers" },
   { name: "blog", path: "/blog" },
   { name: "blog-post", path: "/blog/how-to-choose-noise-cancelling-headphones" },
@@ -76,6 +78,12 @@ for (const route of routes) {
     const width = page.viewportSize()!.width;
     const isDesktop = width >= 1024;
 
+    if (route.session) {
+      await page.addInitScript(() => {
+        const user = { name: "Sheyla Tamayo", email: "sheyla@nexora.store" };
+        localStorage.setItem("nexora-auth", JSON.stringify({ state: { user, token: "mock-jwt-token" }, version: 0 }));
+      });
+    }
     await page.goto(route.path, { waitUntil: "networkidle" });
     await stabilize(page);
 

@@ -10,11 +10,13 @@ import { FieldError } from "@/components/ui/FieldError";
 import { FormField } from "@/components/ui/FormField";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { Dots } from "@/components/ui/Dots";
 import { Link, useRouter } from "@/i18n/navigation";
 import { notifyToast } from "@/lib/toast";
-import { simulateRequest } from "@/lib/simulate";
 import { FORM_OPTIONS, useErrorText } from "@/lib/forms";
 import { loginSchema, registerSchema, type LoginData, type RegisterData } from "@/lib/schemas/auth";
+import { AuthError, type AuthErrorCode, type AuthProvider } from "@/services/auth";
+import { useAuth } from "@/store/auth";
 
 /** Valores de ejemplo con los que arrancan los formularios. */
 const SIGNIN_DEFAULTS: LoginData = { email: "sheyla@nexora.store", password: "password123" };
@@ -28,16 +30,46 @@ const SIGNUP_DEFAULTS: RegisterData = {
   acceptTerms: true,
 };
 
+/** Texto de `auth.errors` de cada motivo conocido de `AuthError`. */
+const AUTH_ERROR_KEYS = {
+  invalid_credentials: "invalidCredentials",
+  email_taken: "emailTaken",
+  provider_cancelled: "providerCancelled",
+} as const satisfies Record<AuthErrorCode, string>;
+
 /**
- * Inicio de sesión. Solo front-end: valida con zod (al salir de cada campo y al
- * enviar) y simula la petición; para conectarlo, cambia `simulateRequest` por
- * la llamada real (p. ej. POST /api/auth/login con los datos validados).
+ * Aviso de fallo de un acceso: el motivo del `AuthError` (traducido si es un
+ * código conocido, si no su mensaje) o, con cualquier otro error, la conexión.
+ */
+function useAuthFailureToast() {
+  const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
+  return (title: string, error: unknown) =>
+    notifyToast({
+      tone: "error",
+      icon: AlertCircle,
+      title,
+      description:
+        error instanceof AuthError
+          ? error.code
+            ? t(`errors.${AUTH_ERROR_KEYS[error.code]}`)
+            : error.message
+          : tCommon("checkConnection"),
+    });
+}
+
+/**
+ * Inicio de sesión. Valida con zod (al salir de cada campo y al enviar) y entra
+ * con `useAuth().login`, que llama al servicio de auth (src/services/auth.ts):
+ * para conectar un backend real solo se cambia el servicio.
  */
 function SignInForm() {
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
   const errorText = useErrorText();
   const router = useRouter();
+  const login = useAuth((s) => s.login);
+  const failureToast = useAuthFailureToast();
   const [navigating, startNavigation] = useTransition();
   const [remember, setRemember] = useState(true);
   const {
@@ -52,17 +84,13 @@ function SignInForm() {
     error: errorText(errors[name]?.message),
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async ({ email, password }: LoginData) => {
     try {
-      await simulateRequest(1000);
+      await login(email, password);
+      notifyToast({ icon: UserCheck, title: t("welcomeBack") });
       startNavigation(() => router.push("/account"));
-    } catch {
-      notifyToast({
-        tone: "error",
-        icon: AlertCircle,
-        title: t("signInFailed"),
-        description: tCommon("checkConnection"),
-      });
+    } catch (error) {
+      failureToast(t("signInFailed"), error);
     }
   };
 
@@ -91,12 +119,14 @@ function SignInForm() {
   );
 }
 
-/** Registro. Mismo funcionamiento que `SignInForm` (cambiar por POST /api/auth/register). */
+/** Registro. Mismo funcionamiento que `SignInForm`, con `useAuth().register`. */
 function SignUpForm() {
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
   const errorText = useErrorText();
   const router = useRouter();
+  const registerUser = useAuth((s) => s.register);
+  const failureToast = useAuthFailureToast();
   const [navigating, startNavigation] = useTransition();
   const {
     register,
@@ -111,18 +141,13 @@ function SignUpForm() {
     error: errorText(errors[name]?.message),
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async ({ firstName, lastName, email, password }: RegisterData) => {
     try {
-      await simulateRequest(1000);
+      await registerUser({ name: `${firstName.trim()} ${lastName.trim()}`.trim(), email, password });
       notifyToast({ icon: UserCheck, title: t("accountCreated"), description: t("accountCreatedDescription") });
       startNavigation(() => router.push("/account"));
-    } catch {
-      notifyToast({
-        tone: "error",
-        icon: AlertCircle,
-        title: t("signUpFailed"),
-        description: tCommon("checkConnection"),
-      });
+    } catch (error) {
+      failureToast(t("signUpFailed"), error);
     }
   };
 
@@ -160,6 +185,63 @@ function SignUpForm() {
   );
 }
 
+const PROVIDERS: { id: AuthProvider; name: string }[] = [
+  { id: "google", name: "Google" },
+  { id: "apple", name: "Apple" },
+];
+
+/** Botones de Google/Apple: entran con `useAuth().loginWithProvider` (en registro también: crea la cuenta). */
+function SocialSignIn() {
+  const t = useTranslations("auth");
+  const router = useRouter();
+  const loginWithProvider = useAuth((s) => s.loginWithProvider);
+  const failureToast = useAuthFailureToast();
+  const [, startNavigation] = useTransition();
+  // Proveedor en curso; sigue fijado tras entrar, hasta que la navegación desmonta la vista.
+  const [pending, setPending] = useState<AuthProvider | null>(null);
+
+  const signIn = async ({ id, name }: (typeof PROVIDERS)[number]) => {
+    setPending(id);
+    try {
+      await loginWithProvider(id);
+      notifyToast({ icon: UserCheck, title: t("signedInWith", { provider: name }) });
+      startNavigation(() => router.push("/account"));
+    } catch (error) {
+      setPending(null);
+      failureToast(t("signInFailed"), error);
+    }
+  };
+
+  return (
+    <div className="flex gap-3">
+      {PROVIDERS.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          onClick={() => signIn(p)}
+          disabled={pending !== null}
+          aria-busy={pending === p.id || undefined}
+          className="flex h-12 flex-1 items-center justify-center gap-2 rounded-md border border-border-strong text-label text-text-primary disabled:cursor-not-allowed"
+        >
+          {pending === p.id ? (
+            <Dots size="sm" />
+          ) : (
+            <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-surface-muted text-label-xs">
+              {p.name[0]}
+            </span>
+          )}
+          <span>
+            {t.rich("continueWith", {
+              provider: p.name,
+              desktop: (chunks) => <span className="hidden lg:inline">{chunks}</span>,
+            })}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function AuthView({ mode }: { mode: "signin" | "signup" }) {
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
@@ -172,25 +254,7 @@ export function AuthView({ mode }: { mode: "signin" | "signup" }) {
         <p className="text-body text-text-secondary">{isSignup ? t("signUpSubtitle") : t("signInSubtitle")}</p>
       </div>
 
-      {/* Social */}
-      <div className="flex gap-3">
-        {["Google", "Apple"].map((p) => (
-          <button
-            key={p}
-            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-md border border-border-strong text-label text-text-primary"
-          >
-            <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-surface-muted text-label-xs">
-              {p[0]}
-            </span>
-            <span>
-              {t.rich("continueWith", {
-                provider: p,
-                desktop: (chunks) => <span className="hidden lg:inline">{chunks}</span>,
-              })}
-            </span>
-          </button>
-        ))}
-      </div>
+      <SocialSignIn />
       <div className="flex items-center gap-3">
         <span className="h-px flex-1 bg-border" />
         <span className="text-body-sm text-text-muted">{t("orWithEmail")}</span>

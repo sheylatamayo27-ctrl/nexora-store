@@ -6,10 +6,10 @@ import {
   CreditCard,
   Mail,
   Settings,
-  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { AccountProfile, SignOutButton } from "@/components/account/AccountProfile";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Link } from "@/i18n/navigation";
@@ -46,25 +46,8 @@ export function AccountShell({
       <aside className="flex w-full shrink-0 flex-col gap-4 max-lg:-mx-4 max-lg:-mt-8 max-lg:w-auto max-lg:border-b max-lg:border-border max-lg:bg-surface max-lg:px-4 max-lg:pb-4 max-lg:pt-4 sm:max-lg:-mx-6 sm:max-lg:px-6 md:max-lg:pt-5 lg:w-72">
         <Breadcrumb items={[{ label: t("myAccount") }, { label: crumb }]} className="max-lg:hidden" />
 
-        {/* Perfil */}
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-gradient-to-b from-brand-100 to-surface p-6 text-center max-lg:flex-row max-lg:gap-3 max-lg:rounded-none max-lg:border-0 max-lg:bg-none max-lg:p-0 max-lg:text-left md:max-lg:gap-4">
-          <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-brand-100 text-h3 text-brand-800 max-lg:shrink-0 max-md:h-12 max-md:w-12 max-md:text-label-lg md:max-lg:h-14 md:max-lg:w-14 md:max-lg:text-h4">
-            ST
-          </span>
-          {/* lg:contents: en escritorio los hijos siguen siendo ítems directos de la tarjeta. */}
-          <div className="contents max-lg:flex max-lg:min-w-0 max-lg:flex-col max-lg:gap-0.5">
-            <div className="contents max-lg:flex max-lg:items-center max-lg:gap-2">
-              <span className="text-label-lg text-text-primary max-lg:truncate max-lg:font-semibold">Sheyla Tamayo</span>
-              <span className="shrink-0 rounded-sm bg-accent-500 px-1.5 py-0.5 text-label-xs uppercase text-brand-900 lg:hidden">
-                {t("gold")}
-              </span>
-            </div>
-            <span className="text-body-sm text-text-secondary max-lg:truncate">sheyla@nexora.store</span>
-          </div>
-          <span className="rounded-sm bg-accent-500 px-2 py-1 text-label-xs uppercase text-brand-900 max-lg:hidden">
-            {t("goldMember")}
-          </span>
-        </div>
+        {/* Perfil (datos de la sesión) */}
+        <AccountProfile />
 
         {/* Navegación — <lg: chips con scroll horizontal que arranca en el margen
             (móvil con ícono; tablet sin ícono para que quepan las 6). */}
@@ -87,13 +70,7 @@ export function AccountShell({
             </Link>
           ))}
           <div className="my-1 hidden h-px bg-border lg:block" />
-          <Link
-            href="/"
-            className="flex shrink-0 items-center gap-3 rounded-md px-4 py-3 text-label text-sale-500 hover:bg-surface-subtle max-lg:hidden"
-          >
-            <LogOut className="h-5 w-5" />
-            {t("signOut")}
-          </Link>
+          <SignOutButton />
         </nav>
       </aside>
 

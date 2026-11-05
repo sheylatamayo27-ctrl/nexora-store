@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { notifyToast } from "@/lib/toast";
+import { useAuth, type User } from "@/store/auth";
 
 type Field = "firstName" | "lastName" | "email" | "phone";
 type Values = Record<Field, string>;
@@ -14,12 +15,11 @@ type Errors = Partial<Record<Field, "firstName" | "lastName" | "email" | "phone"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const initialValues: Values = {
-  firstName: "Sheyla",
-  lastName: "Tamayo",
-  email: "sheyla@nexora.store",
-  phone: "+52 55 9876 5432",
-};
+/** Datos de la sesión; el teléfono aún no forma parte del perfil, así que es de ejemplo. */
+function initialValues(user: User | null): Values {
+  const [firstName = "", ...rest] = (user?.name ?? "").trim().split(/\s+/);
+  return { firstName, lastName: rest.join(" "), email: user?.email ?? "", phone: "+52 55 9876 5432" };
+}
 
 function validate(v: Values): Errors {
   const errors: Errors = {};
@@ -31,15 +31,17 @@ function validate(v: Values): Errors {
 }
 
 /**
- * Configuración (datos del perfil). Solo front-end: valida en el cliente y
- * simula el guardado. Para conectarlo, cambia el bloque marcado en
- * `handleSubmit` por la llamada real (p. ej. PATCH /api/account).
+ * Configuración (datos del perfil). Valida en el cliente y guarda nombre y
+ * correo en la sesión (`updateProfile`), así el perfil y el header se
+ * actualizan. Con backend, ahí iría también la llamada real (p. ej. PATCH /api/account).
  */
 export function SettingsView() {
   const t = useTranslations("settings");
   const tFields = useTranslations("common.fields");
   const tValidation = useTranslations("validation");
-  const [values, setValues] = useState<Values>(initialValues);
+  const updateProfile = useAuth((s) => s.updateProfile);
+  // /account/* solo se pinta con sesión (`RequireAuth`), así que el usuario ya está aquí.
+  const [values, setValues] = useState<Values>(() => initialValues(useAuth.getState().user));
   const [errors, setErrors] = useState<Errors>({});
 
   const field = (name: Field) => {
@@ -62,7 +64,7 @@ export function SettingsView() {
     const next = validate(values);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    // Guardado simulado: aquí iría la petición al backend.
+    updateProfile({ name: `${values.firstName.trim()} ${values.lastName.trim()}`, email: values.email.trim() });
     notifyToast({ title: t("savedTitle"), description: t("savedDescription"), icon: Check });
   };
 

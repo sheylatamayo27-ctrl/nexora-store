@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, User, Menu, X, ChevronDown } from "lucide-react";
+import { Heart, User, Menu, X, ChevronDown, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -11,13 +11,24 @@ import { SearchBar } from "@/components/layout/SearchBar";
 import { LanguageSelector } from "@/components/layout/LanguageSelector";
 import { MegaMenu, type MegaMenuData } from "@/components/layout/MegaMenu";
 import { primaryNav, secondaryNav } from "@/components/layout/nav-links";
+import { useHydrated } from "@/hooks/useHydrated";
+import { useSignOut } from "@/hooks/useSignOut";
 import { Link, usePathname } from "@/i18n/navigation";
+import { getFirstName, getInitials, useAuth } from "@/store/auth";
 
 export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuData; mobileSearch?: boolean }) {
   const t = useTranslations("header");
   const tNav = useTranslations("nav");
   const tCommon = useTranslations("common");
+  const tAccount = useTranslations("account");
   const [menuOpen, setMenuOpen] = useState(false);
+  // La sesión vive en localStorage: hasta hidratar se pinta como sin sesión (igual que el HTML del servidor).
+  const hydrated = useHydrated();
+  const storedUser = useAuth((s) => s.user);
+  const user = hydrated ? storedUser : null;
+  // Sin sesión, la cuenta lleva directo a entrar (/account mandaría ahí de todos modos).
+  const accountHref = hydrated && !user ? "/login" : "/account";
+  const { signOut, signingOut } = useSignOut();
   // Sin prefijo de idioma: "/cart" tanto en /cart como en /en/cart.
   const pathname = usePathname();
   // El producto, el carrito, la confirmación de pedido, ofertas, el blog y la 404
@@ -58,12 +69,22 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
           {/* Utilidades (desktop) */}
           <div className="ml-auto hidden items-center gap-6 lg:flex">
             <LanguageSelector />
-            <Link href="/account" className="flex items-center gap-3">
+            <Link href={accountHref} className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100">
-                <User className="h-5 w-5 text-brand-800" />
+                {user ? (
+                  <span className="text-label text-brand-800">{getInitials(user.name)}</span>
+                ) : (
+                  <User className="h-5 w-5 text-brand-800" />
+                )}
               </span>
               <span className="flex flex-col leading-tight">
-                <span className="text-body-sm text-text-secondary">{t("greeting")}</span>
+                {user ? (
+                  <span className="max-w-[10rem] truncate text-body-sm text-text-secondary">
+                    {t("greetingUser", { name: getFirstName(user.name) })}
+                  </span>
+                ) : (
+                  <span className="text-body-sm text-text-secondary">{t("greeting")}</span>
+                )}
                 <span className="text-label text-text-primary">{t("accountAndOrders")}</span>
               </span>
             </Link>
@@ -76,8 +97,14 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
             <Link href="/wishlist" aria-label={t("wishlist")}>
               <Heart className="h-[22px] w-[22px]" />
             </Link>
-            <Link href="/account" aria-label={t("account")}>
-              <User className="h-[22px] w-[22px]" />
+            <Link href={accountHref} aria-label={t("account")}>
+              {user ? (
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-label-xs text-brand-800">
+                  {getInitials(user.name)}
+                </span>
+              ) : (
+                <User className="h-[22px] w-[22px]" />
+              )}
             </Link>
             <CartButton compact />
           </div>
@@ -144,6 +171,24 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
                     {tNav(item.key)}
                   </Link>
                 ))}
+                {/* Cerrar sesión: en móvil/tablet el menú lateral de la cuenta no lo muestra. */}
+                {user && (
+                  <>
+                    <div className="my-2 h-px bg-border" />
+                    <button
+                      type="button"
+                      disabled={signingOut}
+                      aria-busy={signingOut || undefined}
+                      onClick={async () => {
+                        if (await signOut()) setMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2 rounded-md px-3 py-2.5 text-left text-label text-sale-500 hover:bg-surface-subtle disabled:opacity-60"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      {signingOut ? tAccount("signingOut") : tAccount("signOut")}
+                    </button>
+                  </>
+                )}
               </nav>
             </motion.aside>
           </>
