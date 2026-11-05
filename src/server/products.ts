@@ -31,7 +31,8 @@ export async function getProductsByCategory(categorySlug: string, locale: Locale
 /** Productos destacados para la home. */
 export async function getFeaturedProducts(locale: Locale): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/products?featured=true&locale=" + locale)
-  return (await getProducts(locale)).slice(0, 6);
+  // 10: dos páginas completas del carrusel de la home en escritorio (5 por página).
+  return (await getProducts(locale)).slice(0, 10);
 }
 
 /** Ofertas del día: los productos con barra de progreso de stock. */
