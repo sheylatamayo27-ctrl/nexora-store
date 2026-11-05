@@ -10,23 +10,8 @@ import { CartButton } from "@/components/layout/CartButton";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { LanguageSelector } from "@/components/layout/LanguageSelector";
 import { MegaMenu, type MegaMenuData } from "@/components/layout/MegaMenu";
+import { primaryNav, secondaryNav } from "@/components/layout/nav-links";
 import { Link, usePathname } from "@/i18n/navigation";
-
-// `key`: texto en el namespace "nav". href "#": página pendiente de completar
-// por el comprador (ver README).
-const primaryNav = [
-  { key: "electronics", href: "/category/headphones" },
-  { key: "offers", href: "/offers" },
-  { key: "blogs", href: "/blog" },
-  { key: "contact", href: "#" },
-  { key: "whatsNew", href: "#" },
-] as const;
-
-const secondaryNav = [
-  { key: "faqs", href: "#" },
-  { key: "trackOrder", href: "/account" },
-  { key: "about", href: "#" },
-] as const;
 
 export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuData; mobileSearch?: boolean }) {
   const t = useTranslations("header");

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, LayoutGrid, Zap, ArrowRight, Clock } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { secondaryNav } from "@/components/layout/nav-links";
 import { AssetImage } from "@/components/media/AssetImage";
 import type { BlogPost, Category, Product } from "@/data/types";
 import { Link } from "@/i18n/navigation";
@@ -28,14 +29,6 @@ const navItems: { key: MenuKey; href: string; hot?: boolean }[] = [
   { key: "offers", href: "/offers", hot: true },
   { key: "blogs", href: "/blog" },
 ];
-
-// `key`: texto en el namespace "nav". href "#": página pendiente de completar
-// por el comprador (ver README).
-const secondaryNav = [
-  { key: "faqs", href: "#" },
-  { key: "trackOrder", href: "/account" },
-  { key: "about", href: "#" },
-] as const;
 
 export function MegaMenu({ data }: { data: MegaMenuData }) {
   const t = useTranslations("nav");

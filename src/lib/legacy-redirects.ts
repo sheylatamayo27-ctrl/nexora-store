@@ -19,6 +19,11 @@ const legacyRoutes = new Map(
     "/favoritos": "/wishlist",
     "/cuenta": "/account",
     "/pedido-confirmado": "/order-confirmation",
+    // Enlazadas desde el footer del checkout antes de existir las páginas.
+    "/devoluciones": "/returns",
+    "/envios": "/shipping",
+    "/privacidad": "/privacy",
+    "/terminos": "/terms",
   }),
 );
 

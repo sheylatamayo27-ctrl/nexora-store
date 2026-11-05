@@ -87,7 +87,7 @@ Deja un solo archivo por nombre: si hay varios, gana el JPG, luego el PNG y por 
 
 `src/server/` es el único lugar que sabe de dónde salen los datos:
 
-- `src/server/db/` — el catálogo de ejemplo (productos, categorías, blog, hero). Los textos traducibles guardan un valor por idioma (`name: { es, en }`); tipos en `src/server/db/types.ts`.
+- `src/server/db/` — el catálogo de ejemplo (productos, categorías, blog, hero) y el contenido de las páginas informativas (`pages.data.ts`: términos, privacidad, envíos, devoluciones, garantía y nosotros; `faq.data.ts`: preguntas frecuentes). Los textos de las páginas usan `[texto](/ruta)` para los enlaces. Los textos traducibles guardan un valor por idioma (`name: { es, en }`); tipos en `src/server/db/types.ts`.
 - `src/server/*.ts` — funciones `async` que reciben el idioma (`getProducts(locale)`, `getProductBySlug(slug, locale)`, `getBlogPosts(locale)`, `searchProducts(q, locale)`…) y devuelven los textos ya resueltos (`product.name` es texto plano; si falta una traducción, se usa el español). Re-exportadas desde `@/server`. Cada una indica en un comentario el `fetch` que la sustituirá.
 - `src/server/localize.ts` — convierte los registros de `db` a un idioma.
 - `src/server/config.ts` — `apiBase` (por defecto `/api`), leído de `NEXT_PUBLIC_API_BASE_URL` (ver `.env.example`). Lo usa solo el cliente (SWR); `src/server` lee siempre de `src/server/db`.
@@ -125,14 +125,14 @@ Los componentes de cliente nunca importan `@/server`: el Server Component más c
 
 ## URLs
 
-Rutas y slugs en inglés (`/product/[slug]`, `/category/[slug]`, `/cart`, `/search`, `/offers`, `/wishlist`, `/account`, `/account/addresses`, `/account/payments`, `/account/notifications`, `/account/settings`, `/login`, `/register`, `/forgot-password`, `/order-confirmation`) en ambos idiomas: el español va sin prefijo y el inglés bajo `/en` (`/en/cart`, `/en/product/[slug]`…). Los slugs del blog también están en inglés. Las URLs antiguas en español redirigen de forma permanente a las nuevas (`src/lib/legacy-redirects.ts`, aplicado en `src/middleware.ts` antes que el idioma).
+Rutas y slugs en inglés (`/product/[slug]`, `/category/[slug]`, `/cart`, `/search`, `/offers`, `/wishlist`, `/account`, `/account/addresses`, `/account/payments`, `/account/notifications`, `/account/settings`, `/login`, `/register`, `/forgot-password`, `/order-confirmation`, `/terms`, `/privacy`, `/shipping`, `/returns`, `/warranty`, `/about`, `/faq`, `/contact`, `/new-arrivals`, `/track-order`) en ambos idiomas: el español va sin prefijo y el inglés bajo `/en` (`/en/cart`, `/en/product/[slug]`…). Los slugs del blog también están en inglés. Las URLs antiguas en español redirigen de forma permanente a las nuevas (`src/lib/legacy-redirects.ts`, aplicado en `src/middleware.ts` antes que el idioma).
 
 ## Idiomas (i18n)
 
 next-intl con `locales: ['es', 'en']`, `defaultLocale: 'es'` y `localePrefix: 'as-needed'` (`src/i18n/routing.ts`).
 
 - **Textos de interfaz** — `messages/es.json` y `messages/en.json`, por namespaces (`common`, `header`, `nav`, `footer`, `home`, `product`, `cart`, `checkout`, `account`, `orders`, `auth`, `search`, `category`, `blog`, `offers`…). Server Components: `getTranslations`; el resto: `useTranslations`. Las claves están tipadas desde `es.json` (`src/i18n/app-config.d.ts`): una clave inexistente no compila.
-- **Contenido** — productos, categorías, blog, hero y banners guardan cada texto en ambos idiomas en `src/server/db/` (ver *Datos*).
+- **Contenido** — productos, categorías, blog, hero, banners, páginas informativas y FAQ guardan cada texto en ambos idiomas en `src/server/db/` (ver *Datos*).
 - **Enlaces** — se usan `Link`, `useRouter` y `usePathname` de `@/i18n/navigation` (no los de Next), que añaden `/en` cuando toca.
 - **Selector de idioma** — navega a la misma página en el otro idioma sin recargar y conservando el scroll. La elección se guarda en la cookie `NEXT_LOCALE` (un año), que el middleware usa al volver. El idioma del navegador no se tiene en cuenta: sin cookie ni `/en`, la tienda se ve en español (en `src/middleware.ts` se explica cómo activarlo).
 - **SEO** — `<html lang>`, títulos y descripciones por idioma, `canonical` y `hreflang` (es, en y x-default) en cada página (`src/i18n/metadata.ts`).
@@ -143,17 +143,11 @@ Para añadir un idioma: agrégalo a `routing.locales` (y a `intlLocales`/`ogLoca
 
 ## Pendiente de completar por el comprador
 
-### Enlaces sin destino (`href: "#"`)
+### Datos de la tienda
 
-Páginas de contenido que la plantilla no incluye. Cambia el `"#"` por la URL de tu página (cada lista lleva el comentario `href "#"` encima):
-
-| Enlace | Dónde |
-|---|---|
-| Redes sociales (Facebook, Instagram, Twitter, YouTube) | `src/components/layout/Footer.tsx` (`socials`) |
-| Centro de ayuda, Devoluciones, Envíos, Garantía | `src/components/layout/Footer.tsx` (`columns`, "Atención al cliente") |
-| Nosotros, Empleos, Contacto, Privacidad | `src/components/layout/Footer.tsx` (`columns`, "Empresa") |
-| FAQs, Nosotros | `src/components/layout/MegaMenu.tsx` y `src/components/layout/Header.tsx` (`secondaryNav`) |
-| Contacto, Novedades | `src/components/layout/Header.tsx` (`primaryNav`, menú móvil) |
+- Contacto (dirección, teléfono, correo), horario y redes sociales: `src/components/layout/store-info.ts`, compartido por el footer y `/contact`. Las redes apuntan a la portada de cada red: cámbialas por los perfiles de tu tienda.
+- Textos legales (`/terms`, `/privacy`) y políticas (`/shipping`, `/returns`, `/warranty`): son de ejemplo; revísalos con tu asesor legal antes de publicar (`src/server/db/pages.data.ts`).
+- Tarifas de envío: `src/lib/shipping.ts`, que usan el checkout y la tabla de `/shipping`.
 
 ### Pantallas solo de front-end
 
@@ -161,6 +155,8 @@ No envían nada a ningún sitio: validan en el cliente y simulan el resultado. C
 
 - `/forgot-password` (`src/components/auth/ForgotPasswordView.tsx`) — valida el correo y muestra "Te enviamos un enlace", sin enviar ningún correo.
 - `/account/settings` (`src/components/account/SettingsView.tsx`) — valida el perfil y muestra "Cambios guardados", sin guardar nada.
+- `/contact` (`src/components/contact/ContactForm.tsx`) — valida el formulario y muestra "Mensaje enviado", sin enviar nada.
+- `/track-order` (`src/components/track-order/TrackOrderView.tsx`) — cualquier número de pedido válido muestra el mismo envío de ejemplo "En camino".
 - `/account/payments`, `/account/addresses` y `/account/notifications` — siempre vacías; "Agregar" solo muestra un aviso de "Próximamente".
 
 ---

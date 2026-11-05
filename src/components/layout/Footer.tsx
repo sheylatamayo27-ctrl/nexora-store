@@ -1,11 +1,11 @@
-import { MapPin, Phone, Mail, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { MapPin, Phone, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { FooterSection } from "@/components/layout/FooterSection";
+import { SOCIALS, STORE_CONTACT, STORE_HOURS } from "@/components/layout/store-info";
 import { Link } from "@/i18n/navigation";
 
-// `title` y `key`: textos en el namespace "footer". href "#": página pendiente
-// de completar por el comprador (ver README).
+// `title` y `key`: textos en el namespace "footer".
 const columns = [
   {
     title: "shop",
@@ -20,28 +20,26 @@ const columns = [
   {
     title: "customerService",
     links: [
-      { key: "helpCenter", href: "#" },
-      { key: "trackOrder", href: "/account" },
-      { key: "returns", href: "#" },
-      { key: "shipping", href: "#" },
-      { key: "warranty", href: "#" },
+      { key: "helpCenter", href: "/faq" },
+      { key: "trackOrder", href: "/track-order" },
+      { key: "returns", href: "/returns" },
+      { key: "shipping", href: "/shipping" },
+      { key: "warranty", href: "/warranty" },
     ],
   },
   {
     title: "company",
     links: [
-      { key: "about", href: "#" },
-      { key: "careers", href: "#" },
+      { key: "about", href: "/about" },
+      // Sin página de empleos: "Nosotros" invita a escribir por el formulario de contacto.
+      { key: "careers", href: "/about" },
       { key: "blog", href: "/blog" },
-      { key: "contact", href: "#" },
-      { key: "privacy", href: "#" },
+      { key: "contact", href: "/contact" },
+      { key: "privacy", href: "/privacy" },
     ],
   },
 ] as const;
 
-const hours = ["weekdays", "saturday", "sunday"] as const;
-// Redes sociales: href "#" pendiente de completar por el comprador (ver README).
-const socials = [Facebook, Instagram, Twitter, Youtube];
 // Marcas de medios de pago: no se traducen.
 const payments = ["VISA", "Mastercard", "PayPal", "UPI", "COD"];
 
@@ -61,25 +59,27 @@ export function Footer() {
             {/* Datos de contacto: nombres propios, iguales en todos los idiomas. */}
             <div className="flex flex-col gap-3 text-body text-white/85">
               <span className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 text-accent-500" /> Parque Tecnológico 221B, CDMX
+                <MapPin className="h-4 w-4 text-accent-500" /> {STORE_CONTACT.address}
               </span>
               <span className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-accent-500" /> +52 55 9876 5432
+                <Phone className="h-4 w-4 text-accent-500" /> {STORE_CONTACT.phone}
               </span>
               <span className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-accent-500" /> soporte@nexora.store
+                <Mail className="h-4 w-4 text-accent-500" /> {STORE_CONTACT.email}
               </span>
             </div>
             <div className="flex items-center gap-3 pt-1">
-              {socials.map((Icon, i) => (
-                <Link
-                  key={i}
-                  href="#"
+              {SOCIALS.map(({ Icon, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
-                  aria-label={t("socialLink")}
+                  aria-label={label}
                 >
                   <Icon className="h-[18px] w-[18px]" />
-                </Link>
+                </a>
               ))}
             </div>
           </div>
@@ -95,7 +95,7 @@ export function Footer() {
           ))}
 
           <FooterSection title={t("hours")}>
-            {hours.map((h) => (
+            {STORE_HOURS.map((h) => (
               <span key={h} className="text-body text-white/65">
                 {t(h)}
               </span>

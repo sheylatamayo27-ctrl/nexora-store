@@ -124,10 +124,10 @@ const paymentOptions = [
 
 // `label`: claves del namespace "checkout".
 const footerLinks = [
-  { href: "/devoluciones", label: "refunds" },
-  { href: "/envios", label: "shippingLink" },
-  { href: "/privacidad", label: "privacy" },
-  { href: "/terminos", label: "termsLink" },
+  { href: "/returns", label: "refunds" },
+  { href: "/shipping", label: "shippingLink" },
+  { href: "/privacy", label: "privacy" },
+  { href: "/terms", label: "termsLink" },
 ] as const;
 
 /** El formulario arranca vacío; solo vienen elegidos el envío exprés y el pago con tarjeta. */
@@ -541,15 +541,8 @@ export function CheckoutView() {
         <div className="container-page flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
           <p className="order-2 text-body-sm text-text-muted lg:order-1">{t("copyright")}</p>
           <div className="order-1 flex gap-4 text-label-sm text-text-secondary lg:order-2">
-            {/* Páginas aún por crear: sin prefetch, que daría un 404 en consola por cada enlace
-                al ver el footer. Cuando existan, se puede quitar `prefetch={false}`. */}
             {footerLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                prefetch={false}
-                className="transition-colors hover:text-text-primary"
-              >
+              <Link key={l.href} href={l.href} className="transition-colors hover:text-text-primary">
                 {t(l.label)}
               </Link>
             ))}
