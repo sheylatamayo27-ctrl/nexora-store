@@ -8,7 +8,7 @@ import { AlertCircle, Check, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Dots } from "@/components/ui/Dots";
-import { FieldError } from "@/components/ui/FormField";
+import { FieldError } from "@/components/ui/FieldError";
 import { FORM_OPTIONS, useErrorText } from "@/lib/forms";
 import { email } from "@/lib/schemas/common";
 import { simulateRequest } from "@/lib/simulate";

@@ -1,24 +1,10 @@
 "use client";
 
 import { forwardRef, useId, useState } from "react";
-import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Input, Select } from "@/components/ui/Input";
-import { cn } from "@/lib/utils";
-
-/** Mensaje de error bajo un campo: ícono + texto en rojo, con aparición suave. */
-export function FieldError({ id, message, className }: { id?: string; message: string; className?: string }) {
-  return (
-    <span
-      id={id}
-      role="alert"
-      className={cn("flex items-start gap-1.5 text-body-sm text-sale-500 motion-safe:animate-fade-in", className)}
-    >
-      <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
-      {message}
-    </span>
-  );
-}
+import { FieldError } from "@/components/ui/FieldError";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 
 type FormFieldProps = Omit<React.ComponentPropsWithoutRef<typeof Input>, "error" | "helper"> & {
   /** Error ya traducido. Sin él, el campo se ve exactamente como un `Input`. */
@@ -73,6 +59,32 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(funct
 
   return (
     <Select
+      {...props}
+      ref={ref}
+      id={id}
+      error={!!error}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? errorId : undefined}
+      helper={error && <FieldError id={errorId} message={error} />}
+    />
+  );
+});
+
+type TextareaFieldProps = Omit<React.ComponentPropsWithoutRef<typeof Textarea>, "error" | "helper"> & {
+  /** Error ya traducido. */
+  error?: string;
+};
+
+/** `Textarea` para formularios, con el mismo tratamiento de errores que `FormField`. */
+export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(function TextareaField(
+  { error, id, ...props },
+  ref
+) {
+  const autoId = useId();
+  const errorId = `${id ?? autoId}-error`;
+
+  return (
+    <Textarea
       {...props}
       ref={ref}
       id={id}

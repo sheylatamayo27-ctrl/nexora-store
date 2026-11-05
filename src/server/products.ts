@@ -46,6 +46,19 @@ export async function getSaleProducts(locale: Locale): Promise<Product[]> {
   return (await getProducts(locale)).filter((p) => p.compareAt && p.compareAt > p.price);
 }
 
+/**
+ * Novedades: los productos con insignia "Nuevo". Si son menos de 6, se completan
+ * hasta `limit` con los últimos del catálogo (los más recientes).
+ */
+export async function getNewArrivals(locale: Locale, limit = 8): Promise<Product[]> {
+  // Backend real: fetch(apiBase + "/products?sort=newest&limit=" + limit + "&locale=" + locale)
+  const all = await getProducts(locale);
+  const fresh = all.filter((p) => p.badge?.type === "new");
+  if (fresh.length >= 6) return fresh;
+  const latest = all.filter((p) => p.badge?.type !== "new").reverse();
+  return [...fresh, ...latest].slice(0, limit);
+}
+
 /** Valores por defecto y tope del listado paginado. */
 export const PRODUCT_LIST_DEFAULTS = { page: 1, pageSize: 12, maxPageSize: 50 } as const;
 

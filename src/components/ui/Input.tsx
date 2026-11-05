@@ -126,3 +126,37 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     </label>
   );
 });
+
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  helper?: React.ReactNode;
+  error?: boolean;
+}
+
+/** Área de texto con el mismo aspecto que `Input` (borde, foco y error). */
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
+  { label, helper, error, className, rows = 5, ...props },
+  ref
+) {
+  return (
+    <label className={cn("flex flex-col gap-2", className)}>
+      {label && <span className="text-label text-text-primary">{label}</span>}
+      <textarea
+        ref={ref}
+        rows={rows}
+        className={cn(
+          "w-full resize-y rounded-md border bg-surface px-4 py-3 text-body text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-4",
+          error
+            ? "border-sale-500 focus:ring-sale-500/15"
+            : "border-border-strong focus:border-brand-500 focus:ring-brand-500/15"
+        )}
+        {...props}
+      />
+      {helper && (
+        <span className={cn("text-body-sm", error ? "text-sale-500" : "text-text-secondary")}>
+          {helper}
+        </span>
+      )}
+    </label>
+  );
+});
