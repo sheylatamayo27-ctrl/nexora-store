@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { ArrowRight, Cpu, Monitor, BatteryCharging, Mail } from "lucide-react";
+import { ArrowRight, Cpu, Monitor, BatteryCharging } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Container } from "@/components/ui/Container";
 import { AssetImage } from "@/components/media/AssetImage";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Price } from "@/components/commerce/Price";
 import { Rating } from "@/components/commerce/Rating";
 import { Countdown } from "@/components/commerce/Countdown";
 import { StockBar } from "@/components/commerce/StockBar";
 import { ServiceFeatures } from "@/components/commerce/ServiceFeatures";
+import { NewsletterForm } from "@/components/commerce/NewsletterForm";
 import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
@@ -254,17 +255,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
                 <h2 className="text-h2">{t("newsletterTitle")}</h2>
                 <p className="text-body-lg text-white/75">{t("newsletterDescription")}</p>
               </div>
-              <div className="relative flex w-full max-w-md items-center gap-2 max-sm:flex-col max-sm:items-stretch">
-                <div className="flex h-14 items-center gap-3 rounded-md bg-surface px-4 sm:flex-1 max-sm:w-full">
-                  <Mail className="h-5 w-5 text-text-muted" />
-                  <input
-                    type="email"
-                    placeholder={t("newsletterPlaceholder")}
-                    className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
-                  />
-                </div>
-                <Button variant="accent" size="lg" className="max-sm:w-full">{t("subscribe")}</Button>
-              </div>
+              <NewsletterForm />
             </div>
           </Reveal>
         </Container>

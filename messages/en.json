@@ -63,7 +63,7 @@
     "free": "Free",
     "total": "Total",
     "taxVat": "Tax (VAT 16%)",
-    "discountCode": "Discount (NEXORA10)",
+    "discountCode": "Discount ({code})",
     "securePaymentSsl": "Secure payment · 256-bit SSL encryption",
     "removeFilter": "Remove filter",
     "pagination": "Pagination",
@@ -239,7 +239,12 @@
     "newsletterTitle": "Get 10% off your first order",
     "newsletterDescription": "Subscribe for exclusive deals, new arrivals and tech tips. No spam, ever.",
     "newsletterPlaceholder": "Enter your email",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "newsletterSubscribing": "Sending…",
+    "newsletterSubscribed": "Subscribed!",
+    "newsletterSuccess": "You’re subscribed!",
+    "newsletterSuccessDescription": "Your 10% code: NEXORA10",
+    "newsletterFailed": "We couldn’t subscribe you"
   },
   "hero": {
     "warranty": "2-year warranty",
@@ -399,7 +404,13 @@
     "remove": "Remove",
     "removeShort": "Remove",
     "saveForLater": "Save<later> for later</later>",
-    "youSave": "You save {amount}"
+    "youSave": "You save {amount}",
+    "couponApplied": "Coupon {code} applied",
+    "couponPercent": "{percent}% off",
+    "couponFreeShipping": "Free shipping",
+    "couponInvalid": "Invalid promo code",
+    "couponInvalidDescription": "Check the code and try again.",
+    "couponRemove": "Remove coupon"
   },
   "checkout": {
     "securePayment": "Secure checkout",

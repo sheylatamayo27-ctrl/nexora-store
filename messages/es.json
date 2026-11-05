@@ -63,7 +63,7 @@
     "free": "Gratis",
     "total": "Total",
     "taxVat": "Impuestos (IVA 16%)",
-    "discountCode": "Descuento (NEXORA10)",
+    "discountCode": "Descuento ({code})",
     "securePaymentSsl": "Pago seguro · Cifrado SSL de 256 bits",
     "removeFilter": "Quitar filtro",
     "pagination": "Paginación",
@@ -239,7 +239,12 @@
     "newsletterTitle": "Obtén 10% de descuento en tu primer pedido",
     "newsletterDescription": "Suscríbete para ofertas exclusivas, novedades y consejos tech. Sin spam, nunca.",
     "newsletterPlaceholder": "Ingresa tu correo",
-    "subscribe": "Suscribirse"
+    "subscribe": "Suscribirse",
+    "newsletterSubscribing": "Enviando…",
+    "newsletterSubscribed": "¡Suscrito!",
+    "newsletterSuccess": "¡Te has suscrito correctamente!",
+    "newsletterSuccessDescription": "Tu código de 10%: NEXORA10",
+    "newsletterFailed": "No pudimos suscribirte"
   },
   "hero": {
     "warranty": "Garantía de 2 años",
@@ -399,7 +404,13 @@
     "remove": "Eliminar",
     "removeShort": "Quitar",
     "saveForLater": "Guardar<later> para después</later>",
-    "youSave": "Ahorras {amount}"
+    "youSave": "Ahorras {amount}",
+    "couponApplied": "Cupón {code} aplicado",
+    "couponPercent": "{percent}% de descuento",
+    "couponFreeShipping": "Envío gratis",
+    "couponInvalid": "Código de promoción no válido",
+    "couponInvalidDescription": "Revisa el código e inténtalo de nuevo.",
+    "couponRemove": "Quitar cupón"
   },
   "checkout": {
     "securePayment": "Pago seguro",
@@ -637,7 +648,7 @@
     "accountCreatedDescription": "Te damos la bienvenida a Nexora",
     "signInFailed": "No pudimos iniciar sesión",
     "signUpFailed": "No pudimos crear tu cuenta",
-    "acceptTerms":"Acepto los Términos y la Política de Privacidad",
+    "acceptTerms": "Acepto los Términos y la Política de Privacidad",
     "rememberMe": "Recordarme",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "haveAccount": "¿Ya tienes cuenta?",

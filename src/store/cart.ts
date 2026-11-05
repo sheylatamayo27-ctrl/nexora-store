@@ -20,10 +20,13 @@ interface CartState {
    * coincide con el de la página, `StoreLocaleSync` las vuelve a pedir y llama a `relocalize`.
    */
   locale?: Locale;
+  /** Código del cupón aplicado (ver src/lib/coupons.ts). Se vacía con `clear`. */
+  coupon?: string;
   add: (product: Product, opts?: { qty?: number; color?: string }) => void;
   remove: (key: string) => void;
   setQty: (key: string, qty: number) => void;
   clear: () => void;
+  setCoupon: (code?: string) => void;
   /** Sustituye las copias por `products` (mismo id, otro idioma); el color se conserva por posición. */
   relocalize: (products: Product[], locale: Locale) => void;
   count: () => number;
@@ -57,7 +60,8 @@ export const useCart = create<CartState>()(
             .map((i) => (i.key === key ? { ...i, qty: Math.max(1, qty) } : i))
             .filter((i) => i.qty > 0),
         })),
-      clear: () => set({ items: [] }),
+      clear: () => set({ items: [], coupon: undefined }),
+      setCoupon: (coupon) => set({ coupon }),
       relocalize: (products, locale) =>
         set((state) => ({
           locale,

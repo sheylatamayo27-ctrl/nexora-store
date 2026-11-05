@@ -14,6 +14,7 @@ import { Container } from "@/components/ui/Container";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Link } from "@/i18n/navigation";
+import { couponDiscount } from "@/lib/coupons";
 import { formatPrice } from "@/lib/format";
 import { useCart, type CartItem } from "@/store/cart";
 import { cn } from "@/lib/utils";
@@ -49,20 +50,22 @@ export default function ConfirmationPage() {
   const t = useTranslations("orderConfirmation");
   const tCommon = useTranslations("common");
   const [snapshot, setSnapshot] = useState<CartItem[]>([]);
+  const [coupon, setCoupon] = useState<string>();
   const clear = useCart((s) => s.clear);
   const captured = useRef(false);
 
   useEffect(() => {
     if (captured.current) return;
     captured.current = true;
-    const items = useCart.getState().items;
+    const { items, coupon } = useCart.getState();
     setSnapshot(items);
+    setCoupon(coupon);
     clear();
   }, [clear]);
 
   const subtotal = snapshot.reduce((s, i) => s + i.product.price * i.qty, 0);
   const tax = subtotal * 0.16;
-  const discount = Math.round(subtotal * 0.1);
+  const discount = couponDiscount(coupon, subtotal);
   const total = subtotal + tax - discount;
 
   return (
@@ -169,7 +172,9 @@ export default function ConfirmationPage() {
                 { l: tCommon("subtotal"), v: formatPrice(subtotal) },
                 { l: tCommon("shipping"), v: tCommon("free"), h: true },
                 { l: tCommon("taxVat"), v: formatPrice(tax) },
-                { l: tCommon("discountCode"), v: `−${formatPrice(discount)}`, h: true },
+                ...(discount && coupon
+                  ? [{ l: tCommon("discountCode", { code: coupon }), v: `−${formatPrice(discount)}`, h: true }]
+                  : []),
               ].map((r) => (
                 <div key={r.l} className="flex items-center justify-between max-lg:hidden">
                   <span className="text-body text-text-secondary">{r.l}</span>

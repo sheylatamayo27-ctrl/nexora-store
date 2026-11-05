@@ -13,6 +13,7 @@ import { ProductCard } from "@/components/commerce/ProductCard";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/store/cart";
+import { couponDiscount } from "@/lib/coupons";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/data/types";
 
@@ -24,6 +25,8 @@ export function CartView({ recommended }: { recommended: Product[] }) {
   const tCommon = useTranslations("common");
   const [mounted, setMounted] = useState(false);
   const items = useCart((s) => s.items);
+  const coupon = useCart((s) => s.coupon);
+  const setCoupon = useCart((s) => s.setCoupon);
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return <div className="min-h-[60vh]" />;
@@ -32,7 +35,7 @@ export function CartView({ recommended }: { recommended: Product[] }) {
   const itemCount = tCommon("itemCount", { count });
   const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
   const tax = subtotal * 0.16;
-  const discount = Math.round(subtotal * 0.1);
+  const discount = couponDiscount(coupon, subtotal);
   const total = subtotal + tax - discount;
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const pct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
@@ -142,6 +145,8 @@ export function CartView({ recommended }: { recommended: Product[] }) {
             subtotal={subtotal}
             tax={tax}
             discount={discount}
+            coupon={coupon}
+            onCouponChange={setCoupon}
             total={total}
             cta={{ label: t("proceedToCheckout"), href: "/checkout" }}
             ctaHiddenOnMobile

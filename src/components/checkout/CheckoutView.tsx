@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Link, useRouter } from "@/i18n/navigation";
+import { couponDiscount, couponFreeShipping } from "@/lib/coupons";
 import { formatPrice } from "@/lib/format";
 import { FORM_OPTIONS, focusFirstError, useErrorText } from "@/lib/forms";
 import { checkoutSchema, type CheckoutData } from "@/lib/schemas/checkout";
@@ -165,6 +166,7 @@ export function CheckoutView() {
   const [navigating, startNavigation] = useTransition();
   const [mounted, setMounted] = useState(false);
   const items = useCart((s) => s.items);
+  const coupon = useCart((s) => s.coupon);
   const [summaryOpen, setSummaryOpen] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -202,9 +204,9 @@ export function CheckoutView() {
   };
 
   const subtotal = mounted ? items.reduce((s, i) => s + i.product.price * i.qty, 0) : 0;
-  const shipCost = shippingOptions.find((o) => o.id === shipping)?.price ?? 0;
+  const shipCost = mounted && couponFreeShipping(coupon) ? 0 : shippingOptions.find((o) => o.id === shipping)?.price ?? 0;
   const tax = subtotal * 0.16;
-  const discount = Math.round(subtotal * 0.1);
+  const discount = couponDiscount(coupon, subtotal);
   const total = subtotal + tax - discount + shipCost;
   const count = mounted ? items.reduce((n, i) => n + i.qty, 0) : 0;
 
@@ -287,7 +289,7 @@ export function CheckoutView() {
               ))}
               {count === 0 && <p className="text-body text-text-secondary">{t("emptyCart")}</p>}
               <div className="h-px bg-border" />
-              <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
+              <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} coupon={coupon} total={total} count={count} />
             </div>
           </motion.div>
         )}
@@ -489,7 +491,7 @@ export function CheckoutView() {
           {/* Resumen del pedido a ancho completo — solo tablet (T05), antes de pagar. */}
           <div className="hidden flex-col gap-4 rounded-xl border border-border bg-surface p-6 md:flex lg:hidden">
             <h2 className="text-h4 text-text-primary">{tCommon("orderSummary")}</h2>
-            <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
+            <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} coupon={coupon} total={total} count={count} />
             <p className="text-body-sm text-text-muted">{t("taxesIncluded")}</p>
             <span className="flex items-center justify-center gap-1.5 text-body-sm text-text-muted">
               <Lock className="h-3.5 w-3.5" /> {tCommon("securePaymentSsl")}
@@ -527,7 +529,7 @@ export function CheckoutView() {
               {count === 0 && <p className="text-body text-text-secondary">{t("emptyCart")}</p>}
             </div>
             <div className="h-px bg-border" />
-            <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} total={total} count={count} />
+            <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} coupon={coupon} total={total} count={count} />
           </div>
         </aside>
       </div>
@@ -562,6 +564,7 @@ function SummaryRows({
   shipCost,
   tax,
   discount,
+  coupon,
   total,
   count,
 }: {
@@ -569,6 +572,7 @@ function SummaryRows({
   shipCost: number;
   tax: number;
   discount: number;
+  coupon?: string;
   total: number;
   count: number;
 }) {
@@ -578,8 +582,8 @@ function SummaryRows({
     { l: t("subtotalItems", { count }), v: formatPrice(subtotal) },
     { l: tCommon("shipping"), v: shipCost ? formatPrice(shipCost) : tCommon("free"), h: !shipCost },
     { l: tCommon("taxVat"), v: formatPrice(tax) },
-    { l: tCommon("discountCode"), v: `−${formatPrice(discount)}`, h: true },
   ];
+  if (discount && coupon) rows.push({ l: tCommon("discountCode", { code: coupon }), v: `−${formatPrice(discount)}`, h: true });
   return (
     <div className="flex flex-col gap-3">
       {rows.map((r) => (
