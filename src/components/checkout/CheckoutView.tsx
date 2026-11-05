@@ -30,11 +30,12 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Link, useRouter } from "@/i18n/navigation";
-import { couponDiscount, couponFreeShipping } from "@/lib/coupons";
+import { couponDiscount } from "@/lib/coupons";
+import { CASH_ON_DELIVERY_FEE } from "@/lib/fees";
 import { formatPrice } from "@/lib/format";
 import { FORM_OPTIONS, focusFirstError, useErrorText } from "@/lib/forms";
 import { checkoutSchema, type CheckoutData } from "@/lib/schemas/checkout";
-import { SHIPPING_RATES } from "@/lib/shipping";
+import { DEFAULT_SHIPPING_METHOD, shippingCost, type ShippingMethod } from "@/lib/shipping";
 import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
 import { useCart } from "@/store/cart";
@@ -108,11 +109,11 @@ function Section({ title, children, right }: { title: string; children: React.Re
   );
 }
 
-// `title` y `desc`: claves del namespace "checkout".
+// `title` y `desc`: claves del namespace "checkout". El precio sale de `shippingCost` (src/lib/shipping.ts).
 const shippingOptions = [
-  { id: "standard", icon: Truck, title: "standardShipping", desc: "standardShippingDesc", price: SHIPPING_RATES.standard },
-  { id: "express", icon: Zap, title: "expressShipping", desc: "expressShippingDesc", price: SHIPPING_RATES.express },
-  { id: "sameday", icon: Clock, title: "sameDay", desc: "sameDayDesc", price: SHIPPING_RATES.sameday },
+  { id: "standard", icon: Truck, title: "standardShipping", desc: "standardShippingDesc" },
+  { id: "express", icon: Zap, title: "expressShipping", desc: "expressShippingDesc" },
+  { id: "sameday", icon: Clock, title: "sameDay", desc: "sameDayDesc" },
 ] as const;
 
 const paymentOptions = [
@@ -143,7 +144,7 @@ const CHECKOUT_DEFAULTS: CheckoutData = {
   state: "",
   postalCode: "",
   country: "",
-  shippingMethod: "express",
+  shippingMethod: DEFAULT_SHIPPING_METHOD,
   paymentMethod: "card",
   cardNumber: "",
   cardExpiry: "",
@@ -168,6 +169,7 @@ export function CheckoutView() {
   const [mounted, setMounted] = useState(false);
   const items = useCart((s) => s.items);
   const coupon = useCart((s) => s.coupon);
+  const setShippingMethod = useCart((s) => s.setShippingMethod);
   const [summaryOpen, setSummaryOpen] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -189,9 +191,11 @@ export function CheckoutView() {
 
   const field = (name: TextField) => ({ ...register(name), error: errorText(errors[name]?.message) });
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: CheckoutData) => {
     try {
       await simulateRequest(2000);
+      // La confirmación del pedido muestra el método y el costo que se pagaron.
+      setShippingMethod(data.shippingMethod);
       notifyToast({ icon: CheckCircle2, title: t("paymentSuccess"), description: t("paymentSuccessDescription") });
       startNavigation(() => router.push("/order-confirmation"));
     } catch {
@@ -205,7 +209,10 @@ export function CheckoutView() {
   };
 
   const subtotal = mounted ? items.reduce((s, i) => s + i.product.price * i.qty, 0) : 0;
-  const shipCost = mounted && couponFreeShipping(coupon) ? 0 : shippingOptions.find((o) => o.id === shipping)?.price ?? 0;
+  // Antes de montar (HTML del servidor) no hay carrito ni cupón: se calcula como en el servidor.
+  const activeCoupon = mounted ? coupon : undefined;
+  const shippingFor = (method: ShippingMethod) => shippingCost(method, subtotal, activeCoupon);
+  const shipCost = shippingFor(shipping);
   const tax = subtotal * 0.16;
   const discount = couponDiscount(coupon, subtotal);
   const total = subtotal + tax - discount + shipCost;
@@ -424,8 +431,8 @@ export function CheckoutView() {
                   icon={o.icon}
                   title={t(o.title)}
                   desc={t(o.desc)}
-                  price={o.price ? formatPrice(o.price) : tCommon("free")}
-                  priceHighlight={!o.price}
+                  price={shippingFor(o.id) ? formatPrice(shippingFor(o.id)) : tCommon("free")}
+                  priceHighlight={!shippingFor(o.id)}
                 />
               ))}
             </div>
@@ -449,7 +456,7 @@ export function CheckoutView() {
                     selected={payment === o.id}
                     icon={o.icon}
                     title={t(o.title)}
-                    desc={t(o.desc)}
+                    desc={o.desc === "cashOnDeliveryDesc" ? t(o.desc, { amount: formatPrice(CASH_ON_DELIVERY_FEE) }) : t(o.desc)}
                   />
                   {o.id === "card" && payment === "card" && (
                     <div className="flex flex-col gap-4 rounded-lg bg-surface-subtle p-4">

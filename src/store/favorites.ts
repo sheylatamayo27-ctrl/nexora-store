@@ -45,6 +45,11 @@ export const useFavorites = create<FavoritesState>()(
           items: state.items.map((item) => products.find((p) => p.id === item.id) ?? item),
         })),
     }),
-    { name: "nexora-favorites" }
+    {
+      name: "nexora-favorites",
+      // v1: precios en USD (ver el mismo cambio en src/store/cart.ts).
+      version: 1,
+      migrate: (persisted) => ({ ...(persisted as FavoritesState), locale: undefined }),
+    }
   )
 );

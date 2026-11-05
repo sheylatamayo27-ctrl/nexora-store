@@ -1,6 +1,8 @@
 import { Truck, ShieldCheck, Headset, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
+import { formatPriceShort } from "@/lib/format";
+import { FREE_EXPRESS_THRESHOLD } from "@/lib/shipping";
 
 const serviceFeatures = [
   { icon: Truck, title: "freeShipping", desc: "freeShippingDesc" },
@@ -28,7 +30,7 @@ export function ServiceFeatures() {
               </span>
               <div className="flex flex-col">
                 <span className="text-label-lg text-text-primary">{t(f.title)}</span>
-                <span className="text-body-sm text-text-secondary">{t(f.desc)}</span>
+                <span className="text-body-sm text-text-secondary">{f.desc === "freeShippingDesc" ? t(f.desc, { amount: formatPriceShort(FREE_EXPRESS_THRESHOLD) }) : t(f.desc)}</span>
               </div>
             </div>
           ))}

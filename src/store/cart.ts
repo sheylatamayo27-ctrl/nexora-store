@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/data/types";
 import type { Locale } from "@/i18n/routing";
+import type { ShippingMethod } from "@/lib/shipping";
 
 export interface CartItem {
   key: string;
@@ -22,11 +23,14 @@ interface CartState {
   locale?: Locale;
   /** Código del cupón aplicado (ver src/lib/coupons.ts). Se vacía con `clear`. */
   coupon?: string;
+  /** Método de envío del último pago (lo fija el checkout al pagar; lo lee la confirmación). Se vacía con `clear`. */
+  shippingMethod?: ShippingMethod;
   add: (product: Product, opts?: { qty?: number; color?: string }) => void;
   remove: (key: string) => void;
   setQty: (key: string, qty: number) => void;
   clear: () => void;
   setCoupon: (code?: string) => void;
+  setShippingMethod: (method: ShippingMethod) => void;
   /** Sustituye las copias por `products` (mismo id, otro idioma); el color se conserva por posición. */
   relocalize: (products: Product[], locale: Locale) => void;
   count: () => number;
@@ -60,8 +64,9 @@ export const useCart = create<CartState>()(
             .map((i) => (i.key === key ? { ...i, qty: Math.max(1, qty) } : i))
             .filter((i) => i.qty > 0),
         })),
-      clear: () => set({ items: [], coupon: undefined }),
+      clear: () => set({ items: [], coupon: undefined, shippingMethod: undefined }),
       setCoupon: (coupon) => set({ coupon }),
+      setShippingMethod: (shippingMethod) => set({ shippingMethod }),
       relocalize: (products, locale) =>
         set((state) => ({
           locale,
@@ -76,6 +81,12 @@ export const useCart = create<CartState>()(
       count: () => get().items.reduce((n, i) => n + i.qty, 0),
       subtotal: () => get().items.reduce((s, i) => s + i.product.price * i.qty, 0),
     }),
-    { name: "nexora-cart" }
+    {
+      name: "nexora-cart",
+      // v1: precios en USD. Las copias guardadas antes llevan precios viejos: sin
+      // idioma anotado, `StoreLocaleSync` las vuelve a pedir a la API al cargar.
+      version: 1,
+      migrate: (persisted) => ({ ...(persisted as CartState), locale: undefined }),
+    }
   )
 );

@@ -32,7 +32,7 @@ import {
 } from "@/components/category/query";
 
 const ratings = [4, 3, 2];
-const PRICE_STEP = 500;
+const PRICE_STEP = 10;
 /** Espera tras mover el slider de precio o tocar la hoja de filtros antes de pedir a la API. */
 const DEBOUNCE_MS = 250;
 

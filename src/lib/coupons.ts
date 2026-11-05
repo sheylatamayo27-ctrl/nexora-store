@@ -17,10 +17,10 @@ export function findCoupon(code: string | undefined): Coupon | undefined {
   return normalized ? COUPONS.find((c) => c.code === normalized) : undefined;
 }
 
-/** Descuento sobre el subtotal (0 si el cupón no es de porcentaje). */
+/** Descuento sobre el subtotal, redondeado al centavo (0 si el cupón no es de porcentaje). */
 export function couponDiscount(code: string | undefined, subtotal: number): number {
   const coupon = findCoupon(code);
-  return coupon?.kind === "percent" ? Math.round((subtotal * coupon.percent) / 100) : 0;
+  return coupon?.kind === "percent" ? Math.round(subtotal * coupon.percent) / 100 : 0;
 }
 
 /** Si el cupón deja el envío gratis. */

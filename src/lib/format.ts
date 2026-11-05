@@ -1,24 +1,26 @@
 import { intlLocales, type Locale } from "@/i18n/routing";
 
 /**
- * Formato de precios. El diseño original usa la etiqueta "Rs." con separador de
- * miles y dos decimales (p. ej. "Rs. 1,800.00"). Centralizado aquí para poder
- * cambiar de moneda en un solo lugar si el negocio lo requiere.
+ * Formato de precios. La moneda base de la tienda es el dólar estadounidense:
+ * "$1,035.99" en ambos idiomas (los importes del catálogo están en USD).
+ * Centralizado aquí para poder cambiar de moneda en un solo lugar.
  */
-const CURRENCY_PREFIX = "Rs.";
+const CURRENCY = "USD";
+
+const priceFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: CURRENCY });
+const shortPriceFormat = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: CURRENCY,
+  maximumFractionDigits: 0,
+});
 
 export function formatPrice(amount: number): string {
-  const formatted = new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-  return `${CURRENCY_PREFIX} ${formatted}`;
+  return priceFormat.format(amount);
 }
 
-/** Variante corta sin decimales, para tarjetas compactas en móvil. */
+/** Variante corta sin decimales, para tarjetas compactas en móvil y el filtro de precio. */
 export function formatPriceShort(amount: number): string {
-  const formatted = new Intl.NumberFormat("en-US").format(Math.round(amount));
-  return `${CURRENCY_PREFIX} ${formatted}`;
+  return shortPriceFormat.format(Math.round(amount));
 }
 
 /** Calcula el porcentaje de descuento entre precio y precio de comparación. */

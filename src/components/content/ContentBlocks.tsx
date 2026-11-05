@@ -2,8 +2,8 @@ import { BadgeCheck, Check, Headset, Lightbulb, ShieldCheck, X, type LucideIcon 
 import { useTranslations } from "next-intl";
 import { RichText } from "@/components/content/RichText";
 import type { ContentBlock, ContentIcon } from "@/data/types";
-import { formatPrice } from "@/lib/format";
-import { SHIPPING_RATES, type ShippingMethod } from "@/lib/shipping";
+import { formatPrice, formatPriceShort } from "@/lib/format";
+import { FREE_EXPRESS_THRESHOLD, SHIPPING_RATES, type ShippingMethod } from "@/lib/shipping";
 import { cn } from "@/lib/utils";
 
 const icons: Record<ContentIcon, LucideIcon> = {
@@ -118,49 +118,54 @@ const rateRows: { id: ShippingMethod; title: "standardShipping" | "expressShippi
   { id: "sameday", title: "sameDay", time: "sameDayTime" },
 ];
 
-/** Tabla de métodos de envío con las tarifas del checkout (`src/lib/shipping.ts`). */
+/** Tabla de métodos de envío con las tarifas y el umbral del exprés gratis de `src/lib/shipping.ts`. */
 function ShippingRates({ className }: { className?: string }) {
   const t = useTranslations("contentPage");
   const tCheckout = useTranslations("checkout");
   const tCommon = useTranslations("common");
   return (
-    <div className={cn("my-2 overflow-hidden rounded-lg border border-border bg-surface", className)}>
-      <table className="w-full text-left">
-        <thead className="bg-surface-subtle">
-          <tr>
-            <th scope="col" className="px-5 py-3 text-label-sm text-text-secondary max-sm:px-3">
-              {t("method")}
-            </th>
-            <th scope="col" className="px-5 py-3 text-label-sm text-text-secondary max-sm:px-3">
-              {t("deliveryTime")}
-            </th>
-            <th scope="col" className="px-5 py-3 text-right text-label-sm text-text-secondary max-sm:px-3">
-              {t("cost")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rateRows.map((row) => {
-            const price = SHIPPING_RATES[row.id];
-            return (
-              <tr key={row.id} className="border-t border-border">
-                <th scope="row" className="px-5 py-4 text-label text-text-primary max-sm:px-3">
-                  {tCheckout(row.title)}
-                </th>
-                <td className="px-5 py-4 text-body text-text-secondary max-sm:px-3">{t(row.time)}</td>
-                <td
-                  className={cn(
-                    "whitespace-nowrap px-5 py-4 text-right text-label max-sm:px-3",
-                    price ? "text-text-primary" : "text-success-500"
-                  )}
-                >
-                  {price ? formatPrice(price) : tCommon("free")}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className={cn("my-2 flex flex-col gap-3", className)}>
+      <div className="overflow-hidden rounded-lg border border-border bg-surface">
+        <table className="w-full text-left">
+          <thead className="bg-surface-subtle">
+            <tr>
+              <th scope="col" className="px-5 py-3 text-label-sm text-text-secondary max-sm:px-3">
+                {t("method")}
+              </th>
+              <th scope="col" className="px-5 py-3 text-label-sm text-text-secondary max-sm:px-3">
+                {t("deliveryTime")}
+              </th>
+              <th scope="col" className="px-5 py-3 text-right text-label-sm text-text-secondary max-sm:px-3">
+                {t("cost")}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rateRows.map((row) => {
+              const price = SHIPPING_RATES[row.id];
+              return (
+                <tr key={row.id} className="border-t border-border">
+                  <th scope="row" className="px-5 py-4 text-label text-text-primary max-sm:px-3">
+                    {tCheckout(row.title)}
+                  </th>
+                  <td className="px-5 py-4 text-body text-text-secondary max-sm:px-3">{t(row.time)}</td>
+                  <td
+                    className={cn(
+                      "whitespace-nowrap px-5 py-4 text-right text-label max-sm:px-3",
+                      price ? "text-text-primary" : "text-success-500"
+                    )}
+                  >
+                    {price ? formatPrice(price) : tCommon("free")}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-body-sm text-text-secondary">
+        {t("freeExpressNote", { amount: formatPriceShort(FREE_EXPRESS_THRESHOLD) })}
+      </p>
     </div>
   );
 }

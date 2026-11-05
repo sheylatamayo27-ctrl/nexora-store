@@ -14,15 +14,17 @@ import { SectionHeader } from "@/components/home/SectionHeader";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/store/cart";
 import { couponDiscount } from "@/lib/coupons";
+import { GIFT_WRAP_PRICE } from "@/lib/fees";
 import { formatPrice } from "@/lib/format";
+import { DEFAULT_SHIPPING_METHOD, freeExpressProgress, shippingCost } from "@/lib/shipping";
 import type { Product } from "@/data/types";
 
-const FREE_SHIPPING_THRESHOLD = 15000;
 
 /** Carrito. El contenido sale del store del navegador; las recomendaciones, del servidor. */
 export function CartView({ recommended }: { recommended: Product[] }) {
   const t = useTranslations("cart");
   const tCommon = useTranslations("common");
+  const tCheckout = useTranslations("checkout");
   const [mounted, setMounted] = useState(false);
   const items = useCart((s) => s.items);
   const coupon = useCart((s) => s.coupon);
@@ -36,9 +38,11 @@ export function CartView({ recommended }: { recommended: Product[] }) {
   const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
   const tax = subtotal * 0.16;
   const discount = couponDiscount(coupon, subtotal);
-  const total = subtotal + tax - discount;
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const pct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  // Envío estimado con el método que el checkout trae elegido (exprés), el mismo
+  // que promete la barra de progreso: así el total coincide al pasar a pagar.
+  const shipping = shippingCost(DEFAULT_SHIPPING_METHOD, subtotal, coupon);
+  const total = subtotal + tax - discount + shipping;
+  const { remaining, percent: pct } = freeExpressProgress(subtotal);
 
   if (count === 0) {
     return (
@@ -114,7 +118,7 @@ export function CartView({ recommended }: { recommended: Product[] }) {
                 {tCommon("continueShopping")} <ArrowRight className="h-4 w-4" />
               </Link>
               <button type="button" className="flex items-center gap-2 text-label text-text-secondary">
-                <Gift className="h-4 w-4 text-brand-700" /> {t("giftWrap")}
+                <Gift className="h-4 w-4 text-brand-700" /> {t("giftWrap", { amount: formatPrice(GIFT_WRAP_PRICE) })}
               </button>
             </div>
           </div>
@@ -143,6 +147,8 @@ export function CartView({ recommended }: { recommended: Product[] }) {
           <OrderSummary
             itemsLabel={t("subtotalItems", { count })}
             subtotal={subtotal}
+            shipping={shipping}
+            shippingLabel={tCheckout("expressShipping")}
             tax={tax}
             discount={discount}
             coupon={coupon}

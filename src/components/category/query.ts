@@ -8,7 +8,7 @@ import type { ProductListQuery, ProductSort } from "@/server/api-types";
 
 export const PAGE_SIZE = 12;
 export const PRICE_MIN = 0;
-export const PRICE_MAX = 90000;
+export const PRICE_MAX = 1100;
 
 export type AvailId = "inStock" | "onSale" | "freeDelivery";
 

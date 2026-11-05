@@ -30,7 +30,8 @@ import { Accordion } from "@/components/ui/Accordion";
 import { MobileGallery } from "@/components/product/MobileGallery";
 import { Container } from "@/components/ui/Container";
 import { Link } from "@/i18n/navigation";
-import { formatPrice, formatNumber, discountPercent } from "@/lib/format";
+import { formatPrice, formatPriceShort, formatNumber, discountPercent } from "@/lib/format";
+import { FREE_EXPRESS_THRESHOLD } from "@/lib/shipping";
 import { useCart } from "@/store/cart";
 import { useFavorites } from "@/store/favorites";
 import { favoriteToast } from "@/lib/toast";
@@ -38,13 +39,18 @@ import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
 
 // Contenido de ejemplo de la ficha. Los textos son claves del namespace "product".
+/** Lo que cuesta la edición Pro sobre la Estándar (USD). */
+const PRO_EDITION_EXTRA = 18;
+/** Meses sin intereses que anuncia la ficha ("Mensualidades desde…"). */
+const INSTALLMENTS = 12;
+
 const editions: {
   label: "editionStandard" | "editionPro" | "editionMax";
   value: string;
   delta: number;
   disabled?: boolean;
 }[] = [
-  { label: "editionStandard", value: "estandar", delta: -1500 },
+  { label: "editionStandard", value: "estandar", delta: -PRO_EDITION_EXTRA },
   { label: "editionPro", value: "pro", delta: 0 },
   { label: "editionMax", value: "max", disabled: true, delta: 0 },
 ];
@@ -208,7 +214,9 @@ export function ProductView({ product, related }: { product: Product; related: P
                   </span>
                 )}
               </div>
-              <p className="text-body-sm text-text-muted">{t("taxLine")}</p>
+              <p className="text-body-sm text-text-muted">
+                {t("taxLine", { monthly: formatPrice(unitPrice / INSTALLMENTS) })}
+              </p>
 
               <div className="h-px bg-border" />
 
@@ -256,7 +264,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                       disabled={e.disabled}
                       onClick={() => !e.disabled && setEdition(e.value)}
                     >
-                      {t(e.label)}
+                      {e.label === "editionPro" ? t(e.label, { amount: formatPriceShort(PRO_EDITION_EXTRA) }) : t(e.label)}
                     </OptionChip>
                   ))}
                 </div>
@@ -444,7 +452,7 @@ export function ProductView({ product, related }: { product: Product; related: P
 
         <Accordion title={t("shippingAndReturns")}>
           <div className="flex flex-col gap-3 text-body text-text-secondary">
-            <p>{t("shippingInfo")}</p>
+            <p>{t("shippingInfo", { amount: formatPriceShort(FREE_EXPRESS_THRESHOLD) })}</p>
             <p>{t("returnsInfo")}</p>
             <p>{t("warrantyInfo")}</p>
           </div>
@@ -549,7 +557,7 @@ export function ProductView({ product, related }: { product: Product; related: P
             className="flex-1 px-4"
             onClick={() => add(product, { qty, color })}
           >
-            {t("addWithPrice", { amount: formatNumber(unitPrice * qty, locale) })}
+            {t("addWithPrice", { amount: formatPrice(unitPrice * qty) })}
           </Button>
         </div>
       </div>

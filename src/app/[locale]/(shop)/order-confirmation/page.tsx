@@ -15,6 +15,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Link } from "@/i18n/navigation";
 import { couponDiscount } from "@/lib/coupons";
+import { DEFAULT_SHIPPING_METHOD, shippingCost, type ShippingMethod } from "@/lib/shipping";
 import { formatPrice } from "@/lib/format";
 import { useCart, type CartItem } from "@/store/cart";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,9 @@ const CUSTOMER = { firstName: "Sheyla", email: "sheyla@nexora.store" };
 
 // `label` y `sub` son claves de "orderConfirmation". `sub` (fecha/estado) solo se
 // muestra en la línea de tiempo vertical de móvil (M06).
+// Nombre de cada método: claves del namespace "checkout" (las mismas que al pagar).
+const shippingTitles = { standard: "standardShipping", express: "expressShipping", sameday: "sameDay" } as const;
+
 const tracker = [
   { label: "stepConfirmed", state: "done", sub: "stepConfirmedSub" },
   { label: "stepPacked", state: "current", sub: "stepPackedSub" },
@@ -49,24 +53,28 @@ function stepCircle(state: string, index: number) {
 export default function ConfirmationPage() {
   const t = useTranslations("orderConfirmation");
   const tCommon = useTranslations("common");
+  const tCheckout = useTranslations("checkout");
   const [snapshot, setSnapshot] = useState<CartItem[]>([]);
   const [coupon, setCoupon] = useState<string>();
+  const [shippingMethod, setShippingMethod] = useState<ShippingMethod>(DEFAULT_SHIPPING_METHOD);
   const clear = useCart((s) => s.clear);
   const captured = useRef(false);
 
   useEffect(() => {
     if (captured.current) return;
     captured.current = true;
-    const { items, coupon } = useCart.getState();
+    const { items, coupon, shippingMethod } = useCart.getState();
     setSnapshot(items);
     setCoupon(coupon);
+    if (shippingMethod) setShippingMethod(shippingMethod);
     clear();
   }, [clear]);
 
   const subtotal = snapshot.reduce((s, i) => s + i.product.price * i.qty, 0);
   const tax = subtotal * 0.16;
   const discount = couponDiscount(coupon, subtotal);
-  const total = subtotal + tax - discount;
+  const shipping = shippingCost(shippingMethod, subtotal, coupon);
+  const total = subtotal + tax - discount + shipping;
 
   return (
     <Container className="flex flex-col gap-6 py-8 sm:py-12">
@@ -170,7 +178,7 @@ export default function ConfirmationPage() {
                   directamente el "Total pagado" (M06/T06). */}
               {[
                 { l: tCommon("subtotal"), v: formatPrice(subtotal) },
-                { l: tCommon("shipping"), v: tCommon("free"), h: true },
+                { l: tCommon("shipping"), v: shipping ? formatPrice(shipping) : tCommon("free"), h: !shipping },
                 { l: tCommon("taxVat"), v: formatPrice(tax) },
                 ...(discount && coupon
                   ? [{ l: tCommon("discountCode", { code: coupon }), v: `−${formatPrice(discount)}`, h: true }]
@@ -197,7 +205,7 @@ export default function ConfirmationPage() {
           {[
             // Nombre y calle: datos del pedido de ejemplo (no se traducen).
             { icon: MapPin, title: t("shippingAddress"), lines: ["Sheyla Tamayo", "Parque Tecnológico 221B", t("addressCityLine")] },
-            { icon: Truck, title: t("deliveryMethod"), lines: [t("expressShipping"), t("arrives")] },
+            { icon: Truck, title: t("deliveryMethod"), lines: [tCheckout(shippingTitles[shippingMethod]), t("arrives")] },
             { icon: CreditCard, title: t("payment"), lines: [t("cardEnding"), t("paidOn")] },
           ].map((b) => (
             <div key={b.title} className="flex gap-3.5 md:flex-1 lg:flex-initial">

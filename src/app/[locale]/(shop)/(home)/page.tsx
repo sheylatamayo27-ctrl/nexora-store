@@ -19,13 +19,14 @@ import { FeaturedCarousel } from "@/components/home/FeaturedCarousel";
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/i18n/metadata";
 import type { Locale } from "@/i18n/routing";
-import { formatPrice } from "@/lib/format";
+import { discountPercent, formatPrice } from "@/lib/format";
 import { Reveal } from "@/lib/motion";
 import {
   getCategories,
   getDealProducts,
   getFeaturedProducts,
   getHeroSlides,
+  getProductBySlug,
   getPromoBanners,
 } from "@/server";
 
@@ -39,17 +40,24 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   return { alternates: localeAlternates("/", locale) };
 }
 
+/** Producto de la sección destacada: sus precios y valoración salen del catálogo. */
+const SPOTLIGHT_SLUG = "mybook-14-inch-laptop-2-8k-oled";
+
 export default async function HomePage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
-  const [heroSlides, categories, featuredProducts, dealProducts, promoBanners, t, tc] = await Promise.all([
+  const [heroSlides, categories, featuredProducts, dealProducts, promoBanners, spotlight, t, tc] = await Promise.all([
     getHeroSlides(locale),
     getCategories(locale),
     getFeaturedProducts(locale),
     getDealProducts(locale),
     getPromoBanners(locale),
+    getProductBySlug(SPOTLIGHT_SLUG, locale),
     getTranslations({ locale, namespace: "home" }),
     getTranslations({ locale, namespace: "common" }),
   ]);
+
+  if (!spotlight) throw new Error(`Falta el producto destacado "${SPOTLIGHT_SLUG}" en el catálogo`);
+  const spotlightCompareAt = spotlight.compareAt ?? spotlight.price;
 
   /** "Top 10": las grillas de colecciones son de 5 columnas (2 filas exactas). */
   const topCategories = categories.slice(0, 10);
@@ -190,7 +198,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-subtle">
                 <AssetImage folder="products" name="laptop" alt={t("spotlightImageAlt")} sizes="(max-width: 1024px) 100vw, 50vw" />
                 <Badge type="sale" className="absolute left-5 top-5">
-                  {t("spotlightSave", { amount: formatPrice(92500 - 85999) })}
+                  {t("spotlightSave", { amount: formatPrice(spotlightCompareAt - spotlight.price) })}
                 </Badge>
               </div>
               <div className="flex flex-col gap-5">
@@ -199,7 +207,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
                   <span className="text-label-sm tracking-wide text-brand-700">{t("spotlightEyebrow")}</span>
                 </div>
                 <h2 className="text-h2 text-text-primary sm:text-display-l">{t("spotlightTitle")}</h2>
-                <Rating rating={4.9} reviews={1240} size={16} />
+                <Rating rating={spotlight.rating} reviews={spotlight.reviews} size={16} />
                 <p className="max-w-lg text-body-lg text-text-secondary max-lg:line-clamp-2">
                   {t("spotlightDescription")}
                 </p>
@@ -213,14 +221,14 @@ export default async function HomePage({ params: { locale } }: { params: { local
                   ))}
                 </div>
                 <div className="flex items-center gap-3">
-                  <Price price={85999} compareAt={92500} size="lg" />
+                  <Price price={spotlight.price} compareAt={spotlight.compareAt} size="lg" />
                   <span className="rounded-sm bg-sale-100 px-2 py-1 text-label-sm text-sale-500">
-                    {tc("percentOff", { percent: 7 })}
+                    {tc("percentOff", { percent: discountPercent(spotlight.price, spotlight.compareAt) ?? 0 })}
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 max-lg:flex-col max-lg:items-stretch">
                   <ButtonLink
-                    href="/product/mybook-14-inch-laptop-2-8k-oled"
+                    href={`/product/${SPOTLIGHT_SLUG}`}
                     variant="primary"
                     size="lg"
                     className="max-lg:w-full"
@@ -228,7 +236,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
                     {tc("addToCart")}
                   </ButtonLink>
                   <ButtonLink
-                    href="/product/mybook-14-inch-laptop-2-8k-oled"
+                    href={`/product/${SPOTLIGHT_SLUG}`}
                     variant="outline"
                     size="lg"
                     className="max-lg:hidden"

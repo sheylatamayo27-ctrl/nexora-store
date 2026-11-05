@@ -19,6 +19,7 @@ export function OrderSummary({
   itemsLabel,
   subtotal,
   shipping,
+  shippingLabel,
   tax,
   discount,
   coupon,
@@ -32,6 +33,8 @@ export function OrderSummary({
   itemsLabel: string;
   subtotal: number;
   shipping?: number;
+  /** Etiqueta de la fila de envío (p. ej. "Envío exprés"); por defecto, "Envío". */
+  shippingLabel?: string;
   tax: number;
   /** Descuento ya calculado; su fila lleva el código de `coupon`. */
   discount?: number;
@@ -52,7 +55,7 @@ export function OrderSummary({
   const rows: Row[] = [
     { label: itemsLabel, value: formatPrice(subtotal) },
     {
-      label: tCommon("shipping"),
+      label: shippingLabel ?? tCommon("shipping"),
       value: shipping ? formatPrice(shipping) : tCommon("free"),
       highlight: !shipping,
     },

@@ -147,7 +147,9 @@ Para añadir un idioma: agrégalo a `routing.locales` (y a `intlLocales`/`ogLoca
 
 - Contacto (dirección, teléfono, correo), horario y redes sociales: `src/components/layout/store-info.ts`, compartido por el footer y `/contact`. Las redes apuntan a la portada de cada red: cámbialas por los perfiles de tu tienda.
 - Textos legales (`/terms`, `/privacy`) y políticas (`/shipping`, `/returns`, `/warranty`): son de ejemplo; revísalos con tu asesor legal antes de publicar (`src/server/db/pages.data.ts`).
-- Tarifas de envío: `src/lib/shipping.ts`, que usan el checkout y la tabla de `/shipping`.
+- Moneda: dólares estadounidenses (USD), con el formato de `src/lib/format.ts` (`$1,035.99`). Los precios del catálogo y de los pedidos de ejemplo están en USD.
+- Regla de envío: `src/lib/shipping.ts` (`shippingCost`). Estándar siempre gratis, exprés $4.99 y gratis desde $500 (`FREE_EXPRESS_THRESHOLD`), mismo día $8.99. La usan el carrito (resumen y barra de progreso), el checkout, la confirmación, la tabla de `/shipping` y los textos que mencionan el umbral: cambia el valor ahí y se actualiza en todo el sitio.
+- Recargos fijos (envoltorio de regalo, pago contra entrega): `src/lib/fees.ts`.
 
 ### Pantallas solo de front-end
 

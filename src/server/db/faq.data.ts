@@ -44,8 +44,8 @@ export const faqGroups: FaqGroupRecord[] = [
       {
         question: { es: "¿Qué métodos de pago aceptan?", en: "Which payment methods do you accept?" },
         answer: {
-          es: "Tarjetas de crédito y débito (Visa, Mastercard y American Express), billeteras digitales, transferencia bancaria y pago contra entrega, que tiene un cargo adicional de Rs. 49.",
-          en: "Credit and debit cards (Visa, Mastercard and American Express), digital wallets, bank transfer and cash on delivery, which has an extra Rs. 49 fee.",
+          es: "Tarjetas de crédito y débito (Visa, Mastercard y American Express), billeteras digitales, transferencia bancaria y pago contra entrega, que tiene un cargo adicional de $1.99.",
+          en: "Credit and debit cards (Visa, Mastercard and American Express), digital wallets, bank transfer and cash on delivery, which has an extra $1.99 fee.",
         },
       },
       {

@@ -180,7 +180,7 @@
     "goToBlog": "Go to the blog"
   },
   "announcement": {
-    "freeShipping": "Free shipping on orders over $500",
+    "freeShipping": "Free express shipping from {amount}",
     "firstOrder": "Extra 10% off your first order with code NEXORA10",
     "returns": "Hassle-free returns within 30 days"
   },
@@ -213,7 +213,7 @@
   },
   "services": {
     "freeShipping": "Free shipping",
-    "freeShippingDesc": "On orders over $500",
+    "freeShippingDesc": "Free express from {amount}",
     "securePayment": "Secure payment",
     "securePaymentDesc": "100% protected checkout",
     "support": "24/7 support",
@@ -276,11 +276,11 @@
   "product": {
     "brandLine": "{vendor} AUDIO",
     "reviewCount": "{count, plural, one {{formatted} review} other {{formatted} reviews}}",
-    "taxLine": "Taxes included · Monthly payments from Rs. 667/mo · Free shipping",
+    "taxLine": "Taxes included · Monthly payments from {monthly}/mo · Free shipping",
     "colorSelected": "Color: <value>{color}</value>",
     "edition": "Edition",
     "editionStandard": "Standard",
-    "editionPro": "Pro · +Rs. 1,500",
+    "editionPro": "Pro · +{amount}",
     "editionMax": "Max · Sold out",
     "freeDeliveryDate": "Free delivery Fri, Oct 17",
     "orderWithin": "Order within the next 4 h 20 min",
@@ -325,7 +325,7 @@
     "review3Body": "The build quality feels far more expensive than it is. The app’s equalizer is excellent.",
     "helpful": "Helpful ({count})",
     "shippingAndReturns": "Shipping & returns",
-    "shippingInfo": "Free shipping on every order, with estimated delivery in 24–48 h and real-time tracking.",
+    "shippingInfo": "Free standard shipping on every order (3–5 business days) and free express from {amount}, with real-time tracking.",
     "returnsInfo": "Hassle-free returns for 30 days: free home pickup and a refund to your original payment method.",
     "warrantyInfo": "Every product includes the 2-year Nexora warranty against manufacturing defects.",
     "basedOn": "Based on {count, plural, one {{formatted} review} other {{formatted} reviews}}",
@@ -333,7 +333,7 @@
     "writeReview": "Write a review",
     "customerReviews": "Customer reviews",
     "youMayAlsoLike": "You may also like",
-    "addWithPrice": "Add · Rs. {amount}"
+    "addWithPrice": "Add · {amount}"
   },
   "category": {
     "productsDelivery": "{count, plural, one {# product} other {# products}} · Next-day delivery",
@@ -398,7 +398,7 @@
     "title": "Shopping cart",
     "freeShippingRemaining": "You’re <strong>{amount}</strong> away from FREE express SHIPPING!",
     "freeShippingUnlocked": "Congratulations! You’ve unlocked free express shipping 🎉",
-    "giftWrap": "Add gift wrap (Rs. 99)",
+    "giftWrap": "Add gift wrap ({amount})",
     "buyerProtection": "Buyer protection",
     "buyerProtectionSub": "Full refund if it’s not as described",
     "freeReturns": "Free 30-day returns",
@@ -471,7 +471,7 @@
     "bankTransfer": "Bank transfer",
     "bankTransferDesc": "All major banks",
     "cashOnDelivery": "Cash on delivery",
-    "cashOnDeliveryDesc": "Pay on arrival · Rs. 49 fee",
+    "cashOnDeliveryDesc": "Pay on arrival · {amount} fee",
     "cardNumber": "Card number",
     "expiry": "Expiration date",
     "cvv": "CVV",
@@ -513,7 +513,6 @@
     "shippingAddress": "Shipping address",
     "addressCityLine": "CDMX 06000 · Mexico",
     "deliveryMethod": "Delivery method",
-    "expressShipping": "Express shipping",
     "arrives": "Arrives Sat, Oct 18, 2026",
     "payment": "Payment",
     "cardEnding": "Visa ending in 4417",
@@ -708,7 +707,8 @@
     "cost": "Cost",
     "standardTime": "3–5 business days",
     "expressTime": "1–2 business days",
-    "sameDayTime": "Same day · Mexico City only"
+    "sameDayTime": "Same day · Mexico City only",
+    "freeExpressNote": "Express shipping is free on orders from {amount}."
   },
   "contact": {
     "title": "Contact us",

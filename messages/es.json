@@ -180,7 +180,7 @@
     "goToBlog": "Ir al blog"
   },
   "announcement": {
-    "freeShipping": "Envío gratis en pedidos superiores a $500",
+    "freeShipping": "Envío exprés gratis desde {amount}",
     "firstOrder": "10% extra en tu primer pedido con el código NEXORA10",
     "returns": "Devoluciones sin complicaciones en 30 días"
   },
@@ -213,7 +213,7 @@
   },
   "services": {
     "freeShipping": "Envío gratis",
-    "freeShippingDesc": "En pedidos superiores a $500",
+    "freeShippingDesc": "Exprés gratis desde {amount}",
     "securePayment": "Pago seguro",
     "securePaymentDesc": "Checkout 100% protegido",
     "support": "Soporte 24/7",
@@ -276,11 +276,11 @@
   "product": {
     "brandLine": "{vendor} AUDIO",
     "reviewCount": "{count, plural, one {{formatted} reseña} other {{formatted} reseñas}}",
-    "taxLine": "Impuestos incluidos · Mensualidades desde Rs. 667/mes · Envío gratis",
+    "taxLine": "Impuestos incluidos · Mensualidades desde {monthly}/mes · Envío gratis",
     "colorSelected": "Color: <value>{color}</value>",
     "edition": "Edición",
     "editionStandard": "Estándar",
-    "editionPro": "Pro · +Rs. 1,500",
+    "editionPro": "Pro · +{amount}",
     "editionMax": "Max · Agotado",
     "freeDeliveryDate": "Entrega gratis el vie 17 oct",
     "orderWithin": "Haz tu pedido en las próximas 4 h 20 min",
@@ -325,7 +325,7 @@
     "review3Body": "La calidad de construcción se siente mucho más cara de lo que cuesta. El ecualizador de la app es excelente.",
     "helpful": "Útil ({count})",
     "shippingAndReturns": "Envío y devoluciones",
-    "shippingInfo": "Envío gratis en todos los pedidos, con entrega estimada en 24–48 h y seguimiento en tiempo real.",
+    "shippingInfo": "Envío estándar gratis en todos los pedidos (3–5 días hábiles) y exprés gratis desde {amount}, con seguimiento en tiempo real.",
     "returnsInfo": "Devoluciones sin complicaciones durante 30 días: recogida gratuita a domicilio y reembolso al método de pago original.",
     "warrantyInfo": "Todos los productos incluyen la garantía Nexora de 2 años contra defectos de fabricación.",
     "basedOn": "Basado en {count, plural, one {{formatted} reseña} other {{formatted} reseñas}}",
@@ -333,7 +333,7 @@
     "writeReview": "Escribir una reseña",
     "customerReviews": "Reseñas de clientes",
     "youMayAlsoLike": "También te puede gustar",
-    "addWithPrice": "Agregar · Rs. {amount}"
+    "addWithPrice": "Agregar · {amount}"
   },
   "category": {
     "productsDelivery": "{count, plural, one {# producto} other {# productos}} · Entrega al día siguiente",
@@ -398,7 +398,7 @@
     "title": "Carrito de compras",
     "freeShippingRemaining": "¡Te faltan <strong>{amount}</strong> para el ENVÍO exprés GRATIS!",
     "freeShippingUnlocked": "¡Felicidades! Tienes envío exprés gratis 🎉",
-    "giftWrap": "Agregar envoltorio de regalo (Rs. 99)",
+    "giftWrap": "Agregar envoltorio de regalo ({amount})",
     "buyerProtection": "Protección al comprador",
     "buyerProtectionSub": "Reembolso total si no es como se describe",
     "freeReturns": "Devoluciones gratis 30 días",
@@ -471,7 +471,7 @@
     "bankTransfer": "Transferencia bancaria",
     "bankTransferDesc": "Todos los bancos principales",
     "cashOnDelivery": "Pago contra entrega",
-    "cashOnDeliveryDesc": "Paga al recibir · Cargo de Rs. 49",
+    "cashOnDeliveryDesc": "Paga al recibir · Cargo de {amount}",
     "cardNumber": "Número de tarjeta",
     "expiry": "Vencimiento",
     "cvv": "CVV",
@@ -513,7 +513,6 @@
     "shippingAddress": "Dirección de envío",
     "addressCityLine": "CDMX 06000 · México",
     "deliveryMethod": "Método de entrega",
-    "expressShipping": "Envío exprés",
     "arrives": "Llega el sáb 18 oct 2026",
     "payment": "Pago",
     "cardEnding": "Visa terminada en 4417",
@@ -708,7 +707,8 @@
     "cost": "Costo",
     "standardTime": "3–5 días hábiles",
     "expressTime": "1–2 días hábiles",
-    "sameDayTime": "Mismo día · solo CDMX"
+    "sameDayTime": "Mismo día · solo CDMX",
+    "freeExpressNote": "El envío exprés es gratis en pedidos desde {amount}."
   },
   "contact": {
     "title": "Contáctanos",
