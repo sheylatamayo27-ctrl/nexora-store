@@ -45,6 +45,16 @@
     }
   }
 
+  /* Ancho fijo de los avisos propios (toast.custom + unstyled): sonner solo se
+     lo da a los suyos, así que los nuestros crecían con el nombre del producto
+     y se salían por la derecha sin llegar a recortarlo con "…". Hasta 600px
+     sonner ya los ajusta al ancho de la pantalla. */
+  @media (min-width: 601px) {
+    [data-sonner-toast][data-styled="false"] {
+      width: var(--width);
+    }
+  }
+
   * {
     @apply border-border;
   }
