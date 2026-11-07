@@ -16,11 +16,13 @@ import { Marquee } from "@/components/home/Marquee";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { FeaturedCarousel } from "@/components/home/FeaturedCarousel";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/i18n/metadata";
 import type { Locale } from "@/i18n/routing";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { Reveal } from "@/lib/motion";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/jsonLd";
 import {
   getCategories,
   getDealProducts,
@@ -45,7 +47,7 @@ const SPOTLIGHT_SLUG = "mybook-14-inch-laptop-2-8k-oled";
 
 export default async function HomePage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
-  const [heroSlides, categories, featuredProducts, dealProducts, promoBanners, spotlight, t, tc] = await Promise.all([
+  const [heroSlides, categories, featuredProducts, dealProducts, promoBanners, spotlight, t, tc, tm] = await Promise.all([
     getHeroSlides(locale),
     getCategories(locale),
     getFeaturedProducts(locale),
@@ -54,6 +56,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
     getProductBySlug(SPOTLIGHT_SLUG, locale),
     getTranslations({ locale, namespace: "home" }),
     getTranslations({ locale, namespace: "common" }),
+    getTranslations({ locale, namespace: "metadata" }),
   ]);
 
   if (!spotlight) throw new Error(`Falta el producto destacado "${SPOTLIGHT_SLUG}" en el catálogo`);
@@ -268,6 +271,9 @@ export default async function HomePage({ params: { locale } }: { params: { local
           </Reveal>
         </Container>
       </section>
+
+      <JsonLd data={websiteJsonLd(locale, tm("siteDescription"))} />
+      <JsonLd data={organizationJsonLd()} />
     </div>
   );
 }

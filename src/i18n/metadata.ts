@@ -44,3 +44,35 @@ export function localeAlternates(pathname: string, locale: Locale): NonNullable<
     },
   };
 }
+
+/**
+ * Open Graph y Twitter de una página con imagen propia (producto, categoría, artículo).
+ * Next reemplaza el `openGraph` del layout entero, así que aquí se repiten `siteName`
+ * y los idiomas. `image` es una ruta de /public (p. ej. "/images/products/x.webp").
+ */
+export function socialMetadata(
+  locale: Locale,
+  page: {
+    pathname: string;
+    title: string;
+    description: string;
+    image: string;
+    article?: { publishedTime: string; authors: string[] };
+  },
+): Pick<Metadata, "openGraph" | "twitter"> {
+  const common = {
+    locale: ogLocales[locale],
+    alternateLocale: routing.locales.filter((l) => l !== locale).map((l) => ogLocales[l]),
+    siteName: "Nexora",
+    url: getPathname({ href: page.pathname, locale }),
+    title: page.title,
+    description: page.description,
+    images: [page.image],
+  };
+  return {
+    openGraph: page.article
+      ? { ...common, type: "article", publishedTime: page.article.publishedTime, authors: page.article.authors }
+      : { ...common, type: "website" },
+    twitter: { card: "summary_large_image", title: page.title, description: page.description, images: [page.image] },
+  };
+}

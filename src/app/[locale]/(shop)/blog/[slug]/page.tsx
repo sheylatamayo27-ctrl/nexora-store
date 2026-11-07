@@ -6,11 +6,14 @@ import { Container } from "@/components/ui/Container";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { AssetImage } from "@/components/media/AssetImage";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Link } from "@/i18n/navigation";
-import { localeAlternates } from "@/i18n/metadata";
+import { localeAlternates, socialMetadata } from "@/i18n/metadata";
 import type { Locale } from "@/i18n/routing";
 import { Reveal } from "@/lib/motion";
 import { formatDate } from "@/lib/format";
+import { assetSrc } from "@/lib/assets";
+import { blogPostJsonLd, breadcrumbJsonLd } from "@/lib/jsonLd";
 import { getBlogPosts, getPostBySlug, getRelatedPosts } from "@/server";
 import type { BlogBlock } from "@/data/types";
 
@@ -27,7 +30,18 @@ export async function generateMetadata({ params: { locale, slug } }: { params: P
     const t = await getTranslations({ locale, namespace: "metadata" });
     return { title: t("postNotFound") };
   }
-  return { title: post.title, description: post.excerpt, alternates: localeAlternates(`/blog/${slug}`, locale) };
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: localeAlternates(`/blog/${slug}`, locale),
+    ...socialMetadata(locale, {
+      pathname: `/blog/${slug}`,
+      title: post.title,
+      description: post.excerpt,
+      image: assetSrc(post.coverFolder, post.cover),
+      article: { publishedTime: post.date, authors: [post.author.name] },
+    }),
+  };
 }
 
 function Block({ block }: { block: BlogBlock }) {
@@ -62,9 +76,10 @@ export default async function BlogPostPage({ params: { locale, slug } }: { param
   const post = await getPostBySlug(slug, locale);
   if (!post) notFound();
 
-  const [related, t] = await Promise.all([
+  const [related, t, tc] = await Promise.all([
     getRelatedPosts(post.slug, locale),
     getTranslations({ locale, namespace: "blog" }),
+    getTranslations({ locale, namespace: "common" }),
   ]);
 
   return (
@@ -142,6 +157,14 @@ export default async function BlogPostPage({ params: { locale, slug } }: { param
           </Container>
         </section>
       )}
+
+      <JsonLd data={blogPostJsonLd(post, locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [{ name: tc("home"), href: "/" }, { name: t("breadcrumb"), href: "/blog" }, { name: post.title }],
+          locale,
+        )}
+      />
     </div>
   );
 }

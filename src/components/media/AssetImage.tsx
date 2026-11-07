@@ -3,19 +3,9 @@
 import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { REAL_IMAGES } from "@/lib/assets.generated";
+import { assetSrc, type AssetFolder } from "@/lib/assets";
 
-export type AssetFolder = "products" | "banners" | "misc";
-
-/**
- * Ruta de una imagen. Si existe la foto real en /public/images (jpg, png o webp)
- * se usa; si no, se usa el placeholder .svg con el mismo nombre.
- * La lista de fotos reales la genera `scripts/generate-assets-manifest.mjs`.
- */
-export function assetSrc(folder: AssetFolder, name: string): string {
-  const ext = REAL_IMAGES[`${folder}/${name}`] ?? "svg";
-  return `/images/${folder}/${name}.${ext}`;
-}
+export { assetSrc, type AssetFolder };
 
 interface AssetImageProps {
   folder: AssetFolder;
