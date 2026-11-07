@@ -109,7 +109,8 @@
       "email": "Email",
       "phone": "Phone",
       "password": "Password"
-    }
+    },
+    "skipToContent": "Skip to content"
   },
   "validation": {
     "firstName": "Enter your first name.",
@@ -172,7 +173,8 @@
     "wishlist": "Wishlist",
     "account": "Account",
     "viewCart": "View cart",
-    "myCart": "My cart"
+    "myCart": "My cart",
+    "mobileMenu": "Menu"
   },
   "megaMenu": {
     "shopByCategory": "Shop by category",
@@ -400,7 +402,9 @@
     "typeSomething": "Type something to search",
     "hint": "Check the spelling or try more general terms, like “headphones” or “laptop”.",
     "placeholderProducts": "Search products…",
-    "searchProducts": "Search products"
+    "searchProducts": "Search products",
+    "label": "Search products",
+    "suggestions": "Suggestions"
   },
   "cart": {
     "emptyTitle": "Your cart is empty",
@@ -548,7 +552,8 @@
     "guestTitle": "Your account",
     "guestSubtitle": "Sign in to see your orders",
     "gold": "Gold",
-    "goldMember": "Gold member"
+    "goldMember": "Gold member",
+    "accountMenu": "Account menu"
   },
   "orders": {
     "title": "My orders",
@@ -830,5 +835,12 @@
     "analyticsDescription": "Help us understand how you use the site",
     "marketing": "Marketing",
     "marketingDescription": "Allow us to show you relevant ads"
+  },
+  "a11y": {
+    "addedToCart": "{name} added to cart",
+    "removedFromCart": "{name} removed from cart",
+    "quantityUpdated": "Quantity updated to {count}",
+    "carousel": "carousel",
+    "quantity": "Quantity"
   }
 }

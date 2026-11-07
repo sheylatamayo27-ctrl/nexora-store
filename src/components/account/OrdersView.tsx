@@ -185,12 +185,13 @@ export function OrdersView() {
           <p className="text-body text-text-secondary">{t("subtitle")}</p>
         </div>
         {/* El buscador no aparece en M09/T09: solo escritorio. */}
-        <div className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4 max-lg:hidden">
-          <Search className="h-[18px] w-[18px] text-text-muted" />
+        <div role="search" className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4 max-lg:hidden">
+          <Search className="h-[18px] w-[18px] text-text-muted" aria-hidden="true" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
+            aria-label={t("searchPlaceholder")}
             className="h-full w-56 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
           />
         </div>

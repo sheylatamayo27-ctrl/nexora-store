@@ -8,12 +8,14 @@ import { QuantityStepper } from "@/components/commerce/QuantityStepper";
 import { formatPrice } from "@/lib/format";
 import { useCart, type CartItem } from "@/store/cart";
 import { useFavorites } from "@/store/favorites";
+import { announce } from "@/lib/announce";
 import { favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 export function CartLineItem({ item }: { item: CartItem }) {
   const t = useTranslations("cart");
   const tCommon = useTranslations("common");
+  const tA11y = useTranslations("a11y");
   const setQty = useCart((s) => s.setQty);
   const remove = useCart((s) => s.remove);
   const toggleFavorite = useFavorites((s) => s.toggle);
@@ -21,6 +23,11 @@ export function CartLineItem({ item }: { item: CartItem }) {
   const { product } = item;
   const wished = favorites.some((p) => p.id === product.id);
   const handleWish = () => favoriteToast(product, toggleFavorite(product));
+  // Quitar del carrito no muestra toast: se anuncia a los lectores de pantalla.
+  const handleRemove = () => {
+    remove(item.key);
+    announce(tA11y("removedFromCart", { name: product.name }));
+  };
   const savings = product.compareAt ? (product.compareAt - product.price) * item.qty : 0;
 
   return (
@@ -63,7 +70,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
               </button>
               <button
                 type="button"
-                onClick={() => remove(item.key)}
+                onClick={handleRemove}
                 aria-label={t("remove")}
                 className="flex h-9 w-9 items-center justify-center rounded-md text-sale-500 transition-colors hover:bg-sale-100"
               >
@@ -92,13 +99,16 @@ export function CartLineItem({ item }: { item: CartItem }) {
           <div className="mt-2 flex items-center gap-5">
             <QuantityStepper value={item.qty} onChange={(q) => setQty(item.key, q)} size="sm" />
             <button
-              onClick={() => remove(item.key)}
+              type="button"
+              onClick={handleRemove}
               className="flex items-center gap-1.5 text-label-sm text-sale-500"
             >
               <Trash2 className="h-4 w-4" /> {t("removeShort")}
             </button>
             <button
+              type="button"
               onClick={handleWish}
+              aria-pressed={wished}
               className="hidden items-center gap-1.5 text-label-sm text-text-secondary sm:flex"
             >
               <Heart className={cn("h-4 w-4", wished && "fill-sale-500 text-sale-500")} />

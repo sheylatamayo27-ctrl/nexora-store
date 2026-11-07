@@ -13,6 +13,7 @@ import type { Product } from "@/data/types";
  */
 export function FeaturedCarousel({ products }: { products: Product[] }) {
   const t = useTranslations("home");
+  const tA11y = useTranslations("a11y");
   // En SSR se asume móvil (2 por vista); el hook recalcula al montar.
   const { scrollerRef, active, count, goTo } = useCarousel(Math.ceil(products.length / 2));
 
@@ -26,6 +27,8 @@ export function FeaturedCarousel({ products }: { products: Product[] }) {
           tarjetas (14px de 16px), así que no asoma la tarjeta vecina. */}
       <div
         ref={scrollerRef}
+        role="region"
+        aria-roledescription={tA11y("carousel")}
         aria-label={t("featuredTitle")}
         className="flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2 no-scrollbar md:gap-4 lg:-mx-3.5 lg:-my-4 lg:scroll-px-3.5 lg:px-3.5 lg:pb-6 lg:pt-4"
       >

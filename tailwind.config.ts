@@ -23,6 +23,8 @@ const config: Config = {
           100: "#FFF4D6",
         },
         sale: {
+          // TODO: a11y — verificar contraste: 4.35:1 sobre blanco (y en blanco sobre él) y 3.81:1
+          // sobre sale-100; en texto pequeño (errores, "Eliminar", badges) queda bajo 4.5:1.
           500: "#E5322D",
           100: "#FDECEC",
         },
@@ -34,6 +36,8 @@ const config: Config = {
         text: {
           primary: "#0F172A",
           secondary: "#475569",
+          // TODO: a11y — verificar contraste: 2.56:1 sobre blanco y 2.41:1 sobre surface-subtle
+          // (WCAG AA pide 4.5:1 en texto normal). Se usa en marcas, fechas, precios tachados y placeholders.
           muted: "#94A3B8",
           inverse: "#FFFFFF",
         },

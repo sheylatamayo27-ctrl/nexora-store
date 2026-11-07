@@ -34,6 +34,7 @@ import { formatPrice, formatPriceShort, formatNumber, discountPercent } from "@/
 import { FREE_EXPRESS_THRESHOLD } from "@/lib/shipping";
 import { useCart } from "@/store/cart";
 import { useFavorites } from "@/store/favorites";
+import { announce } from "@/lib/announce";
 import { favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
@@ -89,6 +90,7 @@ const distribution = [
 export function ProductView({ product, related }: { product: Product; related: Product[] }) {
   const t = useTranslations("product");
   const tCommon = useTranslations("common");
+  const tA11y = useTranslations("a11y");
   const locale = useLocale();
   const reviewCount = { count: product.reviews, formatted: formatNumber(product.reviews, locale) };
   const [mounted, setMounted] = useState(false);
@@ -99,6 +101,11 @@ export function ProductView({ product, related }: { product: Product; related: P
   // Hasta el montaje se pinta como en el servidor (favoritos vienen de localStorage).
   const wished = mounted && favorites.some((p) => p.id === product.id);
   const handleWish = () => favoriteToast(product, toggleFavorite(product));
+  // Agregar desde la ficha no muestra toast: se anuncia a los lectores de pantalla.
+  const handleAdd = () => {
+    add(product, { qty, color });
+    announce(tA11y("addedToCart", { name: product.name }));
+  };
   const [color, setColor] = useState(product.colors?.[0]?.name);
   const [edition, setEdition] = useState("pro");
   const [qty, setQty] = useState(1);
@@ -137,12 +144,15 @@ export function ProductView({ product, related }: { product: Product; related: P
                 {Array.from({ length: 4 }).map((_, i) => (
                   <button
                     key={i}
+                    type="button"
                     onClick={() => setActiveThumb(i)}
+                    aria-label={t("viewImage", { number: i + 1 })}
+                    aria-pressed={activeThumb === i}
                     className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-subtle sm:h-20 sm:w-20 ${
                       activeThumb === i ? "ring-2 ring-brand-800" : "ring-1 ring-border"
                     }`}
                   >
-                    <AssetImage folder="products" name={product.image} alt={product.name} sizes="80px" />
+                    <AssetImage folder="products" name={product.image} alt="" sizes="80px" />
                   </button>
                 ))}
               </div>
@@ -277,7 +287,7 @@ export function ProductView({ product, related }: { product: Product; related: P
                   variant="primary"
                   size="lg"
                   className="flex-1"
-                  onClick={() => add(product, { qty, color })}
+                  onClick={handleAdd}
                 >
                   {tCommon("addToCart")}
                 </Button>
@@ -555,7 +565,7 @@ export function ProductView({ product, related }: { product: Product; related: P
             variant="primary"
             size="lg"
             className="flex-1 px-4"
-            onClick={() => add(product, { qty, color })}
+            onClick={handleAdd}
           >
             {t("addWithPrice", { amount: formatPrice(unitPrice * qty) })}
           </Button>

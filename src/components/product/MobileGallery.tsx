@@ -28,6 +28,7 @@ export function MobileGallery({
 }) {
   const t = useTranslations("product");
   const tCommon = useTranslations("common");
+  const tA11y = useTranslations("a11y");
   const [index, setIndex] = useState(0);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +50,9 @@ export function MobileGallery({
       <div className="relative">
         <div
           ref={scrollerRef}
+          role="region"
+          aria-roledescription={tA11y("carousel")}
+          aria-label={alt}
           onScroll={onScroll}
           className="no-scrollbar flex aspect-square snap-x snap-mandatory overflow-x-auto rounded-2xl bg-surface-subtle"
         >

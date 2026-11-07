@@ -95,6 +95,7 @@ export function TrackOrderView() {
               spellCheck={false}
               placeholder={t("orderPlaceholder")}
               {...register("orderNumber")}
+              aria-required
               error={errorText(errors.orderNumber?.message)}
             />
             <FormField
@@ -104,6 +105,7 @@ export function TrackOrderView() {
               autoComplete="email"
               placeholder={t("emailPlaceholder")}
               {...register("email")}
+              aria-required
               error={errorText(errors.email?.message)}
             />
           </div>

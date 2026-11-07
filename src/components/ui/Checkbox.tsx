@@ -20,11 +20,13 @@ export function Checkbox({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange?.(e.target.checked)}
-        className="sr-only"
+        className="peer sr-only"
       />
+      {/* El input nativo está oculto: la casilla dibujada muestra su foco de teclado. */}
       <span
+        aria-hidden="true"
         className={cn(
-          "flex h-5 w-5 items-center justify-center rounded-[5px] border transition-colors",
+          "flex h-5 w-5 items-center justify-center rounded-[5px] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-2",
           checked ? "border-brand-800 bg-brand-800" : "border-border-strong bg-surface"
         )}
       >

@@ -109,7 +109,8 @@
       "email": "Correo electrónico",
       "phone": "Teléfono",
       "password": "Contraseña"
-    }
+    },
+    "skipToContent": "Saltar al contenido"
   },
   "validation": {
     "firstName": "Escribe tu nombre.",
@@ -172,7 +173,8 @@
     "wishlist": "Favoritos",
     "account": "Cuenta",
     "viewCart": "Ver carrito",
-    "myCart": "Mi carrito"
+    "myCart": "Mi carrito",
+    "mobileMenu": "Menú"
   },
   "megaMenu": {
     "shopByCategory": "Compra por categoría",
@@ -400,7 +402,9 @@
     "typeSomething": "Escribe algo para buscar",
     "hint": "Revisa la ortografía o prueba con términos más generales, como “auriculares” o “laptop”.",
     "placeholderProducts": "Busca productos…",
-    "searchProducts": "Buscar productos"
+    "searchProducts": "Buscar productos",
+    "label": "Buscar productos",
+    "suggestions": "Sugerencias"
   },
   "cart": {
     "emptyTitle": "Tu carrito está vacío",
@@ -548,7 +552,8 @@
     "guestTitle": "Tu cuenta",
     "guestSubtitle": "Inicia sesión para ver tus pedidos",
     "gold": "Gold",
-    "goldMember": "Miembro Gold"
+    "goldMember": "Miembro Gold",
+    "accountMenu": "Menú de la cuenta"
   },
   "orders": {
     "title": "Mis pedidos",
@@ -830,5 +835,12 @@
     "analyticsDescription": "Nos ayudan a entender cómo usas el sitio",
     "marketing": "Marketing",
     "marketingDescription": "Permiten mostrar anuncios relevantes"
+  },
+  "a11y": {
+    "addedToCart": "{name} agregado al carrito",
+    "removedFromCart": "{name} eliminado del carrito",
+    "quantityUpdated": "Cantidad actualizada a {count}",
+    "carousel": "carrusel",
+    "quantity": "Cantidad"
   }
 }

@@ -88,17 +88,19 @@ export function SearchBar({
   const showDropdown = open && term.length >= MIN_QUERY_LENGTH;
 
   return (
-    <div ref={wrapRef} className="relative flex-1">
+    <div ref={wrapRef} role="search" className="relative flex-1">
       <div
         className={cn(
           "flex items-center rounded-md border border-border bg-surface-subtle",
           variant === "desktop" ? "pl-4 pr-1" : "px-3.5"
         )}
       >
-        <Search className="h-[18px] w-[18px] shrink-0 text-text-muted" />
+        <Search className="h-[18px] w-[18px] shrink-0 text-text-muted" aria-hidden="true" />
+        {/* El placeholder no basta como etiqueta: desaparece al escribir. */}
         <input
           type="text"
           role="combobox"
+          aria-label={t("label")}
           aria-expanded={showDropdown}
           aria-controls={listId}
           aria-autocomplete="list"
@@ -144,6 +146,7 @@ export function SearchBar({
         <div
           id={listId}
           role="listbox"
+          aria-label={t("suggestions")}
           aria-busy={pending}
           className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-lg border border-border bg-surface shadow-elevation-lg"
         >

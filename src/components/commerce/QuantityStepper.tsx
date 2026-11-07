@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { announce } from "@/lib/announce";
 import { cn } from "@/lib/utils";
 
 export function QuantityStepper({
@@ -19,6 +20,7 @@ export function QuantityStepper({
   max?: number;
 }) {
   const t = useTranslations("common");
+  const tA11y = useTranslations("a11y");
   const [internal, setInternal] = useState(value ?? 1);
   const qty = value ?? internal;
 
@@ -26,12 +28,18 @@ export function QuantityStepper({
     const clamped = Math.min(max, Math.max(min, next));
     if (onChange) onChange(clamped);
     else setInternal(clamped);
+    // El número cambia sin mover el foco: se anuncia a los lectores de pantalla.
+    if (clamped !== qty) announce(tA11y("quantityUpdated", { count: clamped }));
   };
 
   const cell = size === "sm" ? "h-9 w-9" : "h-11 w-11";
 
   return (
-    <div className="inline-flex items-center overflow-hidden rounded-md border border-border-strong bg-surface">
+    <div
+      role="group"
+      aria-label={tA11y("quantity")}
+      className="inline-flex items-center overflow-hidden rounded-md border border-border-strong bg-surface"
+    >
       <button
         type="button"
         aria-label={t("decrease")}
@@ -41,7 +49,7 @@ export function QuantityStepper({
           cell
         )}
       >
-        <Minus className="h-4 w-4" />
+        <Minus className="h-4 w-4" aria-hidden="true" />
       </button>
       <span className={cn("flex items-center justify-center text-label-lg text-text-primary", cell)}>
         {qty}
@@ -55,7 +63,7 @@ export function QuantityStepper({
           cell
         )}
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
   );

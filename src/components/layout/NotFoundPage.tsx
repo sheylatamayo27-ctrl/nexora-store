@@ -9,6 +9,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { NotFoundSearch } from "@/components/search/NotFoundSearch";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { MAIN_CONTENT_ID } from "@/lib/a11y";
 import { getCategories } from "@/server";
 
 // Móvil/tablet (M10/T10): sin buscador bajo el header, "4" grandes pegados a un
@@ -28,7 +29,7 @@ export async function NotFoundPage({ locale }: { locale: Locale }) {
   return (
     <div className="flex min-h-screen flex-col bg-surface-subtle">
       <Header megaMenu={megaMenu} mobileSearch={false} />
-      <main className="flex-1">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1 focus:outline-none">
         <Container className="flex flex-col items-center gap-5 py-16 text-center sm:py-24 max-sm:pb-12 max-sm:pt-10 sm:max-lg:pb-[4.5rem] sm:max-lg:pt-[4.5rem]">
           <div className="flex items-center gap-3 sm:gap-4 max-lg:mb-2 max-sm:gap-1.5 sm:max-lg:gap-2">
             <span className={four}>4</span>

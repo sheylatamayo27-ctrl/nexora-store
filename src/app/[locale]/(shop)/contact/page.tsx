@@ -32,9 +32,9 @@ export default async function ContactPage({ params: { locale } }: { params: { lo
       <ContentPageBanner title={t("title")} subtitle={t("subtitle")} />
       <Container className="py-14 max-md:py-10">
         <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] items-start gap-8 max-lg:grid-cols-1 max-sm:gap-6">
-          <aside className={card}>
+          <aside aria-labelledby="contact-info-title" className={card}>
             <div className="flex flex-col gap-1">
-              <h2 className="text-h4 text-text-primary">{t("infoTitle")}</h2>
+              <h2 id="contact-info-title" className="text-h4 text-text-primary">{t("infoTitle")}</h2>
               <p className="text-body text-text-secondary">{t("infoDescription")}</p>
             </div>
 

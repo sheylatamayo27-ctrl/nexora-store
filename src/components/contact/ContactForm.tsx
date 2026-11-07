@@ -27,7 +27,11 @@ export function ContactForm() {
     formState: { errors, isSubmitting },
   } = useForm<ContactData>({ resolver: zodResolver(contactSchema), defaultValues: CONTACT_DEFAULTS, ...FORM_OPTIONS });
 
-  const field = (name: keyof ContactData) => ({ ...register(name), error: errorText(errors[name]?.message) });
+  const field = (name: keyof ContactData) => ({
+    ...register(name),
+    "aria-required": true,
+    error: errorText(errors[name]?.message),
+  });
   const length = watch("message").length;
 
   const onSubmit = async () => {

@@ -23,6 +23,7 @@ export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
     <>
       <div
         ref={scrollerRef}
+        role="region"
         aria-label={t("exploreMore")}
         className="flex snap-x gap-4 overflow-x-auto pb-2 no-scrollbar max-md:snap-mandatory max-md:overscroll-x-contain md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:pb-0 lg:grid-cols-3"
       >

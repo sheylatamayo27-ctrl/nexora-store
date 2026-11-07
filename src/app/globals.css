@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 @layer base {
+  /* Accesibilidad: foco visible y consistente al navegar con teclado (sustituye
+     al anillo del navegador). Solo aparece con :focus-visible, no al hacer clic
+     en botones o enlaces. Los componentes con su propio indicador
+     (focus-visible:outline-none + ring) lo conservan: las utilidades ganan. */
+  :focus-visible {
+    outline: 2px solid theme("colors.brand.700");
+    outline-offset: 2px;
+  }
+
   :root {
     --font-jost: "Jost", sans-serif;
 

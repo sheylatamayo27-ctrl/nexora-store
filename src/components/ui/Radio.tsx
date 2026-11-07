@@ -13,10 +13,12 @@ export function Radio({
 }) {
   return (
     <label className={cn("flex cursor-pointer items-center gap-3 select-none", className)}>
-      <input type="radio" checked={selected} onChange={() => onChange?.()} className="sr-only" />
+      <input type="radio" checked={selected} onChange={() => onChange?.()} className="peer sr-only" />
+      {/* El input nativo está oculto: el círculo dibujado muestra su foco de teclado. */}
       <span
+        aria-hidden="true"
         className={cn(
-          "flex h-5 w-5 items-center justify-center rounded-full border transition-colors",
+          "flex h-5 w-5 items-center justify-center rounded-full border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-2",
           selected ? "border-2 border-brand-800" : "border border-border-strong bg-surface"
         )}
       >

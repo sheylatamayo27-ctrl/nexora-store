@@ -80,6 +80,7 @@ function SignInForm() {
 
   const field = (name: keyof LoginData) => ({
     ...register(name),
+    "aria-required": true,
     defaultValue: SIGNIN_DEFAULTS[name],
     error: errorText(errors[name]?.message),
   });
@@ -137,6 +138,8 @@ function SignUpForm() {
 
   const field = (name: Exclude<keyof RegisterData, "acceptTerms">) => ({
     ...register(name),
+    // El teléfono es opcional; el resto, obligatorio.
+    "aria-required": name !== "phone",
     defaultValue: SIGNUP_DEFAULTS[name],
     error: errorText(errors[name]?.message),
   });

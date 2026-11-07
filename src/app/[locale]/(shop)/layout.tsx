@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { getMegaMenuData } from "@/components/layout/mega-menu-data";
 import { PageDots } from "@/components/ui/Dots";
 import type { Locale } from "@/i18n/routing";
+import { MAIN_CONTENT_ID } from "@/lib/a11y";
 
 export default async function ShopLayout({
   children,
@@ -19,7 +20,7 @@ export default async function ShopLayout({
   return (
     <div className="flex min-h-screen flex-col bg-surface-subtle">
       <Header megaMenu={megaMenu} />
-      <main className="flex-1">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1 focus:outline-none">
         <Suspense fallback={<PageDots />}>{children}</Suspense>
       </main>
       <Footer />

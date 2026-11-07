@@ -311,7 +311,7 @@ export function CategoryView({
 
       <Container className="flex gap-8 py-8">
         {/* Sidebar (escritorio) */}
-        <aside className="hidden w-72 shrink-0 lg:block">
+        <aside aria-label={t("filters")} className="hidden w-72 shrink-0 lg:block">
           <div className="sticky top-28 rounded-xl border border-border bg-surface p-6">
             <div className="mb-4 flex items-center justify-between">
               <span className="flex items-center gap-2 text-h4 text-text-primary">

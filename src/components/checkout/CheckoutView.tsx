@@ -39,6 +39,7 @@ import { DEFAULT_SHIPPING_METHOD, shippingCost, type ShippingMethod } from "@/li
 import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
 import { useCart } from "@/store/cart";
+import { MAIN_CONTENT_ID } from "@/lib/a11y";
 import { cn } from "@/lib/utils";
 
 type RadioCardProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "title"> & {
@@ -189,7 +190,12 @@ export function CheckoutView() {
   const shipping = watch("shippingMethod");
   const payment = watch("paymentMethod");
 
-  const field = (name: TextField) => ({ ...register(name), error: errorText(errors[name]?.message) });
+  // Todo es obligatorio salvo el departamento/interior.
+  const field = (name: TextField) => ({
+    ...register(name),
+    "aria-required": name !== "apartment",
+    error: errorText(errors[name]?.message),
+  });
 
   const onSubmit = async (data: CheckoutData) => {
     try {
@@ -303,7 +309,7 @@ export function CheckoutView() {
         )}
       </AnimatePresence>
 
-      <div className="container-page grid flex-1 gap-10 py-8 lg:grid-cols-[1.5fr_1fr]">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="container-page grid flex-1 gap-10 py-8 focus:outline-none lg:grid-cols-[1.5fr_1fr]">
         {/* Formularios */}
         <form noValidate onSubmit={handleSubmit(onSubmit, focusFirstError)} className="flex flex-col gap-5">
           <Section title={t("expressCheckout")}>
@@ -513,7 +519,7 @@ export function CheckoutView() {
         </form>
 
         {/* Resumen (escritorio) */}
-        <aside className="hidden lg:block">
+        <aside aria-label={tCommon("orderSummary")} className="hidden lg:block">
           <div className="sticky top-8 flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-h4 text-text-primary">{t("yourOrder", { count })}</h2>
@@ -540,7 +546,7 @@ export function CheckoutView() {
             <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} coupon={coupon} total={total} count={count} />
           </div>
         </aside>
-      </div>
+      </main>
 
       {/* Footer mínimo: móvil centrado (enlaces arriba); tablet enlaces a la
           izquierda y copyright a la derecha (T05); escritorio intacto. */}

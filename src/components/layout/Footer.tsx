@@ -85,7 +85,7 @@ export function Footer() {
           </div>
 
           {columns.map((col) => (
-            <FooterSection key={col.title} title={t(col.title)}>
+            <FooterSection key={col.title} title={t(col.title)} nav>
               {col.links.map((l) => (
                 <Link key={l.key} href={l.href} className="text-body text-white/65 transition-colors hover:text-white">
                   {t(l.key)}

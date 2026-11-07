@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, User, Menu, X, ChevronDown, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { SearchBar } from "@/components/layout/SearchBar";
 import { LanguageSelector } from "@/components/layout/LanguageSelector";
 import { MegaMenu, type MegaMenuData } from "@/components/layout/MegaMenu";
 import { primaryNav, secondaryNav } from "@/components/layout/nav-links";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useSignOut } from "@/hooks/useSignOut";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -22,6 +23,11 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
   const tCommon = useTranslations("common");
   const tAccount = useTranslations("account");
   const [menuOpen, setMenuOpen] = useState(false);
+  const drawerId = useId();
+  const drawerRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Menú lateral modal: foco dentro mientras está abierto, Esc lo cierra y el foco vuelve al botón.
+  useDialogFocus(menuOpen, drawerRef, () => setMenuOpen(false), closeButtonRef);
   // La sesión vive en localStorage: hasta hidratar se pinta como sin sesión (igual que el HTML del servidor).
   const hydrated = useHydrated();
   const storedUser = useAuth((s) => s.user);
@@ -54,9 +60,12 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
             type="button"
             className="lg:hidden"
             aria-label={t("openMenu")}
+            aria-expanded={menuOpen}
+            aria-controls={drawerId}
+            aria-haspopup="dialog"
             onClick={() => setMenuOpen(true)}
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-6 w-6" aria-hidden="true" />
           </button>
 
           <Logo className="shrink-0" />
@@ -131,8 +140,14 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
+              aria-hidden="true"
             />
             <motion.aside
+              ref={drawerRef}
+              id={drawerId}
+              role="dialog"
+              aria-modal="true"
+              aria-label={t("mobileMenu")}
               className="fixed inset-y-0 left-0 z-50 flex w-[82%] max-w-sm flex-col bg-surface lg:hidden"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
@@ -141,11 +156,16 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
             >
               <div className="flex items-center justify-between border-b border-border p-4">
                 <Logo />
-                <button aria-label={t("closeMenu")} onClick={() => setMenuOpen(false)}>
-                  <X className="h-6 w-6" />
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  aria-label={t("closeMenu")}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <X className="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-1 p-4">
+              <nav aria-label={t("mobileMenu")} className="flex flex-col gap-1 p-4">
                 {[
                   { label: tCommon("home"), href: "/" },
                   ...primaryNav.map((item) => ({ label: tNav(item.key), href: item.href })),

@@ -81,6 +81,7 @@ export function NewsletterForm() {
             autoComplete="email"
             placeholder={t("newsletterPlaceholder")}
             aria-label={t("newsletterPlaceholder")}
+            aria-required
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? "newsletter-email-error" : undefined}
             className="h-full flex-1 bg-transparent text-body text-text-primary placeholder:text-text-muted focus:outline-none"
