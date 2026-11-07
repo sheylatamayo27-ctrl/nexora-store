@@ -811,5 +811,24 @@
     "description": "We couldn’t display this page. Please try again in a few seconds.",
     "retry": "Try again",
     "goHome": "Back to home"
+  },
+  "cookies": {
+    "regionLabel": "Cookie consent",
+    "title": "We use cookies",
+    "description": "We use cookies to improve your experience, analyze site traffic and personalize content. You can manage your preferences or accept them all.",
+    "policy": "Cookie policy",
+    "rejectOptional": "Reject non-essential",
+    "manage": "Manage preferences",
+    "acceptAll": "Accept all",
+    "preferencesTitle": "Cookie preferences",
+    "preferencesDescription": "Choose which cookies you accept. You can change your mind by clearing this site's data in your browser.",
+    "savePreferences": "Save preferences",
+    "alwaysActive": "Always active",
+    "essential": "Essential",
+    "essentialDescription": "Required for the site's basic functionality",
+    "analytics": "Analytics",
+    "analyticsDescription": "Help us understand how you use the site",
+    "marketing": "Marketing",
+    "marketingDescription": "Allow us to show you relevant ads"
   }
 }

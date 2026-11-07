@@ -78,6 +78,14 @@ for (const route of routes) {
     const width = page.viewportSize()!.width;
     const isDesktop = width >= 1024;
 
+    // Elección de cookies ya hecha: el banner no debe tapar las capturas.
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "nexora-cookie-consent",
+        JSON.stringify({ analytics: false, marketing: false, timestamp: "2026-01-01T00:00:00.000Z" }),
+      );
+    });
+
     if (route.session) {
       await page.addInitScript(() => {
         const user = { name: "Sheyla Tamayo", email: "sheyla@nexora.store" };

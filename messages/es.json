@@ -811,5 +811,24 @@
     "description": "No pudimos mostrar esta página. Inténtalo de nuevo en unos segundos.",
     "retry": "Intentar de nuevo",
     "goHome": "Volver al inicio"
+  },
+  "cookies": {
+    "regionLabel": "Consentimiento de cookies",
+    "title": "Usamos cookies",
+    "description": "Utilizamos cookies para mejorar tu experiencia, analizar el tráfico del sitio y personalizar el contenido. Puedes gestionar tus preferencias o aceptar todas.",
+    "policy": "Política de cookies",
+    "rejectOptional": "Rechazar no esenciales",
+    "manage": "Gestionar preferencias",
+    "acceptAll": "Aceptar todas",
+    "preferencesTitle": "Preferencias de cookies",
+    "preferencesDescription": "Elige qué cookies aceptas. Puedes cambiar de opinión borrando los datos del sitio en tu navegador.",
+    "savePreferences": "Guardar preferencias",
+    "alwaysActive": "Siempre activas",
+    "essential": "Esenciales",
+    "essentialDescription": "Necesarias para el funcionamiento básico del sitio",
+    "analytics": "Analíticas",
+    "analyticsDescription": "Nos ayudan a entender cómo usas el sitio",
+    "marketing": "Marketing",
+    "marketingDescription": "Permiten mostrar anuncios relevantes"
   }
 }

@@ -3,6 +3,7 @@ import { Html } from "./html";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/layout/Toaster";
 import { BackToTop } from "@/components/layout/BackToTop";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import { StoreLocaleSync } from "@/components/layout/StoreLocaleSync";
 import type { Locale } from "@/i18n/routing";
 
@@ -22,6 +23,7 @@ export function AppDocument({ locale, children }: { locale: Locale; children: Re
           </Providers>
           <BackToTop />
           <Toaster />
+          <CookieConsent />
         </NextIntlClientProvider>
       </body>
     </Html>
