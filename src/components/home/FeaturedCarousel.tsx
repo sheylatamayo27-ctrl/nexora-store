@@ -44,15 +44,15 @@ export function FeaturedCarousel({ products }: { products: Product[] }) {
         ))}
       </div>
 
-      {/* Franja del alto de una tarjeta cuadrada: las flechas quedan a media
-          imagen, lejos de los botones de carrito y favorito. */}
+      {/* Flechas centradas en el alto de la tarjeta: la franja es todo el carrusel
+          menos los 8px que el scroller deja de más bajo las tarjetas (pt-4 + pb-6 − 2×my-4). */}
       {count > 1 && (
         <CarouselArrows
           onPrev={() => goTo(active - 1)}
           onNext={() => goTo(active + 1)}
           canPrev={active > 0}
           canNext={active < count - 1}
-          className="bottom-auto h-[calc((100cqw-4rem)/5)]"
+          className="bottom-2"
         />
       )}
 
