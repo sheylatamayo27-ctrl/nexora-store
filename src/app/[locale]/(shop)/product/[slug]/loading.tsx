@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { BreadcrumbSkeleton, CardSkeletons, SectionHeaderSkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Producto: galería e información, pestañas y relacionados. */
 export default function LoadingProduct() {
   return (
     <SkeletonRegion className="flex flex-col">
@@ -10,7 +9,6 @@ export default function LoadingProduct() {
         <Container className="flex flex-col gap-6 py-6 max-lg:gap-4 max-lg:pt-4">
           <BreadcrumbSkeleton />
           <div className="grid grid-cols-2 gap-12 max-lg:grid-cols-1 max-lg:gap-10">
-            {/* Galería: miniaturas a la izquierda en escritorio, debajo en móvil/tablet. */}
             <div className="flex gap-4 self-start max-lg:flex-col-reverse max-lg:self-auto">
               <div className="flex shrink-0 flex-col gap-3 max-lg:flex-row">
                 {[0, 1, 2, 3].map((i) => (
@@ -61,7 +59,6 @@ export default function LoadingProduct() {
         </Container>
       </div>
 
-      {/* Pestañas de descripción (ocultas en móvil, como en la página). */}
       <Container className="flex flex-col gap-6 py-14 max-md:hidden">
         <div className="flex gap-8 border-b border-border pb-4">
           {[0, 1, 2, 3].map((i) => (

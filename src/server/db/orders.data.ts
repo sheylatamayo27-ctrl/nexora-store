@@ -35,7 +35,6 @@ export interface Order {
 
 export type OrderStatKey = "statTotal" | "statInTransit" | "statDelivered" | "statWishlist";
 
-/** Cifras del resumen de /account. `key`: su etiqueta en "orders". */
 export const orderStats: { key: OrderStatKey; value: string }[] = [
   { key: "statTotal", value: "12" },
   { key: "statInTransit", value: "2" },

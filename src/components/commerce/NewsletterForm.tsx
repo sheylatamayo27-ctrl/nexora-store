@@ -18,7 +18,6 @@ import { subscribeNewsletter } from "@/services/newsletter";
 const newsletterSchema = z.object({ email });
 type NewsletterData = z.infer<typeof newsletterSchema>;
 
-/** Cuánto dura el "¡Suscrito!" del botón tras un envío correcto. */
 const SUBSCRIBED_MS = 2000;
 
 /**
@@ -88,7 +87,6 @@ export function NewsletterForm() {
             {...register("email")}
           />
         </div>
-        {/* Rojo claro: el rojo de error no contrasta sobre el degradado azul. */}
         {error && (
           <FieldError
             id="newsletter-email-error"

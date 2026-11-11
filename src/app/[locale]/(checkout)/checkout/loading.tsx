@@ -1,14 +1,12 @@
 import { Skeleton } from "@/components/ui/Skeleton";
 import { OrderSummarySkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Columnas de cada fila del formulario, como en `CheckoutView` (en móvil, una menos). */
 const rowCols: Record<number, string> = {
   1: "grid-cols-1",
   2: "grid-cols-2 max-md:grid-cols-1",
   3: "grid-cols-3 max-md:grid-cols-2",
 };
 
-/** Un bloque del formulario de pago: título y filas de 1, 2 o 3 campos. */
 function FormSectionSkeleton({ rows }: { rows: (1 | 2 | 3)[] }) {
   return (
     <div className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-6 max-sm:p-5">
@@ -27,7 +25,6 @@ function FormSectionSkeleton({ rows }: { rows: (1 | 2 | 3)[] }) {
   );
 }
 
-/** Pago: cabecera con los pasos, formulario y resumen del pedido (escritorio). */
 export default function LoadingCheckout() {
   return (
     <SkeletonRegion className="flex min-h-screen flex-col">
@@ -56,7 +53,6 @@ export default function LoadingCheckout() {
           </div>
         </div>
       </div>
-      {/* "Ver resumen del pedido": la barra desplegable que sustituye al resumen lateral. */}
       <div className="hidden items-center justify-between gap-3 border-b border-border bg-brand-100 px-4 py-4 max-lg:flex">
         <Skeleton variant="text" className="w-52" />
         <Skeleton variant="text" className="w-20" />

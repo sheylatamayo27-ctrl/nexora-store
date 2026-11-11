@@ -20,12 +20,6 @@ import type { Product } from "@/data/types";
 
 const MAX_QTY = 10;
 
-/**
- * Vista rápida de un producto (la abre "Vista rápida" de `ProductCard`).
- * Radix Dialog aporta el foco atrapado y devuelto, Esc, clic fuera y el bloqueo
- * de scroll; framer-motion, la entrada/salida (fade + escala; solo fade con
- * movimiento reducido). El color elegido solo marca el círculo y viaja al carrito.
- */
 export function QuickView({
   product,
   open,
@@ -40,19 +34,16 @@ export function QuickView({
   const reduceMotion = useReducedMotion();
   const add = useCart((s) => s.add);
   const toggleFavorite = useFavorites((s) => s.toggle);
-  // Se monta tras un clic (ya hidratado), así que puede leer favoritos sin esperar.
   const wished = useFavorites((s) => s.items.some((p) => p.id === product.id));
   const [qty, setQty] = useState(1);
   const [color, setColor] = useState(product.colors?.[0]?.name);
 
-  // Cada apertura empieza de cero (cantidad 1, primer color).
   useEffect(() => {
     if (!open) return;
     setQty(1);
     setColor(product.colors?.[0]?.name);
   }, [open, product]);
 
-  // Cualquier cambio de ruta (enlace, atrás) cierra el modal.
   const pathname = usePathname();
   const lastPath = useRef(pathname);
   useEffect(() => {
@@ -61,8 +52,6 @@ export function QuickView({
     onOpenChange(false);
   }, [pathname, onOpenChange]);
 
-  // Radix solo devuelve el foco a un <Dialog.Trigger>; el modal se abre desde el
-  // botón de la tarjeta, así que se recuerda el elemento enfocado al abrir (como en `Modal`).
   const returnFocus = useRef<HTMLElement | null>(null);
 
   const handleAdd = () => {
@@ -88,7 +77,6 @@ export function QuickView({
                 transition={{ duration: 0.2 }}
               />
             </Dialog.Overlay>
-            {/* El centrado va en un contenedor propio: framer-motion escribe el transform del contenido. */}
             <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 max-sm:p-3">
               <Dialog.Content
                 asChild
@@ -116,7 +104,6 @@ export function QuickView({
                   </Dialog.Close>
 
                   <div className="grid grid-cols-2 gap-6 p-6 max-sm:grid-cols-1 max-sm:gap-4 max-sm:p-4">
-                    {/* Imagen */}
                     <div className="relative aspect-square overflow-hidden rounded-xl bg-surface-subtle">
                       <AssetImage
                         folder="products"
@@ -131,7 +118,6 @@ export function QuickView({
                       )}
                     </div>
 
-                    {/* Info */}
                     <div className="flex min-w-0 flex-col gap-3">
                       <span className="text-label-sm uppercase tracking-wide text-text-muted">{product.vendor}</span>
                       <Dialog.Title className="pr-8 text-h3 text-text-primary max-sm:pr-0">{product.name}</Dialog.Title>

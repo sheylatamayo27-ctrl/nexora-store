@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  /* Accesibilidad: foco visible y consistente al navegar con teclado (sustituye
-     al anillo del navegador). Solo aparece con :focus-visible, no al hacer clic
-     en botones o enlaces. Los componentes con su propio indicador
-     (focus-visible:outline-none + ring) lo conservan: las utilidades ganan. */
   :focus-visible {
     outline: 2px solid theme("colors.brand.700");
     outline-offset: 2px;
@@ -15,9 +11,6 @@
   :root {
     --font-jost: "Jost", sans-serif;
 
-    /* Elementos flotantes en móvil/tablet: el botón "Volver arriba" y, encima de
-       él, los avisos. Ambos se apilan sobre la barra fija de compra/pago
-       ([data-fixed-bar], 81px + área segura) cuando la página la tiene. */
     --fixed-bar-h: 0px;
     --fab-bottom: calc(16px + var(--fixed-bar-h) + env(safe-area-inset-bottom));
     --toast-bottom: var(--fab-bottom);
@@ -29,13 +22,10 @@
     }
   }
 
-  /* Con el botón visible (48px + 12px de separación), los avisos suben. */
   :root:has([data-back-to-top][data-visible="true"]) {
     --toast-bottom: calc(var(--fab-bottom) + 60px);
   }
 
-  /* Avisos en móvil/tablet: entran desde abajo con un deslizamiento corto
-     (el fundido lo pone sonner) y acompañan al botón si aparece o desaparece. */
   @media (max-width: 1023.98px) {
     [data-sonner-toaster][data-y-position="bottom"] {
       transition: transform 400ms ease, bottom 300ms ease-out;
@@ -45,10 +35,6 @@
     }
   }
 
-  /* Ancho fijo de los avisos propios (toast.custom + unstyled): sonner solo se
-     lo da a los suyos, así que los nuestros crecían con el nombre del producto
-     y se salían por la derecha sin llegar a recortarlo con "…". Hasta 600px
-     sonner ya los ajusta al ancho de la pantalla. */
   @media (min-width: 601px) {
     [data-sonner-toast][data-styled="false"] {
       width: var(--width);
@@ -73,7 +59,6 @@
     @apply bg-brand-500/20 text-brand-900;
   }
 
-  /* Scrollbars horizontales de carruseles: ocultas pero funcionales */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -84,12 +69,10 @@
 }
 
 @layer components {
-  /* Contenedor central de página a 1440px con gutters responsivos */
   .container-page {
     @apply mx-auto w-full max-w-page px-4 sm:px-6 lg:px-16;
   }
 
-  /* Enlace de texto con subrayado sutil */
   .link-underline {
     @apply underline decoration-from-font underline-offset-2;
   }
@@ -101,8 +84,6 @@
   }
 }
 
-/* Slider de rango doble: el input es transparente y sin eventos; solo el
-   thumb captura el puntero, para que dos sliders superpuestos no se bloqueen. */
 .range-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -136,10 +117,6 @@
   outline-offset: 2px;
 }
 
-/* ── Modal (Radix Dialog) ────────────────────────────────────────────────
-   Animaciones por data-state: Radix espera al animationend para desmontar.
-   El fondo solo anima la opacidad; el contenido es una hoja inferior en
-   móvil y un fade + 8px + escala 0.98→1 desde sm. */
 @keyframes modal-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }

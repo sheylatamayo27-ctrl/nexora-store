@@ -14,15 +14,10 @@ const perks = ["warranty", "freeDelivery", "rating"] as const;
 
 const AUTO_ROTATE_MS = 6000;
 
-/** Variante por dispositivo (`hero-mobile`, `hero-tablet`) si existe; si no, la imagen base. */
 function variant(name: string, device: "mobile" | "tablet") {
   return REAL_IMAGES[`misc/${name}-${device}`] ? `${name}-${device}` : name;
 }
 
-/**
- * Imagen del hero por dispositivo con <picture>: cada pantalla descarga UNA sola
- * imagen (escritorio ≥1024: la original; tablet 768–1023; móvil como fallback).
- */
 function HeroImage({ name, alt }: { name: string; alt: string }) {
   const common = { alt, fill: true, sizes: "100vw" };
   const desktop = getImageProps({ ...common, src: assetSrc("misc", name) }).props.srcSet;
@@ -64,8 +59,6 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
   return (
     <section className="relative overflow-hidden bg-brand-900">
       <HeroImage key={slide.image} name={slide.image} alt={slide.title} />
-      {/* En móvil el degradado es vertical (oscuro abajo) para dejar ver la
-          foto arriba; en escritorio es horizontal (oscuro a la izquierda). */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#061234]/95 via-[#061234]/40 to-[#061234]/5 lg:bg-gradient-to-r lg:from-[#061234]/95 lg:via-[#061234]/40 lg:to-transparent" />
 
       <div className="container-page relative flex min-h-[520px] items-end py-10 sm:min-h-[540px] sm:py-14 lg:min-h-[580px] lg:items-center lg:py-16">

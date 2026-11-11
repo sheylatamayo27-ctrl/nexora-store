@@ -10,12 +10,6 @@ const variants: Record<Variant, string> = {
   button: "h-11 rounded-md",
 };
 
-/**
- * Bloque gris con un brillo que lo recorre de izquierda a derecha (keyframe
- * `shimmer`): imita un contenido mientras carga. `width` es una clase de ancho de
- * Tailwind (`w-full`, `w-32`…); cualquier otra medida va en `className`.
- * Es decorativo (`aria-hidden`): el aviso "Cargando" lo da `SkeletonRegion`.
- */
 export function Skeleton({
   variant,
   width,

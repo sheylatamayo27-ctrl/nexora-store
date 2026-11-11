@@ -1,11 +1,6 @@
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/**
- * Barra de progreso de stock para ofertas. Muestra el porcentaje vendido con
- * un degradado de marca y, opcionalmente, el texto "Vendidos: x / y".
- * Reutilizable en la home (Oferta del día) y en /offers.
- */
 export function StockBar({
   current,
   total,

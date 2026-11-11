@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { PageHeaderSkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Una tarjeta de artículo (`BlogCard`): imagen 16:10, meta, título, extracto y autor. */
 function PostCardSkeleton() {
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface">
@@ -21,7 +20,6 @@ function PostCardSkeleton() {
   );
 }
 
-/** Blog: cabecera, artículo destacado y cuadrícula de artículos. */
 export default function LoadingBlog() {
   return (
     <SkeletonRegion className="flex flex-col">

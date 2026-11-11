@@ -6,12 +6,6 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Html } from "./html";
 
-/*
- * Último recurso: un error en el layout raíz o en el de idioma reemplaza todo el
- * documento, así que esta pantalla trae su propio <html>/<body> y su CSS. Tampoco
- * puede usar next-intl (su proveedor vive en el layout que falló): los textos van
- * aquí en los dos idiomas y el idioma sale de la URL (/en/… → inglés).
- */
 const copy = {
   es: {
     title: "Algo salió mal",
@@ -29,10 +23,6 @@ const copy = {
   },
 };
 
-/**
- * "Intentar de nuevo" recarga la página en vez de llamar a `reset()`: en Next 14,
- * `reset()` aquí vuelve a montar la app sin el estado del router y falla otra vez.
- */
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   const [lang, setLang] = useState<keyof typeof copy>("es");
   const t = copy[lang];
@@ -66,7 +56,6 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
               <Button onClick={() => window.location.reload()} fullWidth>
                 {t.retry}
               </Button>
-              {/* Enlace normal (recarga completa): el router y el idioma pueden ser lo que falló. */}
               <a
                 href={t.home}
                 className="inline-flex h-11 w-full items-center justify-center rounded-md border border-border-strong px-5 text-label text-text-primary transition-colors hover:bg-surface-subtle"

@@ -13,10 +13,6 @@ const icons: Record<ContentIcon, LucideIcon> = {
   trust: ShieldCheck,
 };
 
-/**
- * Cuerpo de una página de contenido. Con `wide`, el texto corrido sigue en el
- * ancho de lectura (max-w-3xl) y las grillas (tarjetas, cifras) usan todo el ancho.
- */
 export function ContentBlocks({ blocks, wide = false }: { blocks: ContentBlock[]; wide?: boolean }) {
   const prose = wide ? "max-w-3xl" : undefined;
   return (
@@ -111,14 +107,12 @@ function Block({ block, prose }: { block: ContentBlock; prose?: string }) {
   }
 }
 
-// `title`: clave del namespace "checkout" (mismos nombres que al pagar); `time`: de "contentPage".
 const rateRows: { id: ShippingMethod; title: "standardShipping" | "expressShipping" | "sameDay"; time: "standardTime" | "expressTime" | "sameDayTime" }[] = [
   { id: "standard", title: "standardShipping", time: "standardTime" },
   { id: "express", title: "expressShipping", time: "expressTime" },
   { id: "sameday", title: "sameDay", time: "sameDayTime" },
 ];
 
-/** Tabla de métodos de envío con las tarifas y el umbral del exprés gratis de `src/lib/shipping.ts`. */
 function ShippingRates({ className }: { className?: string }) {
   const t = useTranslations("contentPage");
   const tCheckout = useTranslations("checkout");

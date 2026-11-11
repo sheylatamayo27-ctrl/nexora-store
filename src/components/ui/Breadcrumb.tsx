@@ -8,7 +8,6 @@ export interface Crumb {
   href?: string;
 }
 
-/** `tone="inverse"`: en blanco, para banners oscuros (páginas de contenido). */
 export function Breadcrumb({
   items,
   tone = "default",

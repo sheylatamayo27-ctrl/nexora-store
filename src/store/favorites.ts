@@ -17,14 +17,11 @@ import type { Locale } from "@/i18n/routing";
  */
 interface FavoritesState {
   items: Product[];
-  /** Idioma de las copias guardadas (ver `StoreLocaleSync`). */
   locale?: Locale;
-  /** Alterna el favorito y devuelve `true` si quedó agregado. */
   toggle: (product: Product) => boolean;
   has: (id: string) => boolean;
   remove: (id: string) => void;
   clear: () => void;
-  /** Sustituye las copias por `products` (mismo id, otro idioma). */
   relocalize: (products: Product[], locale: Locale) => void;
 }
 
@@ -52,7 +49,6 @@ export const useFavorites = create<FavoritesState>()(
     }),
     {
       name: "nexora-favorites",
-      // v1: precios en USD (ver el mismo cambio en src/store/cart.ts).
       version: 1,
       migrate: (persisted) => ({ ...(persisted as FavoritesState), locale: undefined }),
     }

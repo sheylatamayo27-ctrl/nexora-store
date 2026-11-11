@@ -14,7 +14,6 @@ import { Reveal } from "@/lib/motion";
 import { discountPercent } from "@/lib/format";
 import type { Product } from "@/data/types";
 
-/** `label`: texto en "common.sort". */
 const sortOptions = [
   { id: "discount", label: "discount" },
   { id: "price-asc", label: "priceAsc" },
@@ -51,7 +50,6 @@ export function OffersView({
 
   return (
     <div className="flex flex-col">
-      {/* Hero de ofertas */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-500">
         <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-accent-500/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-sale-500/20 blur-3xl" />
@@ -90,7 +88,6 @@ export function OffersView({
         </Container>
       </section>
 
-      {/* Ofertas relámpago (con barra de stock) */}
       {flashDeals.length > 0 && (
         <section className="py-12 sm:py-16">
           <Container className="flex flex-col gap-6">
@@ -131,7 +128,6 @@ export function OffersView({
         </section>
       )}
 
-      {/* Todas las ofertas */}
       <section className="border-t border-border bg-surface py-12 sm:py-16">
         <Container className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center justify-between gap-3">

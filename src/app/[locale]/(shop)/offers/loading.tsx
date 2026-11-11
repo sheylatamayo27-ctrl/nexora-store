@@ -3,7 +3,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { CardSkeletons, SectionHeaderSkeleton, SkeletonRegion, onDark } from "@/components/skeletons/blocks";
 import { cn } from "@/lib/utils";
 
-/** Ofertas: hero con cuenta atrás, ofertas relámpago y cuadrícula de productos rebajados. */
 export default function LoadingOffers() {
   return (
     <SkeletonRegion className="flex flex-col">

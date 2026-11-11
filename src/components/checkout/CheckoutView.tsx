@@ -51,10 +51,6 @@ type RadioCardProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" |
   priceHighlight?: boolean;
 };
 
-/**
- * Opción de una lista (envío, pago): tarjeta con un radio nativo oculto, así se
- * registra con `register()` y se elige con teclado (flechas) como cualquier radio.
- */
 const RadioCard = forwardRef<HTMLInputElement, RadioCardProps>(function RadioCard(
   { selected, icon: Icon, title, desc, price, priceHighlight, ...props },
   ref
@@ -75,7 +71,6 @@ const RadioCard = forwardRef<HTMLInputElement, RadioCardProps>(function RadioCar
       >
         {selected && <span className="h-2.5 w-2.5 rounded-full bg-brand-800" />}
       </span>
-      {/* Ícono en cuadro: visible en tablet/escritorio (≥md); oculto en móvil (M05). */}
       <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface md:flex">
         <Icon className="h-5 w-5 text-brand-800" />
       </span>
@@ -87,7 +82,6 @@ const RadioCard = forwardRef<HTMLInputElement, RadioCardProps>(function RadioCar
         <span
           className={cn(
             "shrink-0 text-label",
-            // "Gratis" en verde en móvil/tablet (M05/T05); escritorio intacto.
             priceHighlight ? "text-text-primary max-lg:text-success-500" : "text-text-primary"
           )}
         >
@@ -110,7 +104,6 @@ function Section({ title, children, right }: { title: string; children: React.Re
   );
 }
 
-// `title` y `desc`: claves del namespace "checkout". El precio sale de `shippingCost` (src/lib/shipping.ts).
 const shippingOptions = [
   { id: "standard", icon: Truck, title: "standardShipping", desc: "standardShippingDesc" },
   { id: "express", icon: Zap, title: "expressShipping", desc: "expressShippingDesc" },
@@ -124,7 +117,6 @@ const paymentOptions = [
   { id: "cod", icon: Package, title: "cashOnDelivery", desc: "cashOnDeliveryDesc" },
 ] as const;
 
-// `label`: claves del namespace "checkout".
 const footerLinks = [
   { href: "/returns", label: "refunds" },
   { href: "/shipping", label: "shippingLink" },
@@ -132,7 +124,6 @@ const footerLinks = [
   { href: "/terms", label: "termsLink" },
 ] as const;
 
-/** El formulario arranca vacío; solo vienen elegidos el envío exprés y el pago con tarjeta. */
 const CHECKOUT_DEFAULTS: CheckoutData = {
   email: "",
   newsletter: true,
@@ -153,7 +144,6 @@ const CHECKOUT_DEFAULTS: CheckoutData = {
   cardName: "",
 };
 
-/** Campos que se registran con `field()` (inputs y selects). */
 type TextField = Exclude<keyof CheckoutData, "newsletter" | "shippingMethod" | "paymentMethod">;
 
 /**
@@ -183,14 +173,12 @@ export function CheckoutView() {
   } = useForm<CheckoutData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: CHECKOUT_DEFAULTS,
-    // El foco al primer error lo lleva `focusFirstError` (centrado en pantalla).
     shouldFocusError: false,
     ...FORM_OPTIONS,
   });
   const shipping = watch("shippingMethod");
   const payment = watch("paymentMethod");
 
-  // Todo es obligatorio salvo el departamento/interior.
   const field = (name: TextField) => ({
     ...register(name),
     "aria-required": name !== "apartment",
@@ -200,7 +188,6 @@ export function CheckoutView() {
   const onSubmit = async (data: CheckoutData) => {
     try {
       await placeOrder(data);
-      // La confirmación del pedido muestra el método y el costo que se pagaron.
       setShippingMethod(data.shippingMethod);
       notifyToast({ icon: CheckCircle2, title: t("paymentSuccess"), description: t("paymentSuccessDescription") });
       startNavigation(() => router.push("/order-confirmation"));
@@ -215,7 +202,6 @@ export function CheckoutView() {
   };
 
   const subtotal = mounted ? items.reduce((s, i) => s + i.product.price * i.qty, 0) : 0;
-  // Antes de montar (HTML del servidor) no hay carrito ni cupón: se calcula como en el servidor.
   const activeCoupon = mounted ? coupon : undefined;
   const shippingFor = (method: ShippingMethod) => shippingCost(method, subtotal, activeCoupon);
   const shipCost = shippingFor(shipping);
@@ -226,7 +212,6 @@ export function CheckoutView() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header minimal */}
       <header className="border-b border-border bg-surface">
         <div className="container-page flex items-center justify-between py-3.5">
           <Logo />
@@ -239,10 +224,8 @@ export function CheckoutView() {
         </div>
       </header>
 
-      {/* Progreso (<lg): móvil con segmentos (M05), tablet con pasos (T05) */}
       <div className="border-b border-border bg-surface py-4 lg:hidden">
         <div className="container-page">
-          {/* Móvil (<md): "Paso 2 de 4" + barra de 4 segmentos */}
           <div className="md:hidden">
             <div className="flex items-center justify-between gap-3">
               <span className="text-label text-text-primary">{t("stepProgress")}</span>
@@ -257,14 +240,12 @@ export function CheckoutView() {
               ))}
             </div>
           </div>
-          {/* Tablet (md–lg): pasos con círculo + nombre unidos por líneas */}
           <div className="hidden md:block">
             <CheckoutSteps current={1} />
           </div>
         </div>
       </div>
 
-      {/* Resumen colapsable (móvil/tablet) — barra azul claro + panel animado */}
       <button
         onClick={() => setSummaryOpen((o) => !o)}
         aria-expanded={summaryOpen}
@@ -310,10 +291,8 @@ export function CheckoutView() {
       </AnimatePresence>
 
       <main id={MAIN_CONTENT_ID} tabIndex={-1} className="container-page grid flex-1 gap-10 py-8 focus:outline-none lg:grid-cols-[1.5fr_1fr]">
-        {/* Formularios */}
         <form noValidate onSubmit={handleSubmit(onSubmit, focusFirstError)} className="flex flex-col gap-5">
           <Section title={t("expressCheckout")}>
-            {/* Móvil (<md): 2 botones (UPI, PayPal). Tablet/escritorio (≥md): 3. */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {[
                 { l: "UPI", c: "bg-brand-800 text-white" },
@@ -362,7 +341,6 @@ export function CheckoutView() {
           </Section>
 
           <Section title={t("shippingAddress")}>
-            {/* <md: una columna (salvo Estado + CP). ≥md: grilla tipo T05. */}
             <div className="grid gap-4 md:grid-cols-2">
               <FormField label={tCommon("fields.firstName")} autoComplete="given-name" {...field("firstName")} />
               <FormField label={tCommon("fields.lastName")} autoComplete="family-name" {...field("lastName")} />
@@ -375,7 +353,6 @@ export function CheckoutView() {
               {...field("apartment")}
             />
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {/* Ciudad a ancho completo en móvil; Estado + CP lado a lado. */}
               <FormField
                 label={t("city")}
                 autoComplete="address-level2"
@@ -502,7 +479,6 @@ export function CheckoutView() {
             <Checkbox checked onChange={() => {}} label={t("billingSame")} />
           </Section>
 
-          {/* Resumen del pedido a ancho completo — solo tablet (T05), antes de pagar. */}
           <div className="hidden flex-col gap-4 rounded-xl border border-border bg-surface p-6 md:flex lg:hidden">
             <h2 className="text-h4 text-text-primary">{tCommon("orderSummary")}</h2>
             <SummaryRows subtotal={subtotal} shipCost={shipCost} tax={tax} discount={discount} coupon={coupon} total={total} count={count} />
@@ -518,7 +494,6 @@ export function CheckoutView() {
           <p className="text-center text-body-sm text-text-muted">{t("terms")}</p>
         </form>
 
-        {/* Resumen (escritorio) */}
         <aside aria-label={tCommon("orderSummary")} className="hidden lg:block">
           <div className="sticky top-8 flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
             <div className="flex items-center justify-between">
@@ -548,8 +523,6 @@ export function CheckoutView() {
         </aside>
       </main>
 
-      {/* Footer mínimo: móvil centrado (enlaces arriba); tablet enlaces a la
-          izquierda y copyright a la derecha (T05); escritorio intacto. */}
       <footer className="border-t border-border bg-surface py-5">
         <div className="container-page flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
           <p className="order-2 text-body-sm text-text-muted lg:order-1">{t("copyright")}</p>

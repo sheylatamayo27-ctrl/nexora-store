@@ -19,7 +19,6 @@ export function badRequest(message: string) {
   return json<ApiError>({ error: message }, 400);
 }
 
-/** Parámetro inválido: `handle()` lo convierte en un 400. */
 export class BadRequestError extends Error {}
 
 interface IntRange {
@@ -28,7 +27,6 @@ interface IntRange {
   max: number;
 }
 
-/** Entero seguro: vacío o no numérico → `fallback` (nunca NaN); se recorta a [min, max]. */
 export function toInt(raw: string | null | undefined, { fallback, min, max }: IntRange): number {
   if (raw == null || raw.trim() === "") return fallback;
   const n = Number(raw);
@@ -40,7 +38,6 @@ export function intParam(params: URLSearchParams, name: string, range: IntRange)
   return toInt(params.get(name), range);
 }
 
-/** Número opcional: vacío o no numérico → undefined; se recorta a [min, max]. */
 export function numberParam(
   params: URLSearchParams,
   name: string,
@@ -53,7 +50,6 @@ export function numberParam(
   return Math.min(max, Math.max(min, n));
 }
 
-/** Lista separada por comas (o parámetro repetido); sin valores → undefined. */
 export function listParam(params: URLSearchParams, name: string): string[] | undefined {
   const values = params
     .getAll(name)
@@ -63,12 +59,10 @@ export function listParam(params: URLSearchParams, name: string): string[] | und
   return values.length ? values : undefined;
 }
 
-/** Texto recortado; vacío → undefined. */
 export function textParam(params: URLSearchParams, name: string): string | undefined {
   return params.get(name)?.trim() || undefined;
 }
 
-/** `true`/`1` o `false`/`0`; ausente → false. Cualquier otro valor es un 400. */
 export function flagParam(params: URLSearchParams, name: string): boolean {
   const raw = params.get(name);
   if (raw === null || raw === "" || raw === "false" || raw === "0") return false;
@@ -76,7 +70,6 @@ export function flagParam(params: URLSearchParams, name: string): boolean {
   throw new BadRequestError(`El parámetro "${name}" debe ser true o false.`);
 }
 
-/** Uno de los valores permitidos; ausente → `fallback`. Cualquier otro valor es un 400. */
 export function enumParam<T extends string>(
   params: URLSearchParams,
   name: string,
@@ -90,7 +83,6 @@ export function enumParam<T extends string>(
   throw new BadRequestError(`El parámetro "${name}" debe ser uno de: ${allowed.join(", ")}.`);
 }
 
-/** Idioma de los textos de la respuesta (`?locale=es|en`); ausente → el idioma por defecto. */
 export function localeParam(params: URLSearchParams): Locale {
   return enumParam(params, "locale", routing.locales, routing.defaultLocale);
 }

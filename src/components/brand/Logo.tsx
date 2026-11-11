@@ -2,10 +2,6 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-/**
- * Logotipo de Nexora: marca con "N" sobre caja degradada y una chispa amarilla,
- * acompañada del wordmark. Tono claro para fondos oscuros, oscuro para claros.
- */
 export function Logo({
   tone = "dark",
   className,

@@ -9,14 +9,12 @@ const messages = [
   { icon: RotateCcw, key: "returns" },
 ] as const;
 
-/** Texto de un mensaje; el de envío lleva el umbral de la regla de envío. */
 function useMessageText() {
   const t = useTranslations("announcement");
   return (key: (typeof messages)[number]["key"]) =>
     key === "freeShipping" ? t(key, { amount: formatPriceShort(FREE_EXPRESS_THRESHOLD) }) : t(key);
 }
 
-/** Un grupo con los tres mensajes (se repite para el desplazamiento continuo). */
 function MessageGroup({ ariaHidden = false }: { ariaHidden?: boolean }) {
   const text = useMessageText();
   return (
@@ -35,7 +33,6 @@ export function AnnouncementBar() {
   const text = useMessageText();
   return (
     <div className="bg-brand-900 text-text-inverse">
-      {/* Móvil y tablet: franja en desplazamiento continuo (marquee). */}
       <div className="overflow-hidden py-2 lg:hidden">
         <div className="flex w-max animate-marquee">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -44,7 +41,6 @@ export function AnnouncementBar() {
         </div>
       </div>
 
-      {/* Escritorio: mensajes fijos y centrados. */}
       <div className="container-page hidden items-center justify-center gap-6 overflow-hidden py-2 lg:flex">
         {messages.map(({ icon: Icon, key }, i) => (
           <div key={i} className="flex items-center gap-2 whitespace-nowrap">

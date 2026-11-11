@@ -1,17 +1,12 @@
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/**
- * Loader de tres puntos con animación suave (sin el spinner clásico).
- * Reutilizable en estados de carga (loading.tsx, botones, etc.).
- */
 export function Dots({
   size = "md",
   tone = "brand",
   className,
 }: {
   size?: "sm" | "md" | "lg";
-  /** "inverse": puntos blancos, para fondos oscuros (p. ej. dentro de un botón primario). */
   tone?: "brand" | "inverse";
   className?: string;
 }) {
@@ -32,7 +27,6 @@ export function Dots({
   );
 }
 
-/** Dots centrados en un área alta: respaldo mínimo de los `<Suspense>` de los layouts. */
 export function PageDots() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">

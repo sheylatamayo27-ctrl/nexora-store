@@ -4,16 +4,8 @@ import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
 
-/*
- * Piezas de las pantallas de carga (`loading.tsx`). Copian las medidas de los
- * componentes reales para que, al llegar el contenido, la página no salte.
- * Estilos de móvil/tablet solo con `max-*`: la base es la de escritorio.
- */
-
-/** Skeleton sobre fondo oscuro (hero, panel de marca). */
 export const onDark = "bg-white/10 before:via-white/10";
 
-/** Envoltorio de una pantalla de carga: anuncia "Cargando" a los lectores de pantalla. */
 export function SkeletonRegion({ children, className }: { children: ReactNode; className?: string }) {
   const t = useTranslations("common");
   return (
@@ -24,7 +16,6 @@ export function SkeletonRegion({ children, className }: { children: ReactNode; c
   );
 }
 
-/** Misma caja que `ProductCard`: imagen, marca, nombre en dos líneas, precio y estrellas. */
 export function CardSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col rounded-lg border border-border bg-surface p-2", className)}>
@@ -40,10 +31,6 @@ export function CardSkeleton({ className }: { className?: string }) {
   );
 }
 
-/**
- * `count` tarjetas. `hide` oculta las sobrantes según el tamaño: `{ 3: "max-lg:hidden" }`
- * oculta de la cuarta en adelante por debajo de 1024px.
- */
 export function CardSkeletons({ count, hide = {} }: { count: number; hide?: Record<number, string> }) {
   const classFor = (i: number) =>
     Object.entries(hide)
@@ -59,7 +46,6 @@ export function CardSkeletons({ count, hide = {} }: { count: number; hide?: Reco
   );
 }
 
-/** Migas de pan: inicio + dos niveles. */
 export function BreadcrumbSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -70,7 +56,6 @@ export function BreadcrumbSkeleton({ className }: { className?: string }) {
   );
 }
 
-/** Franja blanca de cabecera (categoría, blog, búsqueda): migas, título grande y descripción. */
 export function PageHeaderSkeleton({ children }: { children?: ReactNode }) {
   return (
     <div className="bg-surface">
@@ -86,7 +71,6 @@ export function PageHeaderSkeleton({ children }: { children?: ReactNode }) {
   );
 }
 
-/** Cabecera de sección (`SectionHeader`): título, subtítulo y enlace "Ver todo". */
 export function SectionHeaderSkeleton({ subtitle = true, link = true }: { subtitle?: boolean; link?: boolean }) {
   return (
     <div className="flex items-end justify-between gap-4">
@@ -99,7 +83,6 @@ export function SectionHeaderSkeleton({ subtitle = true, link = true }: { subtit
   );
 }
 
-/** Tarjeta de resumen del pedido (carrito y pago): líneas de productos, importes, total y botón. */
 export function OrderSummarySkeleton({ items = 0, coupon = false, cta = false }: { items?: number; coupon?: boolean; cta?: boolean }) {
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
@@ -137,10 +120,6 @@ export function OrderSummarySkeleton({ items = 0, coupon = false, cta = false }:
   );
 }
 
-/**
- * Marco de "Mi cuenta" (`AccountShell`): en escritorio, columna con perfil y menú;
- * en móvil/tablet, franja blanca con el perfil en fila y las pestañas en horizontal.
- */
 export function AccountShellSkeleton({ children }: { children: ReactNode }) {
   return (
     <Container className="flex gap-8 py-8 max-lg:flex-col max-lg:gap-6">
@@ -187,12 +166,6 @@ export function AccountShellSkeleton({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Pantalla de acceso (`AuthShell`): panel de marca oscuro a la izquierda (en móvil,
- * franja arriba) y el formulario con `fields` filas de campos. El panel de registro
- * (`benefits`) lleva titular y ventajas; el de acceso, testimonio y cifras.
- * `pairFirst`: la primera fila tiene dos campos (nombre y apellidos).
- */
 export function AuthSkeleton({
   fields,
   social = true,
@@ -288,7 +261,6 @@ export function AuthSkeleton({
   );
 }
 
-/** Banner azul de las páginas de contenido (`ContentPageBanner`): migas, título y subtítulo centrados. */
 export function ContentBannerSkeleton() {
   return (
     <section className="bg-brand-900">
@@ -306,7 +278,6 @@ export function ContentBannerSkeleton() {
 
 const LINE_WIDTHS = ["w-full", "w-11/12", "w-4/5", "w-full", "w-3/4", "w-5/6", "w-2/3", "w-full", "w-3/5", "w-4/5"];
 
-/** `count` renglones de texto de anchos variados. */
 export function TextLinesSkeleton({ count }: { count: number }) {
   return (
     <div className="flex flex-col gap-3">
@@ -317,10 +288,6 @@ export function TextLinesSkeleton({ count }: { count: number }) {
   );
 }
 
-/**
- * Página de contenido (`ContentPageLayout`): banner + cuerpo. Sin `children`, la
- * tarjeta de lectura de las páginas legales con `lines` renglones.
- */
 export function ContentPageSkeleton({
   lines = 8,
   wide = false,

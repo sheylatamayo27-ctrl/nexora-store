@@ -4,12 +4,9 @@ import { email, isPhone, key, type ValidationKey } from "@/lib/schemas/common";
 export const SHIPPING_METHODS = ["standard", "express", "sameday"] as const;
 export const PAYMENT_METHODS = ["card", "upi", "bank", "cod"] as const;
 
-/** Visa/Mastercard: 16 dígitos. Amex (empieza por 34 o 37): 15. Se aceptan espacios y guiones. */
 const CARD_NUMBER = /^(3[47]\d{13}|\d{16})$/;
-/** MM/AA, con o sin espacios alrededor de la barra ("08/29", "08 / 29"). */
 const CARD_EXPIRY = /^(0[1-9]|1[0-2])\s*\/\s*(\d{2})$/;
 
-/** La tarjeta vale hasta el último día del mes de vencimiento. */
 function isExpired(month: number, year: number) {
   const now = new Date();
   const current = now.getFullYear() * 12 + now.getMonth() + 1;
@@ -18,13 +15,11 @@ function isExpired(month: number, year: number) {
 
 export const checkoutSchema = z
   .object({
-    // Contacto
     email,
     newsletter: z.boolean(),
     phone: z
       .string()
       .check(z.trim(), z.minLength(1, key("phoneRequired")), z.refine((v) => v === "" || isPhone(v, 10), key("phoneDigits"))),
-    // Dirección de envío
     firstName: z.string().check(z.trim(), z.minLength(1, key("firstName")), z.minLength(2, key("firstNameMin"))),
     lastName: z.string().check(z.trim(), z.minLength(1, key("lastName")), z.minLength(2, key("lastNameMin"))),
     address: z.string().check(z.trim(), z.minLength(5, key("address"))),
@@ -33,10 +28,8 @@ export const checkoutSchema = z
     state: z.string().check(z.minLength(1, key("state"))),
     postalCode: z.string().check(z.trim(), z.regex(/^\d{5}$/, key("postalCode"))),
     country: z.string().check(z.minLength(1, key("country"))),
-    // Envío y pago
     shippingMethod: z.enum(SHIPPING_METHODS, key("shippingMethod")),
     paymentMethod: z.enum(PAYMENT_METHODS),
-    // Tarjeta: solo obligatoria si se paga con tarjeta (ver superRefine).
     cardNumber: z.optional(z.string()),
     cardExpiry: z.optional(z.string()),
     cardCvc: z.optional(z.string()),

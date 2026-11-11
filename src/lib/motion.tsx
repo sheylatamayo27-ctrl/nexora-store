@@ -3,7 +3,6 @@
 import { motion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
-/** Variantes reutilizables para revelar contenido al entrar en viewport. */
 export const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
@@ -23,10 +22,6 @@ export const staggerContainer: Variants = {
   visible: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
 };
 
-/**
- * Envoltorio que revela su contenido con una transición elegante cuando
- * entra en pantalla. Se usa dentro de componentes de servidor sin problema.
- */
 export function Reveal({
   children,
   className,

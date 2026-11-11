@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Pedido confirmado: tarjeta de agradecimiento con el seguimiento y los detalles. */
 export default function LoadingOrderConfirmation() {
   return (
     <SkeletonRegion>
@@ -16,7 +15,6 @@ export default function LoadingOrderConfirmation() {
           </div>
           <Skeleton className="h-9 w-40 rounded-full" />
 
-          {/* Seguimiento: en línea en escritorio/tablet, en columna en móvil. */}
           <div className="mt-4 flex w-full max-w-2xl items-start justify-between max-md:mt-2 max-md:flex-col max-md:gap-5">
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="flex flex-col items-center gap-2 max-md:flex-row max-md:gap-3">

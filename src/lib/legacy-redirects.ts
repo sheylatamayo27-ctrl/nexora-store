@@ -1,14 +1,3 @@
-/**
- * URLs antiguas en español → nuevas en inglés. La web ya estaba publicada con las
- * antiguas: se redirigen de forma permanente (308, equivalente a 301 para
- * buscadores) para conservar el SEO y los enlaces.
- *
- * Las resuelve el middleware antes que el idioma, y no `redirects()` de
- * next.config: en Netlify el middleware corre primero, next-intl reescribía
- * /carrito a /es/carrito y la redirección ya no coincidía (404).
- */
-
-/** Rutas sin slug. */
 const legacyRoutes = new Map(
   Object.entries({
     "/entrar": "/login",
@@ -19,7 +8,6 @@ const legacyRoutes = new Map(
     "/favoritos": "/wishlist",
     "/cuenta": "/account",
     "/pedido-confirmado": "/order-confirmation",
-    // Enlazadas desde el footer del checkout antes de existir las páginas.
     "/devoluciones": "/returns",
     "/envios": "/shipping",
     "/privacidad": "/privacy",
@@ -27,7 +15,6 @@ const legacyRoutes = new Map(
   }),
 );
 
-/** /categoria/<viejo> → /category/<nuevo>. "ofertas" es la vista especial de descuentos. */
 const legacyCategorySlugs = new Map(
   Object.entries({
     audifonos: "earbuds",
@@ -45,7 +32,6 @@ const legacyCategorySlugs = new Map(
   }),
 );
 
-/** /producto/<viejo> → /product/<nuevo>. */
 const legacyProductSlugs = new Map(
   Object.entries({
     "nexora-aura-anc-auriculares-inalambricos": "nexora-aura-anc-wireless-headphones",
@@ -66,7 +52,6 @@ const legacyProductSlugs = new Map(
   }),
 );
 
-/** /blog/<viejo> → /blog/<nuevo>. */
 const legacyBlogSlugs = new Map(
   Object.entries({
     "como-elegir-auriculares-cancelacion-de-ruido": "how-to-choose-noise-cancelling-headphones",
@@ -78,12 +63,6 @@ const legacyBlogSlugs = new Map(
   }),
 );
 
-/**
- * Ruta nueva que corresponde a `pathname` si es una URL antigua; si no, `null`.
- * En categoría y producto cualquier otro slug conserva su valor (solo cambia el
- * segmento); en el blog solo se redirigen los slugs renombrados.
- * La barra final no cuenta: en Netlify el middleware recibe /carrito/ tal cual.
- */
 export function legacyRedirect(rawPathname: string): string | null {
   const pathname = rawPathname.replace(/\/+$/, "");
   const route = legacyRoutes.get(pathname);

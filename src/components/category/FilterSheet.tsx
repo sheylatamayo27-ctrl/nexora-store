@@ -9,7 +9,6 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { OptionChip } from "@/components/ui/Chip";
 import { RangeSlider } from "@/components/ui/RangeSlider";
 
-/** Filtros que edita la hoja (los demás —valoración, color— son del sidebar de escritorio). */
 export type SheetFilters = {
   cats: string[];
   price: [number, number];
@@ -17,14 +16,6 @@ export type SheetFilters = {
   avail: Record<string, boolean>;
 };
 
-/**
- * Hoja de filtros (bottom sheet) para móvil/tablet — M02b.
- * Comparte el MISMO estado/lógica que el sidebar del escritorio: recibe los
- * valores actuales y aplica los cambios con `onApply`. Mientras está abierta
- * trabaja sobre un BORRADOR; "Mostrar X" aplica, "Restablecer" limpia el
- * borrador y cerrar sin aplicar descarta los cambios.
- * Solo se usa <lg (el escritorio no la monta).
- */
 export function FilterSheet({
   open,
   onClose,
@@ -50,9 +41,7 @@ export function FilterSheet({
   priceFormat: (n: number) => string;
   availabilityOptions: { id: string; label: string }[];
   initial: SheetFilters;
-  /** Resultados del borrador; `undefined` mientras se consultan (se muestra el último). */
   resultCount: number | undefined;
-  /** Borrador mientras la hoja está abierta (`null` al cerrarla), para consultar su conteo. */
   onDraftChange: (draft: SheetFilters | null) => void;
   onApply: (next: SheetFilters) => void;
 }) {
@@ -60,7 +49,6 @@ export function FilterSheet({
   const [draft, setDraft] = useState<SheetFilters>(initial);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Al abrir, el borrador parte de los filtros aplicados actualmente.
   useEffect(() => {
     if (open) setDraft(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,7 +58,6 @@ export function FilterSheet({
     onDraftChange(open ? draft : null);
   }, [open, draft, onDraftChange]);
 
-  // Bloquea el scroll del body mientras la hoja está abierta.
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -80,7 +67,6 @@ export function FilterSheet({
     };
   }, [open]);
 
-  // Cerrar con Esc + trampa de foco (Tab se queda dentro de la hoja).
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -109,7 +95,6 @@ export function FilterSheet({
     [onClose]
   );
 
-  // Enfoca la hoja al abrir (para que la trampa de foco y Esc funcionen).
   useEffect(() => {
     if (open) panelRef.current?.focus();
   }, [open]);
@@ -133,7 +118,6 @@ export function FilterSheet({
       avail: { inStock: true, onSale: false, freeDelivery: false },
     });
 
-  // Mientras llega el conteo de un borrador nuevo se mantiene el último conocido.
   const [lastCount, setLastCount] = useState(resultCount ?? 0);
   if (resultCount !== undefined && resultCount !== lastCount) setLastCount(resultCount);
   const count = resultCount ?? lastCount;
@@ -163,12 +147,10 @@ export function FilterSheet({
             exit={{ y: "100%" }}
             transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 0.3 }}
           >
-            {/* Tirador */}
             <div className="flex justify-center pt-3">
               <span className="h-1.5 w-10 rounded-full bg-border-strong" aria-hidden />
             </div>
 
-            {/* Encabezado */}
             <div className="flex items-center justify-between border-b border-border px-5 pb-4 pt-3">
               <h2 className="text-h4 text-text-primary">{t("filters")}</h2>
               <button
@@ -181,7 +163,6 @@ export function FilterSheet({
               </button>
             </div>
 
-            {/* Contenido con scroll */}
             <div className="flex-1 overflow-y-auto px-5 py-5">
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-3">
@@ -243,7 +224,6 @@ export function FilterSheet({
               </div>
             </div>
 
-            {/* Pie fijo */}
             <div className="flex gap-3 border-t border-border p-4">
               <Button variant="outline" fullWidth onClick={reset}>
                 {t("reset")}

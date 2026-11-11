@@ -1,16 +1,11 @@
 import { Fragment } from "react";
 import { Link } from "@/i18n/navigation";
 
-/** `[texto](destino)`. Con grupos de captura, `split` intercala texto, etiqueta y destino. */
 const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/;
 
 export const richLinkClass =
   "text-brand-700 underline decoration-brand-500/40 underline-offset-2 transition-colors hover:text-brand-800 hover:decoration-brand-800";
 
-/**
- * Texto de contenido con enlaces `[texto](/ruta)`: los que empiezan por "/" son
- * internos (con el prefijo de idioma); el resto (`mailto:`, https) se abre tal cual.
- */
 export function RichText({ text }: { text: string }) {
   const parts = text.split(new RegExp(LINK, "g"));
   return (

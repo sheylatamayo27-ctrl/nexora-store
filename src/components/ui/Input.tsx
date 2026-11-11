@@ -5,14 +5,12 @@ import type { LucideIcon } from "lucide-react";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   icon?: LucideIcon;
-  /** Si se pasa, el ícono se vuelve un botón (p. ej. mostrar/ocultar contraseña). */
   onIconClick?: () => void;
   iconLabel?: string;
   helper?: React.ReactNode;
   error?: boolean;
 }
 
-/** La ref llega al <input>: `register()` de react-hook-form la usa para leerlo y enfocarlo. */
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { label, icon: Icon, onIconClick, iconLabel, helper, error, className, ...props },
   ref
@@ -30,8 +28,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       >
         {Icon &&
           (onIconClick ? (
-            // <span role="button"> en vez de <button>: un <button> dentro del
-            // <label> sería su control asociado y el clic se dispararía dos veces.
             <span
               role="button"
               tabIndex={0}
@@ -72,7 +68,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   options: { value: string; label: string }[];
-  /** Primera opción, vacía y no elegible ("Selecciona…"); se ve atenuada mientras esté seleccionada. */
   placeholder?: string;
   helper?: React.ReactNode;
   error?: boolean;
@@ -133,7 +128,6 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   error?: boolean;
 }
 
-/** Área de texto con el mismo aspecto que `Input` (borde, foco y error). */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
   { label, helper, error, className, rows = 5, ...props },
   ref

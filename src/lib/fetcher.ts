@@ -1,7 +1,6 @@
 import { apiBase } from "@/server/config";
 import type { ApiError } from "@/server/api-types";
 
-/** Respuesta no-2xx de la API: conserva el status y el mensaje de `{ error }` si lo hay. */
 export class FetchError extends Error {
   readonly status: number;
 

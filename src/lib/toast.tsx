@@ -7,13 +7,11 @@ import { AssetImage } from "@/components/media/AssetImage";
 import { Link } from "@/i18n/navigation";
 import type { Product } from "@/data/types";
 
-/** Un solo aviso a la vez: el nuevo reemplaza al anterior en vez de apilarse. */
 function showToast(...args: Parameters<typeof toast.custom>) {
   toast.dismiss();
   toast.custom(...args);
 }
 
-/** Contenido del toast de favoritos (componente: así lee el idioma activo). */
 function FavoriteToast({ id, product, added }: { id: string | number; product: Product; added: boolean }) {
   const t = useTranslations("toast");
   return (
@@ -50,10 +48,6 @@ function FavoriteToast({ id, product, added }: { id: string | number; product: P
   );
 }
 
-/**
- * Toast elegante y de marca para la lista de favoritos.
- * Muestra la miniatura del producto, el estado y un acceso directo a Favoritos.
- */
 export function favoriteToast(product: Product, added: boolean) {
   showToast((id) => <FavoriteToast id={id} product={product} added={added} />, {
     duration: 3200,
@@ -61,12 +55,10 @@ export function favoriteToast(product: Product, added: boolean) {
   });
 }
 
-/** Recorta `text` a `max` caracteres con "…" (los nombres de producto pueden ser largos). */
 function truncate(text: string, max: number) {
   return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
 
-/** Contenido del toast del carrito: miniatura con check verde, nombre y acceso al carrito. */
 function CartToast({ id, product }: { id: string | number; product: Product }) {
   const t = useTranslations("toast");
   return (
@@ -96,15 +88,10 @@ function CartToast({ id, product }: { id: string | number; product: Product }) {
   );
 }
 
-/** Aviso al agregar un producto al carrito (tarjetas y vista rápida), con acceso a /cart. */
 export function cartToast(product: Product) {
   showToast((id) => <CartToast id={id} product={product} />, { duration: 3000, unstyled: true });
 }
 
-/**
- * Toast de marca genérico (mismo lenguaje visual que el de favoritos). Recibe los textos ya traducidos.
- * `tone: "error"` pinta el ícono en rojo (fallos de envío, etc.).
- */
 export function notifyToast({
   title,
   description,

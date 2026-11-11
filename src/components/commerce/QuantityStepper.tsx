@@ -28,7 +28,6 @@ export function QuantityStepper({
     const clamped = Math.min(max, Math.max(min, next));
     if (onChange) onChange(clamped);
     else setInternal(clamped);
-    // El número cambia sin mover el foco: se anuncia a los lectores de pantalla.
     if (clamped !== qty) announce(tA11y("quantityUpdated", { count: clamped }));
   };
 

@@ -1,31 +1,20 @@
 import type { BlogPost, Category, HeroSlide, Product, PromoBanner } from "@/data/types";
 
-/** Tipos de dominio, re-exportados para que las rutas /api no importen de `@/data`. */
 export type { BlogPost, Category, HeroSlide, Product, PromoBanner };
 
 /** Criterios de orden de GET /api/products. `popular`: más reseñas primero. */
 export type ProductSort = "relevance" | "popular" | "price-asc" | "price-desc" | "rating";
 
-/**
- * Parámetros (ya validados) del listado de productos. El idioma no va aquí: es un
- * argumento aparte de `listProducts` y el parámetro `locale` de la API.
- */
 export interface ProductListQuery {
   page?: number;
   pageSize?: number;
-  /** Solo estos productos (por `id`); lo usa el carrito para traducir sus copias. */
   ids?: string[];
-  /** Slugs de categoría: basta con que coincida uno. */
   category?: string[];
   q?: string;
-  /** Marcas (`vendor`): basta con que coincida una. */
   brand?: string[];
-  /** Nombres de color: basta con que el producto tenga uno. */
   color?: string[];
-  /** Rango de precio, extremos incluidos. */
   minPrice?: number;
   maxPrice?: number;
-  /** Valoración mínima (4 → 4★ o más). */
   minRating?: number;
   sale?: boolean;
   deal?: boolean;
@@ -33,13 +22,9 @@ export interface ProductListQuery {
   sort?: ProductSort;
 }
 
-/** Facetas de un listado: las opciones (y sus conteos) del panel de filtros. */
 export interface ProductFacets {
-  /** Productos por categoría (slug → cantidad). */
   categories: Record<string, number>;
-  /** Marcas con su cantidad: más productos primero, empate alfabético. */
   brands: [string, number][];
-  /** Colores distintos (nombre, hex) en orden de aparición. */
   colors: [string, string][];
 }
 

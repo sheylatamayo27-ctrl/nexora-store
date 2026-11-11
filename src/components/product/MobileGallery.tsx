@@ -8,11 +8,6 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import type { BadgeType } from "@/data/types";
 
-/**
- * Galería deslizable para móvil/tablet (M03/T03): carrusel con scroll-snap,
- * contador "n / total", botones de favorito/compartir y miniaturas sincronizadas.
- * Solo se monta <lg; el escritorio usa su galería de miniaturas en columna.
- */
 export function MobileGallery({
   images,
   alt,
@@ -98,7 +93,6 @@ export function MobileGallery({
         </span>
       </div>
 
-      {/* Miniaturas (fila con scroll) */}
       <div className="no-scrollbar flex gap-3 overflow-x-auto">
         {images.map((img, i) => (
           <button

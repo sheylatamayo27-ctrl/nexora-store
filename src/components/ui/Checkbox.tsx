@@ -22,7 +22,6 @@ export function Checkbox({
         onChange={(e) => onChange?.(e.target.checked)}
         className="peer sr-only"
       />
-      {/* El input nativo está oculto: la casilla dibujada muestra su foco de teclado. */}
       <span
         aria-hidden="true"
         className={cn(

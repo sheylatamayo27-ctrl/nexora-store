@@ -24,13 +24,11 @@ interface AuthState {
    * (`Authorization: Bearer <token>`) leyéndolo con `useAuth.getState().token`.
    */
   token: string | null;
-  /** Derivado: hay sesión si hay usuario. */
   isAuthenticated: () => boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (data: { name: string; email: string; password: string }) => Promise<void>;
   loginWithProvider: (provider: AuthProvider) => Promise<void>;
   logout: () => Promise<void>;
-  /** Mezcla `data` con el perfil actual (sin sesión no hace nada). */
   updateProfile: (data: Partial<User>) => void;
 }
 
@@ -65,7 +63,6 @@ export const useAuth = create<AuthState>()(
   )
 );
 
-/** Iniciales para el avatar: primera letra del nombre y del último apellido ("Sheyla Tamayo" → "ST"). */
 export function getInitials(name: string) {
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return "";
@@ -74,7 +71,6 @@ export function getInitials(name: string) {
   return (first + last).toUpperCase();
 }
 
-/** Nombre de pila para saludar ("Sheyla Tamayo" → "Sheyla"). */
 export function getFirstName(name: string) {
   return name.trim().split(/\s+/)[0] ?? "";
 }

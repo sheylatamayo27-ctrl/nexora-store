@@ -10,7 +10,6 @@ import { ProductCardSkeletons } from "@/components/commerce/ProductCardSkeleton"
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { useSearch } from "@/hooks/useSearch";
 
-/** Tarjetas de relleno mientras llega la respuesta (dos filas en escritorio). */
 const SKELETON_COUNT = 8;
 
 export function SearchResults() {

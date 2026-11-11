@@ -1,7 +1,6 @@
 import { ContentPageSkeleton } from "@/components/skeletons/blocks";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-/** Rastrear pedido: tarjeta con los 2 campos y el botón. */
 export default function LoadingTrackOrder() {
   return (
     <ContentPageSkeleton>

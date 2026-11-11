@@ -10,7 +10,6 @@ export const registerSchema = z.object({
   firstName: z.string().check(z.trim(), z.minLength(1, key("firstName")), z.minLength(2, key("firstNameMin"))),
   lastName: z.string().check(z.trim(), z.minLength(1, key("lastName")), z.minLength(2, key("lastNameMin"))),
   email,
-  /** Opcional, como en Configuración; si se escribe, de 8 a 15 dígitos. */
   phone: z.string().check(z.trim(), z.refine((v) => v === "" || isPhone(v, 8), key("phone"))),
   password: z
     .string()

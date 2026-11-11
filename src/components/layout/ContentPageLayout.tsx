@@ -3,7 +3,6 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils";
 
-/** Banner azul de las páginas de contenido: migas (Inicio › título), título y subtítulo centrados. */
 export function ContentPageBanner({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <section className="bg-brand-900 text-text-inverse">
@@ -16,10 +15,6 @@ export function ContentPageBanner({ title, subtitle }: { title: string; subtitle
   );
 }
 
-/**
- * Página de contenido estático: banner + cuerpo centrado. `width="article"`
- * (por defecto) para texto corrido; `"wide"` para páginas con grillas (nosotros, FAQ).
- */
 export function ContentPageLayout({
   title,
   subtitle,

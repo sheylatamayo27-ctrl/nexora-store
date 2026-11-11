@@ -15,10 +15,6 @@ function buildPages(current: number, total: number): (number | "…")[] {
   return pages;
 }
 
-/**
- * Paginación controlada. No se renderiza si solo hay una página.
- * El consumidor mantiene el estado y recibe la página elegida en `onChange`.
- */
 export function Pagination({
   current = 1,
   total = 1,

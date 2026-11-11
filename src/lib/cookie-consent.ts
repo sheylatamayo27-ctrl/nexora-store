@@ -13,19 +13,16 @@
  */
 export const COOKIE_CONSENT_KEY = "nexora-cookie-consent";
 
-/** Evento de `window` que se emite al guardar una elección (detail: CookieConsent). */
 export const COOKIE_CONSENT_EVENT = "nexora:cookie-consent";
 
 export interface CookieConsent {
   analytics: boolean;
   marketing: boolean;
-  /** Momento de la elección (ISO 8601). */
   timestamp: string;
 }
 
 export type CookieChoice = Omit<CookieConsent, "timestamp">;
 
-/** Elección guardada, o `null` si no hay (o el almacenamiento no está disponible). */
 export function readCookieConsent(): CookieConsent | null {
   try {
     const raw = localStorage.getItem(COOKIE_CONSENT_KEY);
@@ -38,13 +35,11 @@ export function readCookieConsent(): CookieConsent | null {
   }
 }
 
-/** Guarda la elección con su fecha y avisa con `COOKIE_CONSENT_EVENT`. */
 export function saveCookieConsent(choice: CookieChoice): CookieConsent {
   const consent: CookieConsent = { ...choice, timestamp: new Date().toISOString() };
   try {
     localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
   } catch {
-    // Navegación privada o almacenamiento bloqueado: vale solo para esta visita.
   }
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: consent }));
   return consent;

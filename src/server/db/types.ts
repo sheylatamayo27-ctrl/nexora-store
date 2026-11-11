@@ -49,7 +49,6 @@ export interface BlogPostRecord extends Omit<BlogPost, "title" | "excerpt" | "ca
   excerpt: Localized;
   category: Localized;
   author: { name: string; role: Localized };
-  /** Cada idioma tiene su propio cuerpo de artículo. */
   content: Localized<BlogBlock[]>;
 }
 
@@ -57,7 +56,6 @@ export interface ContentPageRecord extends Omit<ContentPage, "title" | "subtitle
   title: Localized;
   subtitle?: Localized;
   description: Localized;
-  /** Cada idioma tiene su propio cuerpo. */
   blocks: Localized<ContentBlock[]>;
 }
 

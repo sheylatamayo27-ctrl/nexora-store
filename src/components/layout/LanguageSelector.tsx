@@ -8,15 +8,8 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
-/** Código corto de cada idioma (botón y opciones). */
 const SHORT: Record<Locale, string> = { es: "ES", en: "EN" };
 
-/**
- * Selector de idioma. El activo es el de la URL (`useLocale`), no un estado propio.
- * Elegir otro navega a la MISMA página en ese idioma con el router de next-intl:
- * transición de cliente, sin recarga y sin mover el scroll. next-intl guarda la
- * elección en su cookie (NEXT_LOCALE), que el middleware usa en visitas futuras.
- */
 export function LanguageSelector() {
   const t = useTranslations("languages");
   const locale = useLocale();
@@ -44,7 +37,6 @@ export function LanguageSelector() {
   const select = (next: Locale) => {
     setOpen(false);
     if (next === locale) return;
-    // `pathname` va sin prefijo de idioma; se conserva la búsqueda (p. ej. ?q=…).
     router.replace(pathname + window.location.search, { locale: next, scroll: false });
   };
 

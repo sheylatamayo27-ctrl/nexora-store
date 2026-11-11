@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CardSkeletons, PageHeaderSkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Categoría: cabecera con chips, filtros laterales (escritorio) y cuadrícula de productos. */
 export default function LoadingCategory() {
   return (
     <SkeletonRegion className="flex flex-col">

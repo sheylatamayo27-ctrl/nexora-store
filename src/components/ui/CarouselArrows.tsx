@@ -2,10 +2,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/**
- * Botón circular de flecha (solo escritorio: `hidden lg:flex`). `md` = 40px
- * (sobre el carrusel), `sm` = 36px (en la cabecera de sección).
- */
 export function ArrowButton({
   direction,
   size = "md",
@@ -40,12 +36,6 @@ export function ArrowButton({
   );
 }
 
-/**
- * Flechas anterior/siguiente a los lados de un carrusel (escritorio). El
- * contenedor del carrusel debe ser `relative`: sobresalen 20px a cada lado,
- * centradas en vertical en la franja que ocupa este componente (por defecto,
- * todo el carrusel; `className` puede acotarla, p. ej. a la altura de las imágenes).
- */
 export function CarouselArrows({
   onPrev,
   onNext,

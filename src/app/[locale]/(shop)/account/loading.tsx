@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/Skeleton";
 import { AccountShellSkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Mi cuenta (y sus secciones): menú lateral, resumen en cifras y pedidos. */
 export default function LoadingAccount() {
   return (
     <SkeletonRegion>

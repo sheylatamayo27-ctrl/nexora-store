@@ -8,12 +8,6 @@ import { useHydrated } from "@/hooks/useHydrated";
 import { useSignOut } from "@/hooks/useSignOut";
 import { getInitials, useAuth } from "@/store/auth";
 
-/**
- * Tarjeta de perfil de `AccountShell` con los datos de la sesión. Las rutas de
- * /account exigen sesión (`RequireAuth`); Favoritos no, así que sin sesión muestra
- * una invitación a entrar. Hasta hidratar (el HTML del servidor no conoce la
- * sesión) pinta un esqueleto con la misma forma.
- */
 export function AccountProfile() {
   const t = useTranslations("account");
   const hydrated = useHydrated();
@@ -28,7 +22,6 @@ export function AccountProfile() {
           <User className="h-8 w-8 max-md:h-6 max-md:w-6 md:max-lg:h-7 md:max-lg:w-7" />
         )}
       </span>
-      {/* lg:contents: en escritorio los hijos siguen siendo ítems directos de la tarjeta. */}
       <div className="contents max-lg:flex max-lg:min-w-0 max-lg:flex-col max-lg:gap-0.5">
         {!hydrated ? (
           <>
@@ -66,7 +59,6 @@ export function AccountProfile() {
 const menuItem =
   "flex shrink-0 items-center gap-3 rounded-md px-4 py-3 text-label hover:bg-surface-subtle max-lg:hidden";
 
-/** Último ítem del menú lateral (solo escritorio): cerrar sesión, o entrar si no hay sesión. */
 export function SignOutButton() {
   const t = useTranslations("account");
   const tCommon = useTranslations("common");

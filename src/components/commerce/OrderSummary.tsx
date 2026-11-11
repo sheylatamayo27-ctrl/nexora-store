@@ -33,20 +33,14 @@ export function OrderSummary({
   itemsLabel: string;
   subtotal: number;
   shipping?: number;
-  /** Etiqueta de la fila de envío (p. ej. "Envío exprés"); por defecto, "Envío". */
   shippingLabel?: string;
   tax: number;
-  /** Descuento ya calculado; su fila lleva el código de `coupon`. */
   discount?: number;
-  /** Código del cupón aplicado (ver src/lib/coupons.ts). */
   coupon?: string;
-  /** Avisa al padre al aplicar (código normalizado) o quitar (`undefined`) el cupón; él recalcula los totales. */
   onCouponChange?: (code?: string) => void;
   total: number;
   showCoupon?: boolean;
   cta?: { label: string; href: string };
-  /** Oculta el botón del resumen en móvil (<md); se usa en el carrito,
-   *  donde el pago va en la barra fija inferior. */
   ctaHiddenOnMobile?: boolean;
   className?: string;
 }) {
@@ -109,14 +103,8 @@ export function OrderSummary({
   );
 }
 
-/** Cuánto dura el borde rojo tras un código no válido. */
 const INVALID_MS = 2000;
 
-/**
- * Campo de cupón (los códigos de demo están en src/lib/coupons.ts). Sin cupón:
- * input + "Aplicar" (también con Enter). Con cupón: chip del mismo alto con el
- * código, lo que descuenta y una X para quitarlo.
- */
 function CouponField({ coupon, onCouponChange }: { coupon?: string; onCouponChange?: (code?: string) => void }) {
   const t = useTranslations("cart");
   const [code, setCode] = useState("");
@@ -127,7 +115,6 @@ function CouponField({ coupon, onCouponChange }: { coupon?: string; onCouponChan
 
   useEffect(() => () => clearTimeout(invalidTimer.current), []);
 
-  // Al quitar el cupón vuelve el input: el foco pasa a él (la X ya no existe).
   useEffect(() => {
     if (!coupon && removed.current) inputRef.current?.focus();
     removed.current = false;

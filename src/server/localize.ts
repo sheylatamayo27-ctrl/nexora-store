@@ -11,11 +11,6 @@ import type {
   PromoBannerRecord,
 } from "./db/types";
 
-/*
- * Registros de `./db` → tipos que ven los componentes, con los textos ya en un
- * idioma. Así los componentes siguen leyendo `product.name` como texto plano.
- */
-
 /** Valor en `locale`; si falta (p. ej. un dato a medio traducir del backend), el del idioma por defecto. */
 export function localize<T>(value: Localized<T>, locale: Locale): T {
   return value[locale] ?? value[routing.defaultLocale];

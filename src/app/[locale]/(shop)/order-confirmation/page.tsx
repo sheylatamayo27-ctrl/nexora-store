@@ -20,12 +20,8 @@ import { formatPrice } from "@/lib/format";
 import { useCart, type CartItem } from "@/store/cart";
 import { cn } from "@/lib/utils";
 
-// Datos de ejemplo: nombre y correo del pedido de demostración (no se traducen).
 const CUSTOMER = { firstName: "Sheyla", email: "sheyla@nexora.store" };
 
-// `label` y `sub` son claves de "orderConfirmation". `sub` (fecha/estado) solo se
-// muestra en la línea de tiempo vertical de móvil (M06).
-// Nombre de cada método: claves del namespace "checkout" (las mismas que al pagar).
 const shippingTitles = { standard: "standardShipping", express: "expressShipping", sameday: "sameDay" } as const;
 
 const tracker = [
@@ -78,7 +74,6 @@ export default function ConfirmationPage() {
 
   return (
     <Container className="flex flex-col gap-6 py-8 sm:py-12">
-      {/* Tarjeta de éxito */}
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-8 text-center sm:p-12">
         <span className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-success-100">
           <span className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-success-500">
@@ -94,8 +89,6 @@ export default function ConfirmationPage() {
           <span className="text-label text-brand-800">#NX-482913</span>
         </span>
 
-        {/* Línea de tiempo VERTICAL (solo móvil, M06): círculo a la izquierda,
-            nombre en negrita + estado/fecha en gris a la derecha. */}
         <div className="mt-2 flex w-full flex-col text-left md:hidden">
           {tracker.map((step, i) => (
             <div key={step.label} className="flex gap-3.5">
@@ -127,7 +120,6 @@ export default function ConfirmationPage() {
           ))}
         </div>
 
-        {/* Tracker HORIZONTAL con nombres (tablet T06 + escritorio, intacto) */}
         <div className="mt-4 hidden w-full max-w-2xl items-center justify-between md:flex">
           {tracker.map((step, i) => (
             <div key={step.label} className="flex flex-1 items-center">
@@ -151,7 +143,6 @@ export default function ConfirmationPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        {/* Detalles del pedido */}
         <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 sm:p-8">
           <h2 className="text-h4 text-text-primary">{t("details")}</h2>
           {snapshot.length > 0 ? (
@@ -174,8 +165,6 @@ export default function ConfirmationPage() {
                 </div>
               ))}
               <div className="h-px bg-border" />
-              {/* Desglose: solo escritorio (≥lg). En móvil/tablet se muestra
-                  directamente el "Total pagado" (M06/T06). */}
               {[
                 { l: tCommon("subtotal"), v: formatPrice(subtotal) },
                 { l: tCommon("shipping"), v: shipping ? formatPrice(shipping) : tCommon("free"), h: !shipping },
@@ -200,10 +189,8 @@ export default function ConfirmationPage() {
           )}
         </div>
 
-        {/* Info de envío — móvil apilado, tablet 3 columnas, escritorio apilado */}
         <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 max-md:gap-5 sm:p-8 md:flex-row md:gap-6 lg:flex-col lg:gap-4">
           {[
-            // Nombre y calle: datos del pedido de ejemplo (no se traducen).
             { icon: MapPin, title: t("shippingAddress"), lines: ["Sheyla Tamayo", "Parque Tecnológico 221B", t("addressCityLine")] },
             { icon: Truck, title: t("deliveryMethod"), lines: [tCheckout(shippingTitles[shippingMethod]), t("arrives")] },
             { icon: CreditCard, title: t("payment"), lines: [t("cardEnding"), t("paidOn")] },
@@ -225,7 +212,6 @@ export default function ConfirmationPage() {
         </div>
       </div>
 
-      {/* Botones — móvil/tablet (M06/T06) */}
       <div className="flex flex-col gap-3 lg:hidden">
         <div className="flex flex-col gap-3 md:flex-row">
           <ButtonLink
@@ -250,7 +236,6 @@ export default function ConfirmationPage() {
         </Link>
       </div>
 
-      {/* Botones — escritorio (intacto) */}
       <div className="hidden flex-wrap items-center justify-center gap-3 lg:flex">
         <Button variant="outline" size="lg">
           {t("downloadInvoice")}

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-/** Marcador de carga con la forma de `ProductCard`: misma caja, imagen cuadrada y líneas de texto. */
 export function ProductCardSkeleton({ className }: { className?: string }) {
   return (
     <div
@@ -19,7 +18,6 @@ export function ProductCardSkeleton({ className }: { className?: string }) {
   );
 }
 
-/** `count` skeletons seguidos (para rellenar una grilla mientras carga). */
 export function ProductCardSkeletons({ count }: { count: number }) {
   return (
     <>

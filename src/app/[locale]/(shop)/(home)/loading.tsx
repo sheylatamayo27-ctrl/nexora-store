@@ -3,7 +3,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { CardSkeletons, SectionHeaderSkeleton, SkeletonRegion, onDark } from "@/components/skeletons/blocks";
 import { cn } from "@/lib/utils";
 
-/** Inicio: hero, colecciones y destacados. */
 export default function LoadingHome() {
   return (
     <SkeletonRegion className="flex flex-col">

@@ -27,7 +27,6 @@ import {
 } from "@/server/db/orders.data";
 import { getOrders } from "@/services/orders";
 
-/** Un pedido con sus textos ya en el idioma actual. */
 interface ResolvedOrder extends Omit<Order, "items" | "cta"> {
   date: string;
   summary: string;
@@ -36,7 +35,6 @@ interface ResolvedOrder extends Omit<Order, "items" | "cta"> {
   items: { name: string; image: string; qty: number; price: number; color?: string }[];
 }
 
-/** Icono y colores de cada cifra del resumen (las cifras vienen de `orderStats`). */
 const statStyles: Record<OrderStatKey, { icon: typeof Package; bg: string; fg: string }> = {
   statTotal: { icon: Package, bg: "bg-brand-100", fg: "text-brand-800" },
   statInTransit: { icon: Truck, bg: "bg-accent-100", fg: "text-accent-700" },
@@ -131,7 +129,6 @@ export function OrdersView() {
           <h1 className="text-h2 text-text-primary">{t("title")}</h1>
           <p className="text-body text-text-secondary">{t("subtitle")}</p>
         </div>
-        {/* El buscador no aparece en M09/T09: solo escritorio. */}
         <div role="search" className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4 max-lg:hidden">
           <Search className="h-[18px] w-[18px] text-text-muted" aria-hidden="true" />
           <input
@@ -144,8 +141,6 @@ export function OrdersView() {
         </div>
       </div>
 
-      {/* Stats */}
-      {/* Móvil 2×2 · tablet una fila de 4 · escritorio intacto */}
       <div className="grid grid-cols-2 gap-4 max-lg:gap-3 md:grid-cols-4">
         {stats.map((s) => (
           <div key={s.l} className="flex items-center gap-4 rounded-xl border border-border bg-surface p-5 max-lg:gap-3 max-lg:p-4 max-md:gap-2.5 max-md:p-3">
@@ -160,7 +155,6 @@ export function OrdersView() {
         ))}
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-6 overflow-x-auto border-b border-border no-scrollbar">
         {tabs.map((tab) => {
           const count = tab.status === null ? orders.length : counts.get(tab.status) ?? 0;
@@ -178,7 +172,6 @@ export function OrdersView() {
               )}
             >
               {t(`tabs.${tab.key}`)}
-              {/* <lg: conteo en gris junto al nombre, sin chip. */}
               <span
                 className={cn(
                   "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-label-xs",
@@ -193,12 +186,10 @@ export function OrdersView() {
         })}
       </div>
 
-      {/* Pedidos */}
       {filtered.length > 0 ? (
         <div className="flex flex-col gap-4">
           {filtered.map((o) => (
             <div key={o.id} className="overflow-hidden rounded-lg border border-border bg-surface">
-              {/* Móvil/tablet (M09/T09) */}
               <div className="lg:hidden">
                 <div className="flex flex-col gap-0.5 bg-surface-subtle px-4 py-3 md:px-5 md:py-4">
                   <div className="flex items-center justify-between gap-3">
@@ -242,7 +233,6 @@ export function OrdersView() {
                 </div>
               </div>
 
-              {/* Escritorio (intacto) */}
               <div className="max-lg:hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-subtle px-5 py-4">
                 <div className="flex flex-wrap gap-8">
@@ -337,9 +327,7 @@ function OrderDetailsModal({ order, onClose }: { order: ResolvedOrder | null; on
     >
       {order && (
         <div className="grid gap-6 p-6 sm:grid-cols-[1.6fr_1fr]">
-          {/* Columna izquierda: estado + artículos */}
           <div className="flex flex-col gap-6">
-          {/* Estado / línea de tiempo */}
           {cancelled ? (
             <div className="flex items-center gap-3 rounded-lg bg-sale-100 p-4">
               <XCircle className="h-5 w-5 shrink-0 text-sale-500" />
@@ -394,7 +382,6 @@ function OrderDetailsModal({ order, onClose }: { order: ResolvedOrder | null; on
             </div>
           )}
 
-          {/* Artículos */}
           <div className="flex flex-col gap-3">
             <span className="text-label text-text-primary">
               {t("items", { count: order.items.reduce((n, i) => n + i.qty, 0) })}
@@ -419,9 +406,7 @@ function OrderDetailsModal({ order, onClose }: { order: ResolvedOrder | null; on
           </div>
           </div>
 
-          {/* Columna derecha: resumen, envío y pago */}
           <div className="flex flex-col gap-4">
-          {/* Totales */}
           <div className="flex flex-col gap-2 rounded-lg bg-surface-subtle p-4">
             <div className="flex justify-between text-body text-text-secondary">
               <span>{tCommon("subtotal")}</span>
@@ -437,7 +422,6 @@ function OrderDetailsModal({ order, onClose }: { order: ResolvedOrder | null; on
             </div>
           </div>
 
-          {/* Envío y pago */}
           <div className="flex flex-col gap-3">
             <div className="flex gap-3 rounded-lg border border-border p-4">
               <MapPin className="h-5 w-5 shrink-0 text-brand-700" />

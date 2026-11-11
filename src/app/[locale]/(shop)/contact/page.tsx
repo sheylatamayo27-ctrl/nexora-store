@@ -15,7 +15,6 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 
 const card = "flex flex-col gap-6 rounded-xl border border-border bg-surface p-8 shadow-elevation-sm max-sm:p-5";
 
-/** Contacto: datos de la tienda (los del footer) a la izquierda y formulario a la derecha; apilados bajo 1024px. */
 export default async function ContactPage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "contact" });

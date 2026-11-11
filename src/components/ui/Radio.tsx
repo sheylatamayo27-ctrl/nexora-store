@@ -14,7 +14,6 @@ export function Radio({
   return (
     <label className={cn("flex cursor-pointer items-center gap-3 select-none", className)}>
       <input type="radio" checked={selected} onChange={() => onChange?.()} className="peer sr-only" />
-      {/* El input nativo está oculto: el círculo dibujado muestra su foco de teclado. */}
       <span
         aria-hidden="true"
         className={cn(

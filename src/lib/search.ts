@@ -11,7 +11,6 @@ import type { Category, Product } from "@/data/types";
 export function createProductSearch(productList: Product[], categoryList: Category[]) {
   const categoryName = (slug: string) => categoryList.find((c) => c.slug === slug)?.name ?? slug;
 
-  /** Enriquecemos cada producto con el nombre de su categoría para poder buscarlo. */
   const searchable = productList.map((p) => ({ product: p, categoryName: categoryName(p.categorySlug) }));
 
   const fuse = new Fuse(searchable, {

@@ -16,12 +16,6 @@ interface AssetImageProps {
   className?: string;
 }
 
-/**
- * Imagen que llena su contenedor (el contenedor debe ser `relative` y tener
- * tamaño). Usa next/image para fotos reales y <img> para los placeholders SVG.
- * Si la imagen resuelta tampoco carga (p. ej. manifiesto desactualizado),
- * cae a un ícono placeholder en vez de romper el layout.
- */
 export function AssetImage({ folder, name, alt, sizes, priority, className }: AssetImageProps) {
   const src = assetSrc(folder, name);
   const [failed, setFailed] = useState(false);

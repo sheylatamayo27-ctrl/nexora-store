@@ -3,11 +3,6 @@
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/**
- * Slider de rango doble (mínimo y máximo) con track relleno.
- * Dos inputs range superpuestos; el truco de pointer-events (ver globals.css)
- * evita que un thumb bloquee al otro.
- */
 export function RangeSlider({
   min,
   max,

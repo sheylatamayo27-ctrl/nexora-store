@@ -18,10 +18,8 @@ import { trackOrder, type TrackingResult, type TrackingStatus } from "@/services
 const TRACKING_DEFAULTS: TrackingInput = { orderNumber: "", email: "" };
 
 type StepState = "done" | "current" | "upcoming";
-/** Claves del namespace "trackOrder". */
 type TrackKey = Parameters<ReturnType<typeof useTranslations<"trackOrder">>>[0];
 
-/** Texto de la etiqueta de estado (arriba a la derecha) para cada `currentStatus`. */
 const STATUS_LABEL = {
   received: "stepReceived",
   processing: "stepProcessing",
@@ -51,7 +49,6 @@ export function TrackOrderView() {
     ...FORM_OPTIONS,
   });
 
-  // Al llegar el resultado, se lleva a la vista (en móvil queda debajo del pliegue).
   useEffect(() => {
     if (result) resultRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [result]);

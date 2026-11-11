@@ -17,6 +17,5 @@ export function useSearch(query: string, limit?: number) {
   const key = q ? `/search?${params}` : null;
   const { data, error, isLoading, mutate } = useSWR<SearchResponse, Error>(key);
 
-  // Sin término no hay resultados (keepPreviousData devolvería los del anterior).
   return { results: (key && data) || NO_RESULTS, isLoading, error, mutate };
 }

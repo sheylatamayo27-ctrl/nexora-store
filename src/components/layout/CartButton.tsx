@@ -8,7 +8,6 @@ import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** Botón de carrito con contador. Evita desajustes de hidratación. */
 export function CartButton({ compact = false }: { compact?: boolean }) {
   const t = useTranslations("header");
   const [mounted, setMounted] = useState(false);

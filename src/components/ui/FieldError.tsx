@@ -1,7 +1,6 @@
 import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** Mensaje de error bajo un campo: ícono + texto en rojo, con aparición suave. */
 export function FieldError({ id, message, className }: { id?: string; message: string; className?: string }) {
   return (
     <span

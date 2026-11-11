@@ -85,7 +85,6 @@ export default async function BlogPostPage({ params: { locale, slug } }: { param
   return (
     <div className="bg-surface-subtle">
       <article>
-        {/* Cabecera */}
         <div className="bg-surface">
           <Container className="flex flex-col gap-5 py-8">
             <Breadcrumb items={[{ label: t("breadcrumb"), href: "/blog" }, { label: post.title }]} />
@@ -113,7 +112,6 @@ export default async function BlogPostPage({ params: { locale, slug } }: { param
           </Container>
         </div>
 
-        {/* Portada */}
         <Container className="py-8">
           <Reveal>
             <div className="relative mx-auto aspect-[16/9] max-w-4xl overflow-hidden rounded-2xl bg-surface-subtle">
@@ -128,7 +126,6 @@ export default async function BlogPostPage({ params: { locale, slug } }: { param
           </Reveal>
         </Container>
 
-        {/* Contenido */}
         <Container className="pb-12">
           <div className="mx-auto flex max-w-3xl flex-col gap-6">
             {post.content.map((block, i) => (
@@ -144,7 +141,6 @@ export default async function BlogPostPage({ params: { locale, slug } }: { param
         </Container>
       </article>
 
-      {/* Relacionados */}
       {related.length > 0 && (
         <section className="border-t border-border bg-surface py-12">
           <Container className="flex flex-col gap-8">

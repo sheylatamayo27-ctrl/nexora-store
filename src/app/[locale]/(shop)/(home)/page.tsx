@@ -42,7 +42,6 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   return { alternates: localeAlternates("/", locale) };
 }
 
-/** Producto de la sección destacada: sus precios y valoración salen del catálogo. */
 const SPOTLIGHT_SLUG = "mybook-14-inch-laptop-2-8k-oled";
 
 export default async function HomePage({ params: { locale } }: { params: { locale: Locale } }) {
@@ -62,14 +61,12 @@ export default async function HomePage({ params: { locale } }: { params: { local
   if (!spotlight) throw new Error(`Falta el producto destacado "${SPOTLIGHT_SLUG}" en el catálogo`);
   const spotlightCompareAt = spotlight.compareAt ?? spotlight.price;
 
-  /** "Top 10": las grillas de colecciones son de 5 columnas (2 filas exactas). */
   const topCategories = categories.slice(0, 10);
 
   return (
     <div className="flex flex-col">
       <Hero slides={heroSlides} />
 
-      {/* Colecciones */}
       <section className="py-14 sm:py-20">
         <Container className="flex flex-col gap-8">
           <Reveal>
@@ -80,7 +77,6 @@ export default async function HomePage({ params: { locale } }: { params: { local
             />
           </Reveal>
           <Reveal>
-            {/* Móvil: fila con scroll horizontal · Tablet: grilla de 5 (ícono + nombre). */}
             <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:hidden">
               {topCategories.map((cat) => (
                 <Link
@@ -99,7 +95,6 @@ export default async function HomePage({ params: { locale } }: { params: { local
               ))}
             </div>
 
-            {/* Escritorio (≥1024): tarjetas horizontales — intacto, idéntico al diseño actual. */}
             <div className="hidden gap-4 lg:grid lg:grid-cols-5">
               {topCategories.map((cat) => (
                 <Link
@@ -128,7 +123,6 @@ export default async function HomePage({ params: { locale } }: { params: { local
 
       <Marquee />
 
-      {/* Colección destacada */}
       <section className="py-14 sm:py-20">
         <Container className="flex flex-col gap-8">
           <Reveal>
@@ -142,7 +136,6 @@ export default async function HomePage({ params: { locale } }: { params: { local
         </Container>
       </section>
 
-      {/* Oferta del día */}
       <section className="pb-14 sm:pb-20">
         <Container>
           <Reveal>
@@ -186,14 +179,12 @@ export default async function HomePage({ params: { locale } }: { params: { local
         </Container>
       </section>
 
-      {/* Banners promocionales */}
       <section className="pb-14 sm:pb-20">
         <Container>
           <PromoCarousel banners={promoBanners} />
         </Container>
       </section>
 
-      {/* Producto destacado (spotlight) */}
       <section className="pb-14 sm:pb-20">
         <Container>
           <Reveal>
@@ -253,10 +244,8 @@ export default async function HomePage({ params: { locale } }: { params: { local
         </Container>
       </section>
 
-      {/* Beneficios */}
       <ServiceFeatures />
 
-      {/* Newsletter */}
       <section className="py-14 sm:py-20">
         <Container>
           <Reveal>

@@ -4,12 +4,6 @@ import { Children, useEffect, useId, useState } from "react";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/**
- * Sección del footer. En móvil funciona como acordeón plegable (toca el título
- * para abrir/cerrar). En escritorio (lg) el botón se desactiva y el contenido
- * se muestra siempre como una columna, igual que el diseño.
- * Con `nav`, el contenido es una lista de enlaces (`<nav><ul><li>`).
- */
 export function FooterSection({
   title,
   nav = false,
@@ -21,8 +15,6 @@ export function FooterSection({
 }) {
   const [open, setOpen] = useState(false);
   const contentId = useId();
-  // En escritorio no hay acordeón: el botón sale del orden de tabulación y no
-  // anuncia "contraído" (el contenido siempre está visible).
   const desktop = useIsDesktop();
 
   const contentClass = cn("flex-col gap-3 pb-4 lg:flex lg:gap-4 lg:pb-0", open ? "flex" : "hidden");
@@ -51,7 +43,6 @@ export function FooterSection({
       {nav ? (
         <nav aria-label={title}>
           <ul id={contentId} className={contentClass}>
-            {/* `flex`: el enlace se comporta como antes (elemento flex, sin caja de línea extra). */}
             {Children.map(children, (child) => (
               <li className="flex">{child}</li>
             ))}

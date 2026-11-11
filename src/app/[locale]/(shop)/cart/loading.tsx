@@ -8,7 +8,6 @@ import {
   SkeletonRegion,
 } from "@/components/skeletons/blocks";
 
-/** Carrito: título, líneas de producto, resumen del pedido y recomendados. */
 export default function LoadingCart() {
   return (
     <SkeletonRegion className="flex flex-col">

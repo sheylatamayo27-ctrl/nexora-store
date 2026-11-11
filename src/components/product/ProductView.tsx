@@ -39,10 +39,7 @@ import { favoriteToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/data/types";
 
-// Contenido de ejemplo de la ficha. Los textos son claves del namespace "product".
-/** Lo que cuesta la edición Pro sobre la Estándar (USD). */
 const PRO_EDITION_EXTRA = 18;
-/** Meses sin intereses que anuncia la ficha ("Mensualidades desde…"). */
 const INSTALLMENTS = 12;
 
 const editions: {
@@ -72,7 +69,6 @@ const specTable = [
   ["specWeight", "specWeightValue"],
 ] as const;
 
-// Nombres de quien reseña: no se traducen.
 const reviews = [
   { initials: "AS", name: "Ana Sánchez", meta: "review1Meta", title: "review1Title", body: "review1Body", helpful: 24 },
   { initials: "RK", name: "Roberto Cano", meta: "review2Meta", title: "review2Title", body: "review2Body", helpful: 17 },
@@ -98,10 +94,8 @@ export function ProductView({ product, related }: { product: Product; related: P
   const toggleFavorite = useFavorites((s) => s.toggle);
   const favorites = useFavorites((s) => s.items);
   useEffect(() => setMounted(true), []);
-  // Hasta el montaje se pinta como en el servidor (favoritos vienen de localStorage).
   const wished = mounted && favorites.some((p) => p.id === product.id);
   const handleWish = () => favoriteToast(product, toggleFavorite(product));
-  // Agregar desde la ficha no muestra toast: se anuncia a los lectores de pantalla.
   const handleAdd = () => {
     add(product, { qty, color });
     announce(tA11y("addedToCart", { name: product.name }));
@@ -116,7 +110,6 @@ export function ProductView({ product, related }: { product: Product; related: P
 
   return (
     <div className="flex flex-col">
-      {/* Bloque superior */}
       <div className="bg-surface">
         <Container className="flex flex-col gap-6 py-6 max-lg:gap-4 max-lg:pt-4">
           <Breadcrumb
@@ -127,7 +120,6 @@ export function ProductView({ product, related }: { product: Product; related: P
           />
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-            {/* Galería móvil/tablet: carrusel deslizable con contador (M03/T03). */}
             <div className="lg:hidden">
               <MobileGallery
                 images={galleryImages}
@@ -138,7 +130,6 @@ export function ProductView({ product, related }: { product: Product; related: P
               />
             </div>
 
-            {/* Galería escritorio (intacta): miniaturas en columna + imagen grande. */}
             <div className="hidden self-start lg:flex lg:gap-4">
               <div className="flex gap-3 lg:flex-col">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -195,7 +186,6 @@ export function ProductView({ product, related }: { product: Product; related: P
               </div>
             </div>
 
-            {/* Info */}
             <div className="flex flex-col gap-5">
               <div className="flex items-center gap-3">
                 <Badge type="hot">{tCommon("bestSeller")}</Badge>
@@ -234,7 +224,6 @@ export function ProductView({ product, related }: { product: Product; related: P
                 <p className="text-body-lg text-text-secondary">{product.shortDescription}</p>
               )}
 
-              {/* Color */}
               {product.colors && (
                 <div className="flex flex-col gap-3">
                   <span className="text-label text-text-secondary">
@@ -263,7 +252,6 @@ export function ProductView({ product, related }: { product: Product; related: P
                 </div>
               )}
 
-              {/* Edición */}
               <div className="flex flex-col gap-3">
                 <span className="text-label text-text-secondary">{t("edition")}</span>
                 <div className="flex flex-wrap gap-2">
@@ -280,7 +268,6 @@ export function ProductView({ product, related }: { product: Product; related: P
                 </div>
               </div>
 
-              {/* Compra en línea (tablet + escritorio). En móvil va en la barra fija. */}
               <div className="hidden flex-wrap items-center gap-3 pt-1 md:flex">
                 <QuantityStepper value={qty} onChange={setQty} />
                 <Button
@@ -313,7 +300,6 @@ export function ProductView({ product, related }: { product: Product; related: P
                 </button>
               </div>
 
-              {/* Entrega */}
               <div className="overflow-hidden rounded-lg border border-border">
                 {(
                   [
@@ -341,7 +327,6 @@ export function ProductView({ product, related }: { product: Product; related: P
         </Container>
       </div>
 
-      {/* Pestañas (tablet + escritorio) */}
       <Container className="hidden py-14 md:block">
         <Tabs
           items={[
@@ -424,7 +409,6 @@ export function ProductView({ product, related }: { product: Product; related: P
         />
       </Container>
 
-      {/* Acordeones + reseñas (móvil) — M03 */}
       <Container className="flex flex-col gap-4 py-10 md:hidden">
         <Accordion title={t("tabDescription")} defaultOpen>
           <div className="flex flex-col gap-4">
@@ -468,7 +452,6 @@ export function ProductView({ product, related }: { product: Product; related: P
           </div>
         </Accordion>
 
-        {/* Resumen de reseñas */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-3">
             <span className="text-display-l text-text-primary">{product.rating.toFixed(1)}</span>
@@ -486,7 +469,6 @@ export function ProductView({ product, related }: { product: Product; related: P
           </Button>
         </div>
 
-        {/* Una reseña */}
         <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -512,7 +494,6 @@ export function ProductView({ product, related }: { product: Product; related: P
         </article>
       </Container>
 
-      {/* Relacionados */}
       <Container className="pb-20">
         <div className="flex flex-col gap-8">
           <div className="flex items-end justify-between gap-4">
@@ -527,21 +508,18 @@ export function ProductView({ product, related }: { product: Product; related: P
             </Link>
           </div>
 
-          {/* Móvil: grilla de 2 columnas */}
           <div className="grid grid-cols-2 gap-3 md:hidden">
             {related.slice(0, 2).map((p) => (
               <ProductCard key={p.id} product={p} showColors={false} />
             ))}
           </div>
 
-          {/* Tablet: carrusel con la 4ª tarjeta asomando */}
           <div className="no-scrollbar -mx-4 hidden gap-4 overflow-x-auto px-4 pb-2 md:flex lg:hidden">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} showColors={false} className="w-[30%] shrink-0" />
             ))}
           </div>
 
-          {/* Escritorio: grilla de 5 (intacta) */}
           <div className="hidden gap-4 pb-2 lg:grid lg:grid-cols-5">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} showColors={false} />
@@ -550,10 +528,8 @@ export function ProductView({ product, related }: { product: Product; related: P
         </div>
       </Container>
 
-      {/* Beneficios (igual que en el home), encima del pie de página */}
       <ServiceFeatures />
 
-      {/* Barra fija de compra (móvil). El footer reserva su alto vía [data-fixed-bar]. */}
       <div
         data-fixed-bar
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-4 pt-3 md:hidden"

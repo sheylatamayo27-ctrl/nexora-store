@@ -4,18 +4,10 @@ import { STORE_CONTACT } from "@/components/layout/store-info";
 import { assetSrc } from "@/lib/assets";
 import { SITE_URL, absoluteUrl, localizedUrl } from "@/lib/site";
 
-/**
- * Datos estructurados (JSON-LD, schema.org) para buscadores. Se insertan en cada
- * página con `<JsonLd data={…} />` (`components/seo/JsonLd.tsx`). Todas las URLs
- * son absolutas y apuntan a la versión de la página en el idioma que se pinta.
- */
-
 export type JsonLdObject = Record<string, unknown>;
 
 const ORGANIZATION_NAME = "Nexora";
-/** Logo cuadrado (el ícono de la app); también lo usa el manifest. */
 const LOGO_URL = absoluteUrl("/icon-512.png");
-/** Moneda del catálogo (precios en dólares, ver `src/lib/shipping.ts`). */
 const CURRENCY = "USD";
 
 const publisher = {
@@ -24,7 +16,6 @@ const publisher = {
   logo: { "@type": "ImageObject", url: LOGO_URL },
 } as const;
 
-/** Sitio web con su buscador interno (cuadro de búsqueda en los resultados de Google). */
 export function websiteJsonLd(locale: Locale, description: string): JsonLdObject {
   return {
     "@context": "https://schema.org",
@@ -41,7 +32,6 @@ export function websiteJsonLd(locale: Locale, description: string): JsonLdObject
   };
 }
 
-/** La tienda como organización: logo y atención al cliente (datos de `store-info.ts`). */
 export function organizationJsonLd(): JsonLdObject {
   return {
     "@context": "https://schema.org",
@@ -59,7 +49,6 @@ export function organizationJsonLd(): JsonLdObject {
   };
 }
 
-/** Ficha de producto: precio, disponibilidad y valoración media. */
 export function productJsonLd(product: Product, locale: Locale, description: string): JsonLdObject {
   const url = localizedUrl(`/product/${product.slug}`, locale);
   return {
@@ -92,10 +81,6 @@ export function productJsonLd(product: Product, locale: Locale, description: str
   };
 }
 
-/**
- * Ruta de navegación. `href` va sin prefijo de idioma (p. ej. "/blog"); el último
- * elemento (la página actual) puede ir sin él.
- */
 export function breadcrumbJsonLd(items: { name: string; href?: string }[], locale: Locale): JsonLdObject {
   return {
     "@context": "https://schema.org",
@@ -109,7 +94,6 @@ export function breadcrumbJsonLd(items: { name: string; href?: string }[], local
   };
 }
 
-/** Artículo del blog. */
 export function blogPostJsonLd(post: BlogPost, locale: Locale): JsonLdObject {
   const url = localizedUrl(`/blog/${post.slug}`, locale);
   return {

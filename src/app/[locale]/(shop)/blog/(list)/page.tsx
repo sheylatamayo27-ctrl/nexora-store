@@ -44,7 +44,6 @@ export default async function BlogPage({ params: { locale } }: { params: { local
       </div>
 
       <Container className="flex flex-col gap-10 py-10">
-        {/* Artículo destacado */}
         <Reveal>
           <Link
             href={`/blog/${featuredPost.slug}`}
@@ -81,7 +80,6 @@ export default async function BlogPage({ params: { locale } }: { params: { local
           </Link>
         </Reveal>
 
-        {/* Resto de artículos */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((post, i) => (
             <Reveal key={post.slug} delay={i * 0.05}>

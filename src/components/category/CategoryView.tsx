@@ -33,10 +33,8 @@ import {
 
 const ratings = [4, 3, 2];
 const PRICE_STEP = 10;
-/** Espera tras mover el slider de precio o tocar la hoja de filtros antes de pedir a la API. */
 const DEBOUNCE_MS = 250;
 
-/** `label`: texto en "common.sort". */
 const sortOptions = [
   { id: "popular", label: "popular" },
   { id: "price-asc", label: "priceAsc" },
@@ -46,7 +44,6 @@ const sortOptions = [
 
 const toSort = (id: string): ProductSort => sortOptions.find((o) => o.id === id)?.id ?? "popular";
 
-/** El id es también la clave de su texto en "category". */
 const availabilityOptions = ["inStock", "onSale", "freeDelivery"] as const;
 
 /**
@@ -65,14 +62,10 @@ export function CategoryView({
 }: {
   title: string;
   description: string;
-  /** Todas las categorías (nombres de los filtros, chips y la hoja de filtros). */
   categories: Category[];
   initialCategories?: string[];
-  /** Vista de ofertas: el listado parte solo de los productos rebajados. */
   saleOnly?: boolean;
-  /** Conteos de categorías, marcas y colores del conjunto base (del servidor). */
   facets: ProductFacets;
-  /** Primera página con los filtros iniciales, calculada en el servidor (SEO, sin parpadeo). */
   initialData: ProductListResponse;
 }) {
   const t = useTranslations("category");
@@ -96,12 +89,9 @@ export function CategoryView({
 
   const priceChanged = price[0] !== PRICE_MIN || price[1] !== PRICE_MAX;
 
-  // El slider de precio cambia en cada paso del arrastre: se pide al dejar de moverlo.
   const debouncedPrice = useDebouncedValue(price, DEBOUNCE_MS);
   const query = toListQuery({ cats, price: debouncedPrice, rating, brands, colors, avail, sort }, saleOnly);
 
-  // Filtros u orden nuevos → página 1. Se ajusta en este mismo render (no en un
-  // efecto) para no llegar a pedir las páginas 2..N de la consulta nueva.
   const filtersKey = JSON.stringify([cats, debouncedPrice, rating, brands, colors, avail, sort]);
   const [pageFilters, setPageFilters] = useState(filtersKey);
   if (pageFilters !== filtersKey) {
@@ -117,8 +107,6 @@ export function CategoryView({
   const currentPage = Math.min(page, Math.max(1, totalPages));
   const shownTo = Math.min(currentPage * PAGE_SIZE, total);
 
-  // Conteo de la hoja de filtros (borrador + valoración/color actuales): se pide a la
-  // API con la misma forma que la grilla, así al aplicarlo ya está en caché.
   const debouncedDraft = useDebouncedValue(sheetDraft, DEBOUNCE_MS);
   const draftQuery =
     debouncedDraft &&
@@ -277,13 +265,11 @@ export function CategoryView({
 
   return (
     <div className="flex flex-col">
-      {/* Encabezado de categoría */}
       <div className="bg-surface">
         <Container className="flex flex-col gap-5 py-8">
           <Breadcrumb items={[{ label: tCommon("shop"), href: "/category/headphones" }, { label: title }]} />
           <div className="flex flex-col gap-2">
             <h1 className="text-h2 text-text-primary sm:text-display-l">{title}</h1>
-            {/* Escritorio: descripción (intacta). Móvil/tablet: conteo real · entrega. */}
             <p className="hidden max-w-2xl text-body-lg text-text-secondary lg:block">{description}</p>
             <p className="text-body text-text-secondary lg:hidden">{t("productsDelivery", { count: total })}</p>
           </div>
@@ -310,7 +296,6 @@ export function CategoryView({
       </div>
 
       <Container className="flex gap-8 py-8">
-        {/* Sidebar (escritorio) */}
         <aside aria-label={t("filters")} className="hidden w-72 shrink-0 lg:block">
           <div className="sticky top-28 rounded-xl border border-border bg-surface p-6">
             <div className="mb-4 flex items-center justify-between">
@@ -325,9 +310,7 @@ export function CategoryView({
           </div>
         </aside>
 
-        {/* Resultados */}
         <div className="flex min-w-0 flex-1 flex-col gap-6">
-          {/* Barra de herramientas (móvil <768): dos botones al 50% */}
           <div className="flex gap-3 md:hidden">
             <Button variant="primary" className="flex-1" onClick={() => setSheetOpen(true)}>
               <SlidersHorizontal className="h-[18px] w-[18px]" /> {t("filters")}
@@ -340,7 +323,6 @@ export function CategoryView({
             <SortMenu value={sort} options={sortLabels} onChange={(id) => setSort(toSort(id))} className="flex-1" />
           </div>
 
-          {/* Barra de herramientas (tablet + escritorio) — en escritorio es idéntica */}
           <div className="hidden flex-wrap items-center justify-between gap-3 md:flex">
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="primary" className="lg:hidden" onClick={() => setSheetOpen(true)}>
@@ -413,7 +395,6 @@ export function CategoryView({
             </div>
           </div>
 
-          {/* Chips de filtros activos (móvil + tablet) — en escritorio van en la barra */}
           {(cats.length > 0 || brands.length > 0 || priceChanged) && (
             <div className="flex flex-wrap items-center gap-2 lg:hidden">
               {cats.map((slug) => (
@@ -434,7 +415,6 @@ export function CategoryView({
             </div>
           )}
 
-          {/* Grid */}
           {failed ? (
             <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface py-20 text-center">
               <p className="text-h4 text-text-primary">{t("loadError")}</p>
@@ -456,7 +436,6 @@ export function CategoryView({
               ) : (
                 items.map((p) => <ProductCard key={p.id} product={p} />)
               )}
-              {/* Páginas 2..N ("Cargar más" / paginación): cada una es su propia petición. */}
               {Array.from({ length: currentPage - 1 }, (_, i) => (
                 <ProductPage
                   key={i + 2}
@@ -477,7 +456,6 @@ export function CategoryView({
 
           {!failed && total > 0 && (
             <div className="flex flex-col items-center gap-5 pt-4">
-              {/* Móvil (<768): resumen + barra de progreso + "Cargar más" */}
               <div className="flex w-full flex-col items-center gap-3 md:hidden">
                 <span className="text-body-sm text-text-secondary">
                   {t("showingOf", { shown: shownTo, total })}
@@ -501,7 +479,6 @@ export function CategoryView({
                 )}
               </div>
 
-              {/* Tablet (768–1023): paginación numérica + "Página X de Y" */}
               {totalPages > 1 && (
                 <div className="hidden flex-col items-center gap-3 md:flex lg:hidden">
                   <Pagination current={currentPage} total={totalPages} onChange={setPage} />
@@ -511,7 +488,6 @@ export function CategoryView({
                 </div>
               )}
 
-              {/* Escritorio (≥1024): idéntico al original */}
               {totalPages > 1 && (
                 <div className="hidden w-full items-center justify-between gap-3 lg:flex">
                   <span className="block text-body text-text-secondary">
@@ -532,10 +508,8 @@ export function CategoryView({
         </div>
       </Container>
 
-      {/* Beneficios (igual que en el home), encima del pie de página */}
       <ServiceFeatures />
 
-      {/* Hoja de filtros (móvil/tablet) — M02b. El escritorio usa el sidebar. */}
       <FilterSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -559,7 +533,6 @@ export function CategoryView({
   );
 }
 
-/** Página 2 en adelante del listado: se pide al pulsar "Cargar más" o elegir una página. */
 function ProductPage({ query, page, expected }: { query: ProductListQuery; page: number; expected: number }) {
   const t = useTranslations("category");
   const tCommon = useTranslations("common");
@@ -585,7 +558,6 @@ function ProductPage({ query, page, expected }: { query: ProductListQuery; page:
   );
 }
 
-/** Heurística simple para elegir el color del check sobre un swatch. */
 function isLight(hex: string): boolean {
   const h = hex.replace("#", "");
   if (h.length < 6) return true;

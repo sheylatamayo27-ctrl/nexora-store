@@ -3,16 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-/**
- * Lógica común de los carruseles nativos (scroll-snap) con puntos indicadores.
- * Cada hijo directo del contenedor (`scrollerRef`) es una tarjeta.
- *
- * El carrusel avanza por páginas de tantas tarjetas como caben a la vez:
- * - `count`: número de páginas (se recalcula al cambiar el ancho;
- *   `initialCount` evita saltos en SSR).
- * - `active`: página de la primera tarjeta visible (≥60 %), vía IntersectionObserver.
- * - `goTo(i)`: desplaza el carrusel hasta la página i.
- */
 export function useCarousel(initialCount: number, align: ScrollLogicalPosition = "start") {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const perViewRef = useRef(1);
@@ -47,7 +37,6 @@ export function useCarousel(initialCount: number, align: ScrollLogicalPosition =
           else visible.delete(index);
         }
         if (!visible.size) return;
-        // Al final del carrusel, la última página aunque esté incompleta.
         const last = items.length - 1;
         setActive(
           visible.has(last)
@@ -78,10 +67,6 @@ export function useCarousel(initialCount: number, align: ScrollLogicalPosition =
   return { scrollerRef, active: Math.min(active, count - 1), count, goTo };
 }
 
-/**
- * Puntos indicadores: el activo es una píldora azul marino, los demás puntos grises.
- * Cada botón mide 44px para el toque; el punto, 8px.
- */
 export function CarouselDots({
   count,
   active,

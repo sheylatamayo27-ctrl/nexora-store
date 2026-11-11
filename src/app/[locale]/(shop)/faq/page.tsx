@@ -13,18 +13,12 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   return { title: t("faq"), description: t("faqDescription"), alternates: localeAlternates("/faq", locale) };
 }
 
-/** Texto plano de una respuesta para el JSON-LD: `[texto](/ruta)` → texto. */
 const plain = (text: string) => text.replace(/\[([^\]]+)\]\([^)\s]+\)/g, "$1");
 
-/**
- * Preguntas frecuentes por categoría. Acordeón con `<details>` nativo (sin JS):
- * funciona antes de hidratar y el buscador del navegador encuentra las respuestas.
- */
 export default async function FaqPage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
   const [groups, t] = await Promise.all([getFaqGroups(locale), getTranslations({ locale, namespace: "faq" })]);
 
-  // Datos estructurados FAQPage: Google puede mostrar las respuestas en los resultados.
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

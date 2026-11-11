@@ -11,17 +11,12 @@ import { Link } from "@/i18n/navigation";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** Lo que pinta cada panel, ya seleccionado en el servidor (`./mega-menu-data`). */
 export interface MegaMenuData {
-  /** Electrónica: grilla de 5×2. */
   categories: Category[];
-  /** Ofertas: los mayores descuentos. */
   deals: Product[];
-  /** Blogs: últimos artículos, sin el cuerpo (viajan en el HTML de cada página). */
   posts: Pick<BlogPost, "slug" | "title" | "category" | "cover" | "coverFolder" | "readingMinutes">[];
 }
 
-/** Cada panel; también es la clave de su texto en el namespace "nav". */
 type MenuKey = "electronics" | "offers" | "blogs";
 
 const navItems: { key: MenuKey; href: string; hot?: boolean }[] = [
@@ -155,7 +150,6 @@ function ElectronicaPanel({ categories }: { categories: MegaMenuData["categories
           {t("viewAllCategories")} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      {/* Grilla de 5×2: las 10 primeras categorías. */}
       <div className="grid grid-cols-5 gap-3">
         {categories.map((cat) => (
           <Link

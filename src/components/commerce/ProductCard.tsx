@@ -16,8 +16,6 @@ import { cn } from "@/lib/utils";
 import { discountPercent } from "@/lib/format";
 import type { Product } from "@/data/types";
 
-// La vista rápida (Radix Dialog + framer-motion) se carga aparte, al primer uso:
-// así no pesa en cada página con tarjetas. Al pasar el cursor por el botón ya se pide.
 const loadQuickView = () => import("@/components/commerce/QuickView").then((m) => m.QuickView);
 const QuickView = dynamic(loadQuickView, { ssr: false });
 
@@ -29,7 +27,6 @@ export function ProductCard({
 }: {
   product: Product;
   showColors?: boolean;
-  /** Muestra un chip "-X%" en lugar del badge por defecto (vista de ofertas). */
   showDiscountPercent?: boolean;
   className?: string;
 }) {
@@ -41,9 +38,7 @@ export function ProductCard({
   const favorites = useFavorites((s) => s.items);
   useEffect(() => setMounted(true), []);
   const [quickOpen, setQuickOpen] = useState(false);
-  // El modal se monta la primera vez que se abre y luego se queda (para animar el cierre).
   const [quickUsed, setQuickUsed] = useState(false);
-  // Hasta el montaje se pinta como en el servidor (favoritos vienen de localStorage).
   const wished = mounted && favorites.some((p) => p.id === product.id);
   const href = `/product/${product.slug}`;
   const pct = discountPercent(product.price, product.compareAt);
@@ -62,7 +57,6 @@ export function ProductCard({
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
-    // El botón está sobre el enlace de la imagen: que no navegue.
     e.preventDefault();
     e.stopPropagation();
     setQuickUsed(true);
@@ -76,7 +70,6 @@ export function ProductCard({
         className
       )}
     >
-      {/* Media */}
       <div className="relative aspect-square overflow-hidden rounded-md bg-surface-subtle">
         <AssetImage
           folder="products"
@@ -98,7 +91,6 @@ export function ProductCard({
           )
         )}
 
-        {/* Wishlist */}
         <button
           type="button"
           aria-label={wished ? t("removeFromWishlist") : t("saveToWishlist")}
@@ -114,7 +106,6 @@ export function ProductCard({
           />
         </button>
 
-        {/* Add to cart */}
         <button
           type="button"
           aria-label={t("addToCart")}
@@ -126,9 +117,6 @@ export function ProductCard({
 
         <Link href={href} className="absolute inset-0" aria-label={product.name} />
 
-        {/* Vista rápida: aparece al pasar el cursor (o con el foco del teclado). En
-            pantallas sin cursor no se muestra nunca, así que tampoco ocupa el toque.
-            Va después del enlace de la imagen para quedar encima sin z-index. */}
         <button
           type="button"
           onClick={handleQuickView}
@@ -140,7 +128,6 @@ export function ProductCard({
         </button>
       </div>
 
-      {/* Info */}
       <div className="flex flex-1 flex-col gap-1.5 px-1 pb-1 pt-3">
         <span className="text-label-sm uppercase tracking-wide text-text-muted">{product.vendor}</span>
         <Link

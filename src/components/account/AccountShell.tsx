@@ -17,8 +17,6 @@ import { cn } from "@/lib/utils";
 
 type ActiveId = "dashboard" | "orders" | "wishlist" | "addresses" | "payments" | "notifications" | "settings";
 
-// El id es también la clave de su texto en "account". `desktopOnly`: no aparece
-// en las pestañas de móvil/tablet (M09/T09 muestran 6).
 const navItems: { id: ActiveId; href: string; icon: LucideIcon; desktopOnly?: boolean }[] = [
   { id: "dashboard", href: "/account", icon: LayoutGrid },
   { id: "orders", href: "/account", icon: Package },
@@ -41,16 +39,11 @@ export function AccountShell({
   const t = useTranslations("account");
   return (
     <Container className="flex flex-col gap-6 py-8 lg:flex-row lg:gap-8">
-      {/* <lg (M09/T09): banda blanca a todo el ancho con el perfil horizontal y
-          las pestañas en chips; sin migas de pan. Escritorio: columna lateral intacta. */}
       <aside aria-label={t("myAccount")} className="flex w-full shrink-0 flex-col gap-4 max-lg:-mx-4 max-lg:-mt-8 max-lg:w-auto max-lg:border-b max-lg:border-border max-lg:bg-surface max-lg:px-4 max-lg:pb-4 max-lg:pt-4 sm:max-lg:-mx-6 sm:max-lg:px-6 md:max-lg:pt-5 lg:w-72">
         <Breadcrumb items={[{ label: t("myAccount") }, { label: crumb }]} className="max-lg:hidden" />
 
-        {/* Perfil (datos de la sesión) */}
         <AccountProfile />
 
-        {/* Navegación — <lg: chips con scroll horizontal que arranca en el margen
-            (móvil con ícono; tablet sin ícono para que quepan las 6). */}
         <nav aria-label={t("accountMenu")} className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-3 no-scrollbar max-lg:-mx-4 max-lg:gap-2 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:px-4 max-lg:py-0 sm:max-lg:-mx-6 sm:max-lg:px-6 lg:flex-col">
           {navItems.map((item) => (
             <Link

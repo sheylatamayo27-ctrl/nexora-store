@@ -21,7 +21,6 @@ export function ForgotPasswordView() {
   const tCommon = useTranslations("common");
   const tValidation = useTranslations("validation");
   const [email, setEmail] = useState("");
-  /** Clave del error en "validation". */
   const [error, setError] = useState<"emailRequired" | "email" | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
 

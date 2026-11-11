@@ -5,12 +5,6 @@ import { ChevronDown, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/**
- * Selector de orden personalizado para móvil. A diferencia de un <select>
- * nativo (cuyo desplegable coloca el navegador y puede salirse de la pantalla),
- * este menú se ancla a la derecha y limita su ancho al viewport, así nunca
- * desborda. Solo se usa en la barra móvil; tablet/escritorio siguen con <select>.
- */
 export function SortMenu({
   value,
   options,

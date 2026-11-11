@@ -5,11 +5,6 @@ import { AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button, ButtonLink } from "@/components/ui/Button";
 
-/**
- * Pantalla de error de una ruta (la usan todos los `error.tsx`): avisa de que algo
- * falló y ofrece reintentar (`reset` vuelve a pintar el segmento) o volver al inicio.
- * El mensaje técnico del error solo se muestra en desarrollo.
- */
 export function ErrorFallback({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const t = useTranslations("error");
 

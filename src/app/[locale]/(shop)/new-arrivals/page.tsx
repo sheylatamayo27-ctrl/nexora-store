@@ -18,7 +18,6 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   };
 }
 
-/** Novedades: los últimos productos (ver `getNewArrivals`). Server Component: el HTML ya trae la grilla. */
 export default async function NewArrivalsPage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
   const [products, t] = await Promise.all([

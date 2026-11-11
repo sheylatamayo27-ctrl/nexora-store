@@ -1,11 +1,3 @@
-/**
- * Comprueba los diccionarios de next-intl (messages/*.json) contra el de referencia
- * (es.json, el que tipa las claves en TypeScript):
- *  - mismas claves en todos los idiomas (ni faltan ni sobran),
- *  - ningún texto vacío,
- *  - mensajes ICU válidos y con los mismos parámetros ({name}) y etiquetas (<tag>).
- * Corre antes de `dev` y de `build` (ver package.json); si algo falla, lo detiene.
- */
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse, TYPE } from "@formatjs/icu-messageformat-parser";
@@ -17,7 +9,6 @@ const locales = readdirSync(dir)
   .filter((f) => f.endsWith(".json"))
   .map((f) => f.slice(0, -".json".length));
 
-/** { "a.b.c": "texto" } a partir del objeto anidado. */
 function flatten(obj, prefix = "", out = {}) {
   for (const [key, value] of Object.entries(obj)) {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -27,7 +18,6 @@ function flatten(obj, prefix = "", out = {}) {
   return out;
 }
 
-/** Parámetros y etiquetas que usa un mensaje ICU (recorre plurales y etiquetas). */
 function signature(elements, acc = { args: new Set(), tags: new Set() }) {
   for (const el of elements) {
     if (el.type === TYPE.tag) {
@@ -80,7 +70,7 @@ for (const locale of locales.filter((l) => l !== REFERENCE)) {
       a = signature(parse(reference[key]));
       b = signature(parse(dictionary[key]));
     } catch {
-      continue; // ya reportado arriba
+      continue;
     }
     if (!sameSet(a.args, b.args)) {
       errors.push(`"${key}": parámetros distintos — ${REFERENCE} ${show(a.args)} vs ${locale} ${show(b.args)}.`);

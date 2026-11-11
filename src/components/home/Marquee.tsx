@@ -1,7 +1,6 @@
 import { Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-/** Franja animada de ofertas (desplazamiento continuo). */
 export function Marquee() {
   const t = useTranslations("marquee");
   const item = (

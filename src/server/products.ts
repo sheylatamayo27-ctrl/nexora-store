@@ -11,7 +11,6 @@ import { searchProducts } from "./search";
  * `./config`) y quien la llama no se entera. Todas devuelven los textos en `locale`.
  */
 
-/** Todo el catálogo. */
 export async function getProducts(locale: Locale): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/products?locale=" + locale)
   return products.map((p) => toProduct(p, locale));
@@ -28,29 +27,22 @@ export async function getProductsByCategory(categorySlug: string, locale: Locale
   return (await getProducts(locale)).filter((p) => p.categorySlug === categorySlug);
 }
 
-/** Productos destacados para la home. */
 export async function getFeaturedProducts(locale: Locale): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/products?featured=true&locale=" + locale)
   // 10: dos páginas completas del carrusel de la home en escritorio (5 por página).
   return (await getProducts(locale)).slice(0, 10);
 }
 
-/** Ofertas del día: los productos con barra de progreso de stock. */
 export async function getDealProducts(locale: Locale): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/products?deals=true&locale=" + locale)
   return (await getProducts(locale)).filter((p) => p.sold);
 }
 
-/** Todos los productos en descuento (tienen precio de comparación). */
 export async function getSaleProducts(locale: Locale): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/products?onSale=true&locale=" + locale)
   return (await getProducts(locale)).filter((p) => p.compareAt && p.compareAt > p.price);
 }
 
-/**
- * Novedades: los productos con insignia "Nuevo". Si son menos de 6, se completan
- * hasta `limit` con los últimos del catálogo (los más recientes).
- */
 export async function getNewArrivals(locale: Locale, limit = 8): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/products?sort=newest&limit=" + limit + "&locale=" + locale)
   const all = await getProducts(locale);
@@ -60,10 +52,8 @@ export async function getNewArrivals(locale: Locale, limit = 8): Promise<Product
   return [...fresh, ...latest].slice(0, limit);
 }
 
-/** Valores por defecto y tope del listado paginado. */
 export const PRODUCT_LIST_DEFAULTS = { page: 1, pageSize: 12, maxPageSize: 50 } as const;
 
-/** `relevance` conserva el orden de llegada: el del catálogo, o el ranking de la búsqueda si hay `q`. */
 const sorters: Record<ProductSort, ((a: Product, b: Product) => number) | undefined> = {
   relevance: undefined,
   popular: (a, b) => b.reviews - a.reviews,
@@ -74,13 +64,11 @@ const sorters: Record<ProductSort, ((a: Product, b: Product) => number) | undefi
 
 export const PRODUCT_SORTS = Object.keys(sorters) as ProductSort[];
 
-/** Productos que cumplen la búsqueda y los filtros, ya ordenados (sin paginar). */
 async function filterProducts(query: ProductListQuery, locale: Locale): Promise<Product[]> {
   const { ids, q, category, brand, color, minPrice, maxPrice, minRating, sale, deal, featured } = query;
 
   let items = q ? await searchProducts(q, locale) : await getProducts(locale);
 
-  // Cada filtro activo se cruza con su selector, conservando el orden actual.
   const subsets = await Promise.all([
     category?.length
       ? Promise.all(category.map((slug) => getProductsByCategory(slug, locale))).then((lists) => lists.flat())
@@ -95,7 +83,6 @@ async function filterProducts(query: ProductListQuery, locale: Locale): Promise<
     items = items.filter((p) => subsetIds.has(p.id));
   }
 
-  // Filtros sobre atributos del propio producto. Los colores van por nombre en `locale`.
   items = items.filter(
     (p) =>
       (!ids?.length || ids.includes(p.id)) &&
@@ -128,7 +115,6 @@ export async function listProducts(query: ProductListQuery, locale: Locale): Pro
   };
 }
 
-/** Facetas (categorías, marcas y colores con sus conteos) del conjunto que describe `query`. */
 export async function getProductFacets(query: ProductListQuery, locale: Locale): Promise<ProductFacets> {
   // Backend real: vendrían junto al listado (fetch(apiBase + "/products?...")) o de un endpoint de facetas.
   const items = await filterProducts(query, locale);

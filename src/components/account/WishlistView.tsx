@@ -9,7 +9,6 @@ import { useFavorites } from "@/store/favorites";
 import { useCart } from "@/store/cart";
 import { notifyToast } from "@/lib/toast";
 
-/** Favoritos. El contenido sale del store del navegador (localStorage). */
 export function WishlistView() {
   const t = useTranslations("wishlist");
   const tCommon = useTranslations("common");

@@ -6,12 +6,6 @@ import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/**
- * Modal sobre Radix Dialog: portal, bloqueo de scroll compensando la barra
- * (sin salto lateral), foco atrapado y devuelto al cerrar, Esc y clic fuera.
- * Animaciones por data-state en globals.css (.modal-overlay / .modal-content):
- * hoja inferior en móvil y fade + escala leve desde sm.
- */
 export function Modal({
   open,
   onClose,
@@ -29,19 +23,14 @@ export function Modal({
   description?: ReactNode;
   footer?: ReactNode;
   className?: string;
-  /** Título solo para lectores de pantalla cuando no hay `title` visible (por defecto, "Ventana"). */
   srTitle?: string;
 }) {
-  // Mientras se anima el cierre, el padre suele vaciar las props (p. ej.
-  // order = null); conservamos el último contenido para que no "salte".
   const t = useTranslations("common");
   const a11yTitle = srTitle ?? t("dialog");
   const last = useRef({ title, description, children, footer });
   if (open) last.current = { title, description, children, footer };
   const view = open ? { title, description, children, footer } : last.current;
 
-  // Radix devuelve el foco al <Dialog.Trigger>; como el modal se abre desde
-  // botones propios, recordamos el elemento enfocado al abrir y lo restauramos.
   const returnFocus = useRef<HTMLElement | null>(null);
 
   return (

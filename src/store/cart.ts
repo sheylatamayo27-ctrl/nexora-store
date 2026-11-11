@@ -10,20 +10,13 @@ export interface CartItem {
   key: string;
   product: Product;
   qty: number;
-  /** Nombre del color, en el idioma de `product`. */
   color?: string;
 }
 
 interface CartState {
   items: CartItem[];
-  /**
-   * Idioma de las copias de producto guardadas (nombre, color, badge). Si no
-   * coincide con el de la página, `StoreLocaleSync` las vuelve a pedir y llama a `relocalize`.
-   */
   locale?: Locale;
-  /** Código del cupón aplicado (ver src/lib/coupons.ts). Se vacía con `clear`. */
   coupon?: string;
-  /** Método de envío del último pago (lo fija el checkout al pagar; lo lee la confirmación). Se vacía con `clear`. */
   shippingMethod?: ShippingMethod;
   add: (product: Product, opts?: { qty?: number; color?: string }) => void;
   remove: (key: string) => void;
@@ -31,7 +24,6 @@ interface CartState {
   clear: () => void;
   setCoupon: (code?: string) => void;
   setShippingMethod: (method: ShippingMethod) => void;
-  /** Sustituye las copias por `products` (mismo id, otro idioma); el color se conserva por posición. */
   relocalize: (products: Product[], locale: Locale) => void;
   count: () => number;
   subtotal: () => number;
@@ -83,8 +75,6 @@ export const useCart = create<CartState>()(
     }),
     {
       name: "nexora-cart",
-      // v1: precios en USD. Las copias guardadas antes llevan precios viejos: sin
-      // idioma anotado, `StoreLocaleSync` las vuelve a pedir a la API al cargar.
       version: 1,
       migrate: (persisted) => ({ ...(persisted as CartState), locale: undefined }),
     }

@@ -3,14 +3,11 @@ import { getTranslations } from "next-intl/server";
 import { getPathname } from "./navigation";
 import { ogLocales, routing, type Locale } from "./routing";
 
-/** Metadata común del sitio en `locale` (título por defecto, plantilla, Open Graph). */
 export async function siteMetadata(locale: Locale): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "metadata" });
   const title = t("siteTitle");
   const description = t("siteDescription");
 
-  // Íconos e imagen para redes: archivos icon.png, apple-icon.png,
-  // opengraph-image.png y twitter-image.png en src/app (convención de Next).
   return {
     title: { default: title, template: "%s | Nexora" },
     description,
@@ -31,10 +28,6 @@ export async function siteMetadata(locale: Locale): Promise<Metadata> {
   };
 }
 
-/**
- * Canonical y hreflang (es, en y x-default) de una página. `pathname` va sin prefijo
- * de idioma (p. ej. "/cart"); en inglés se publica como /en/cart.
- */
 export function localeAlternates(pathname: string, locale: Locale): NonNullable<Metadata["alternates"]> {
   return {
     canonical: getPathname({ href: pathname, locale }),
@@ -45,11 +38,6 @@ export function localeAlternates(pathname: string, locale: Locale): NonNullable<
   };
 }
 
-/**
- * Open Graph y Twitter de una página con imagen propia (producto, categoría, artículo).
- * Next reemplaza el `openGraph` del layout entero, así que aquí se repiten `siteName`
- * y los idiomas. `image` es una ruta de /public (p. ej. "/images/products/x.webp").
- */
 export function socialMetadata(
   locale: Locale,
   page: {

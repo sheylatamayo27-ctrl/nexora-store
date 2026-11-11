@@ -1,7 +1,6 @@
 import { z } from "zod/mini";
 import { email, key } from "@/lib/schemas/common";
 
-/** Límite del mensaje: el contador del formulario lo muestra. */
 export const CONTACT_MESSAGE_MAX = 2000;
 
 export const contactSchema = z.object({

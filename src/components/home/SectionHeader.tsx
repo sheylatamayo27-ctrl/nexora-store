@@ -16,12 +16,7 @@ export function SectionHeader({
   title: string;
   subtitle?: string;
   href?: string;
-  /** Texto del enlace; por defecto "Ver todo". */
   linkLabel?: string;
-  /**
-   * Flechas de un carrusel (solo escritorio), antes del enlace. Se muestran si
-   * se pasa `onPrev` u `onNext`; requieren que quien renderiza sea un Client Component.
-   */
   onPrev?: () => void;
   onNext?: () => void;
   canPrev?: boolean;

@@ -4,7 +4,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 const card = "flex flex-col gap-6 rounded-xl border border-border bg-surface p-8 max-sm:p-5";
 
-/** Contacto: tarjeta de datos y tarjeta del formulario, lado a lado (apiladas bajo 1024px). */
 export default function LoadingContact() {
   return (
     <SkeletonRegion className="flex flex-col">

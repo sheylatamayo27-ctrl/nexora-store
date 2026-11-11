@@ -5,7 +5,6 @@ import { FooterSection } from "@/components/layout/FooterSection";
 import { SOCIALS, STORE_CONTACT, STORE_HOURS } from "@/components/layout/store-info";
 import { Link } from "@/i18n/navigation";
 
-// `title` y `key`: textos en el namespace "footer".
 const columns = [
   {
     title: "shop",
@@ -31,7 +30,6 @@ const columns = [
     title: "company",
     links: [
       { key: "about", href: "/about" },
-      // Sin página de empleos: "Nosotros" invita a escribir por el formulario de contacto.
       { key: "careers", href: "/about" },
       { key: "blog", href: "/blog" },
       { key: "contact", href: "/contact" },
@@ -40,7 +38,6 @@ const columns = [
   },
 ] as const;
 
-// Marcas de medios de pago: no se traducen.
 const payments = ["VISA", "Mastercard", "PayPal", "UPI", "COD"];
 
 export function Footer() {
@@ -48,15 +45,11 @@ export function Footer() {
 
   return (
     <footer className="bg-brand-900 text-text-inverse">
-      {/* En móvil, si la página tiene una barra fija abajo ([data-fixed-bar], 81px +
-          área segura), se reserva su alto para que no tape el final del footer. */}
       <div className="container-page pt-16 pb-16 max-md:[body:has([data-fixed-bar])_&]:pb-[calc(9rem+env(safe-area-inset-bottom))]">
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:gap-12">
-          {/* Marca */}
           <div className="flex flex-col gap-5">
             <Logo tone="light" />
             <p className="max-w-xs text-body text-white/70">{t("tagline")}</p>
-            {/* Datos de contacto: nombres propios, iguales en todos los idiomas. */}
             <div className="flex flex-col gap-3 text-body text-white/85">
               <span className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-accent-500" /> {STORE_CONTACT.address}

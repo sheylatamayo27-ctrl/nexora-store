@@ -1,6 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 
-/** Estado vacío de una vista de cuenta (mismo formato que el de Favoritos). */
 export function AccountEmptyState({
   icon: Icon,
   title,
@@ -10,7 +9,6 @@ export function AccountEmptyState({
   icon: LucideIcon;
   title: string;
   description: string;
-  /** Acciones (botones) bajo el texto. */
   children?: React.ReactNode;
 }) {
   return (

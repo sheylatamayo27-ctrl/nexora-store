@@ -18,29 +18,22 @@ import { loginSchema, registerSchema, type LoginData, type RegisterData } from "
 import { AuthError, type AuthErrorCode, type AuthProvider } from "@/services/auth";
 import { useAuth } from "@/store/auth";
 
-/** Valores de ejemplo con los que arrancan los formularios. */
 const SIGNIN_DEFAULTS: LoginData = { email: "sheyla@nexora.store", password: "password123" };
 const SIGNUP_DEFAULTS: RegisterData = {
   firstName: "Sheyla",
   lastName: "Tamayo",
   email: "sheyla@nexora.store",
   phone: "+52 55 9876 5432",
-  // Mismo largo que la de inicio de sesión (enmascarada se ve igual), pero con la mayúscula que pide el registro.
   password: "Password123",
   acceptTerms: true,
 };
 
-/** Texto de `auth.errors` de cada motivo conocido de `AuthError`. */
 const AUTH_ERROR_KEYS = {
   invalid_credentials: "invalidCredentials",
   email_taken: "emailTaken",
   provider_cancelled: "providerCancelled",
 } as const satisfies Record<AuthErrorCode, string>;
 
-/**
- * Aviso de fallo de un acceso: el motivo del `AuthError` (traducido si es un
- * código conocido, si no su mensaje) o, con cualquier otro error, la conexión.
- */
 function useAuthFailureToast() {
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
@@ -120,7 +113,6 @@ function SignInForm() {
   );
 }
 
-/** Registro. Mismo funcionamiento que `SignInForm`, con `useAuth().register`. */
 function SignUpForm() {
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
@@ -138,7 +130,6 @@ function SignUpForm() {
 
   const field = (name: Exclude<keyof RegisterData, "acceptTerms">) => ({
     ...register(name),
-    // El teléfono es opcional; el resto, obligatorio.
     "aria-required": name !== "phone",
     defaultValue: SIGNUP_DEFAULTS[name],
     error: errorText(errors[name]?.message),
@@ -193,14 +184,12 @@ const PROVIDERS: { id: AuthProvider; name: string }[] = [
   { id: "apple", name: "Apple" },
 ];
 
-/** Botones de Google/Apple: entran con `useAuth().loginWithProvider` (en registro también: crea la cuenta). */
 function SocialSignIn() {
   const t = useTranslations("auth");
   const router = useRouter();
   const loginWithProvider = useAuth((s) => s.loginWithProvider);
   const failureToast = useAuthFailureToast();
   const [, startNavigation] = useTransition();
-  // Proveedor en curso; sigue fijado tras entrar, hasta que la navegación desmonta la vista.
   const [pending, setPending] = useState<AuthProvider | null>(null);
 
   const signIn = async ({ id, name }: (typeof PROVIDERS)[number]) => {

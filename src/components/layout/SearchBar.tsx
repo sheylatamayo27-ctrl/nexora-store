@@ -12,7 +12,6 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const MAX_SUGGESTIONS = 6;
-/** Mínimo de caracteres para sugerir (por debajo, la API no devuelve nada). */
 const MIN_QUERY_LENGTH = 2;
 const DEBOUNCE_MS = 250;
 
@@ -21,7 +20,6 @@ export function SearchBar({
   onNavigate,
 }: {
   variant?: "desktop" | "mobile";
-  /** Se llama tras navegar (p. ej. para cerrar el drawer móvil). */
   onNavigate?: () => void;
 }) {
   const t = useTranslations("search");
@@ -39,7 +37,6 @@ export function SearchBar({
     debouncedTerm.length >= MIN_QUERY_LENGTH ? debouncedTerm : "",
     MAX_SUGGESTIONS
   );
-  // Lo escrito aún no tiene respuesta (debounce en curso o petición en vuelo).
   const pending = debouncedTerm !== term || isLoading;
 
   useEffect(() => {
@@ -96,7 +93,6 @@ export function SearchBar({
         )}
       >
         <Search className="h-[18px] w-[18px] shrink-0 text-text-muted" aria-hidden="true" />
-        {/* El placeholder no basta como etiqueta: desaparece al escribir. */}
         <input
           type="text"
           role="combobox"
@@ -164,7 +160,6 @@ export function SearchBar({
             </div>
           ) : results.length > 0 && !error ? (
             <>
-              {/* Mientras llega la respuesta de lo último escrito, la lista anterior se atenúa. */}
               <ul className={cn("max-h-[22rem] overflow-y-auto py-1 transition-opacity", pending && "opacity-60")}>
                 {results.map((p, i) => (
                   <li key={p.id} id={`${listId}-${i}`} role="option" aria-selected={active === i}>

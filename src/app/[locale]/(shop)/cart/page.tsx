@@ -12,7 +12,6 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 
 export default async function CartPage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
-  // "Comprados juntos frecuentemente": los 5 primeros destacados.
   const recommended = (await getFeaturedProducts(locale)).slice(0, 5);
   return <CartView recommended={recommended} />;
 }

@@ -3,7 +3,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 const widths = ["w-3/4", "w-2/3", "w-4/5", "w-1/2", "w-3/5", "w-2/3", "w-3/4", "w-1/2", "w-4/5", "w-3/5"];
 
-/** FAQ: título de categoría + 10 preguntas cerradas del acordeón. */
 export default function LoadingFaq() {
   return (
     <ContentPageSkeleton>

@@ -11,8 +11,6 @@ const serviceFeatures = [
   { icon: RotateCcw, title: "returns", desc: "returnsDesc" },
 ] as const;
 
-/** Barra de beneficios (envío, pago, soporte, devoluciones). Compartida por home,
- *  categoría y detalle de producto; se sitúa justo encima del pie de página. */
 export function ServiceFeatures() {
   const t = useTranslations("services");
   return (
@@ -20,7 +18,6 @@ export function ServiceFeatures() {
       <Container>
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {serviceFeatures.map((f) => (
-            // ≤339px: ícono encima del texto para que "Devoluciones" quepa sin desbordar.
             <div
               key={f.title}
               className="flex items-center gap-4 max-[339px]:flex-col max-[339px]:items-start max-[339px]:gap-2"

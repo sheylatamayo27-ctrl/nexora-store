@@ -23,7 +23,6 @@ export function CartLineItem({ item }: { item: CartItem }) {
   const { product } = item;
   const wished = favorites.some((p) => p.id === product.id);
   const handleWish = () => favoriteToast(product, toggleFavorite(product));
-  // Quitar del carrito no muestra toast: se anuncia a los lectores de pantalla.
   const handleRemove = () => {
     remove(item.key);
     announce(tA11y("removedFromCart", { name: product.name }));
@@ -38,7 +37,6 @@ export function CartLineItem({ item }: { item: CartItem }) {
       transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       className="border-b border-border p-4 last:border-b-0 sm:p-6"
     >
-      {/* Móvil (<md): fila simplificada (M04) — sin marca, stock ni "Ahorras". */}
       <div className="flex gap-4 md:hidden">
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-surface-subtle">
           <AssetImage folder="products" name={product.image} alt={product.name} sizes="96px" />
@@ -81,7 +79,6 @@ export function CartLineItem({ item }: { item: CartItem }) {
         </div>
       </div>
 
-      {/* Tablet + escritorio (≥md): fila completa (idéntica en escritorio). */}
       <div className="hidden gap-4 md:flex">
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-surface-subtle sm:h-28 sm:w-28">
           <AssetImage folder="products" name={product.image} alt={product.name} sizes="112px" />

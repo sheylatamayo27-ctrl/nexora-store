@@ -11,12 +11,10 @@ import { useAuth, type User } from "@/store/auth";
 
 type Field = "firstName" | "lastName" | "email" | "phone";
 type Values = Record<Field, string>;
-/** Error de cada campo: su clave de texto en "validation". */
 type Errors = Partial<Record<Field, "firstName" | "lastName" | "email" | "phone">>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Datos de la sesión; el teléfono aún no forma parte del perfil, así que es de ejemplo. */
 function initialValues(user: User | null): Values {
   const [firstName = "", ...rest] = (user?.name ?? "").trim().split(/\s+/);
   return { firstName, lastName: rest.join(" "), email: user?.email ?? "", phone: "+52 55 9876 5432" };
@@ -41,7 +39,6 @@ export function SettingsView() {
   const tCommon = useTranslations("common");
   const tFields = useTranslations("common.fields");
   const tValidation = useTranslations("validation");
-  // /account/* solo se pinta con sesión (`RequireAuth`), así que el usuario ya está aquí.
   const [values, setValues] = useState<Values>(() => initialValues(useAuth.getState().user));
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);

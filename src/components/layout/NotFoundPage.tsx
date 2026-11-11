@@ -12,13 +12,9 @@ import type { Locale } from "@/i18n/routing";
 import { MAIN_CONTENT_ID } from "@/lib/a11y";
 import { getCategories } from "@/server";
 
-// Móvil/tablet (M10/T10): sin buscador bajo el header, "4" grandes pegados a un
-// círculo con anillo azul, botones apilados en móvil y "Inicio" activo abajo.
-// Las clases sin prefijo max-* son las del escritorio, que no cambia.
 const four =
   "text-[6rem] font-bold leading-none text-brand-800 sm:text-[10rem] max-sm:text-[7rem] sm:max-lg:text-[11rem]";
 
-/** Página 404 completa (con header y footer). La usan `[locale]/not-found.tsx` y la 404 raíz. */
 export async function NotFoundPage({ locale }: { locale: Locale }) {
   const [megaMenu, categories, t] = await Promise.all([
     getMegaMenuData(locale),
@@ -67,7 +63,6 @@ export async function NotFoundPage({ locale }: { locale: Locale }) {
             <span className="text-label-xs uppercase tracking-widest text-text-muted max-lg:text-[0.6875rem] max-lg:leading-4">
               {t("popularCategories")}
             </span>
-            {/* Móvil: rejilla de 3 columnas a la medida de su chip más ancho (2 filas). */}
             <div className="flex flex-wrap justify-center gap-2 max-sm:grid max-sm:grid-cols-[repeat(3,auto)] max-sm:justify-center max-[339px]:gap-1.5">
               {categories.slice(0, 6).map((c) => (
                 <Link

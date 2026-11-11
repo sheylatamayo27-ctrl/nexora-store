@@ -9,12 +9,6 @@ import { Reveal } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { PromoBanner } from "@/data/types";
 
-/**
- * Banners promocionales ("Explorar más").
- * Móvil (<md): carrusel de un banner a todo el ancho por vista (como
- * "Colección destacada") + puntos indicadores.
- * Tablet/escritorio (≥md): grilla, idéntica a la versión anterior.
- */
 export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
   const t = useTranslations("home");
   const { scrollerRef, active, count, goTo } = useCarousel(banners.length);
@@ -28,8 +22,6 @@ export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
         className="flex snap-x gap-4 overflow-x-auto pb-2 no-scrollbar max-md:snap-mandatory max-md:overscroll-x-contain md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:pb-0 lg:grid-cols-3"
       >
         {banners.map((b, i) => (
-          // En móvil el Reveal (que se activa al entrar en vertical) dejaría ocultos
-          // los banners que esperan a la derecha: se muestran siempre.
           <Reveal
             key={b.href}
             delay={i * 0.08}
@@ -75,7 +67,6 @@ export function PromoCarousel({ banners }: { banners: PromoBanner[] }) {
         ))}
       </div>
 
-      {/* Indicadores (solo móvil). -mt-2.5 deja ~16px visibles entre los banners y los puntos. */}
       <CarouselDots
         count={count}
         active={active}

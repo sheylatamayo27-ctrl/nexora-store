@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/Skeleton";
 import { AccountShellSkeleton, CardSkeletons, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Favoritos: menú de la cuenta y cuadrícula de productos guardados. */
 export default function LoadingWishlist() {
   return (
     <SkeletonRegion>

@@ -5,17 +5,15 @@ import { ArrowUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const SHOW_AFTER = 400; // px de scroll antes de mostrarse
-const DURATION = 550; // ms
+const SHOW_AFTER = 400;
+const DURATION = 550;
 
-/** Curva cubic-bezier(x1, y1, x2, y2) como función de progreso (0–1). */
 function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
   const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
   const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
   const sampleX = (t: number) => ((ax * t + bx) * t + cx) * t;
   const sampleY = (t: number) => ((ay * t + by) * t + cy) * t;
   return (x: number) => {
-    // Bisección: busca el t cuya x coincide con el progreso temporal.
     let lo = 0, hi = 1, t = x;
     for (let i = 0; i < 24; i++) {
       const diff = sampleX(t) - x;
@@ -28,13 +26,8 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
   };
 }
 
-// Lenta al principio y rápida al final.
 const easeIn = cubicBezier(0.55, 0, 1, 0.45);
 
-/**
- * Botón flotante "Volver arriba" (móvil/tablet). Se coloca en `--fab-bottom`
- * (ver globals.css), que lo sube por encima de las barras fijas de compra/pago.
- */
 export function BackToTop() {
   const t = useTranslations("common");
   const [visible, setVisible] = useState(false);
@@ -52,7 +45,6 @@ export function BackToTop() {
   const scrollToTop = () => {
     const root = document.documentElement;
     const start = window.scrollY;
-    // El scroll suave global (html { scroll-behavior: smooth }) suavizaría cada paso.
     root.style.scrollBehavior = "auto";
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -61,7 +53,6 @@ export function BackToTop() {
       return;
     }
 
-    // Si la persona vuelve a desplazarse, se cancela la animación.
     const stop = () => {
       cancelAnimationFrame(frame.current);
       root.style.scrollBehavior = "";

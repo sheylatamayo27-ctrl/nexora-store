@@ -26,20 +26,13 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
   const drawerId = useId();
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  // Menú lateral modal: foco dentro mientras está abierto, Esc lo cierra y el foco vuelve al botón.
   useDialogFocus(menuOpen, drawerRef, () => setMenuOpen(false), closeButtonRef);
-  // La sesión vive en localStorage: hasta hidratar se pinta como sin sesión (igual que el HTML del servidor).
   const hydrated = useHydrated();
   const storedUser = useAuth((s) => s.user);
   const user = hydrated ? storedUser : null;
-  // Sin sesión, la cuenta lleva directo a entrar (/account mandaría ahí de todos modos).
   const accountHref = hydrated && !user ? "/login" : "/account";
   const { signOut, signingOut } = useSignOut();
-  // Sin prefijo de idioma: "/cart" tanto en /cart como en /en/cart.
   const pathname = usePathname();
-  // El producto, el carrito, la confirmación de pedido, ofertas, el blog y la 404
-  // (que trae su propio buscador) no llevan buscador bajo el header
-  // (M03/T03, M04/T04, M06/T06, M10/T10).
   const hideMobileSearch =
     !mobileSearch ||
     pathname.startsWith("/product/") ||
@@ -53,7 +46,6 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
     <header className="sticky top-0 z-40 bg-surface">
       <AnnouncementBar />
 
-      {/* Barra principal */}
       <div className="border-b border-border bg-surface">
         <div className="container-page flex items-center gap-4 py-3 lg:gap-10 lg:py-5">
           <button
@@ -70,12 +62,10 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
 
           <Logo className="shrink-0" />
 
-          {/* Buscador (desktop) */}
           <div className="hidden flex-1 lg:flex">
             <SearchBar variant="desktop" />
           </div>
 
-          {/* Utilidades (desktop) */}
           <div className="ml-auto hidden items-center gap-6 lg:flex">
             <LanguageSelector />
             <Link href={accountHref} className="flex items-center gap-3">
@@ -101,7 +91,6 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
             <CartButton />
           </div>
 
-          {/* Iconos (móvil) */}
           <div className="ml-auto flex items-center gap-4 lg:hidden">
             <Link href="/wishlist" aria-label={t("wishlist")}>
               <Heart className="h-[22px] w-[22px]" />
@@ -119,7 +108,6 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
           </div>
         </div>
 
-        {/* Buscador (móvil) — oculto en pantallas sin buscador bajo el header */}
         {!hideMobileSearch && (
           <div className="container-page pb-3 lg:hidden">
             <SearchBar variant="mobile" />
@@ -127,10 +115,8 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
         )}
       </div>
 
-      {/* Navegación con mega-menú (desktop) */}
       <MegaMenu data={megaMenu} />
 
-      {/* Drawer móvil */}
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -191,7 +177,6 @@ export function Header({ megaMenu, mobileSearch = true }: { megaMenu: MegaMenuDa
                     {tNav(item.key)}
                   </Link>
                 ))}
-                {/* Cerrar sesión: en móvil/tablet el menú lateral de la cuenta no lo muestra. */}
                 {user && (
                   <>
                     <div className="my-2 h-px bg-border" />

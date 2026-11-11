@@ -6,10 +6,6 @@ import { getBlogPosts, getCategories, getProducts } from "@/server";
 type Entry = MetadataRoute.Sitemap[number];
 type Options = Pick<Entry, "lastModified" | "changeFrequency" | "priority">;
 
-/**
- * Una entrada por idioma (/… en español, /en/… en inglés), cada una con sus
- * alternativas hreflang. Los slugs son iguales en los dos idiomas.
- */
 function localized(pathname: string, options: Options): Entry[] {
   const languages = Object.fromEntries(routing.locales.map((l) => [l, localizedUrl(pathname, l)]));
   return routing.locales.map((locale) => ({
@@ -19,7 +15,6 @@ function localized(pathname: string, options: Options): Entry[] {
   }));
 }
 
-/** Páginas públicas sin datos (las privadas —cuenta, carrito, pago— quedan fuera; ver robots.ts). */
 const STATIC_PAGES: [pathname: string, options: Options][] = [
   ["/", { changeFrequency: "daily", priority: 1 }],
   ["/offers", { changeFrequency: "daily", priority: 0.9 }],

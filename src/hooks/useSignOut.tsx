@@ -7,10 +7,6 @@ import { useRouter } from "@/i18n/navigation";
 import { useAuth } from "@/store/auth";
 import { notifyToast } from "@/lib/toast";
 
-/**
- * Cierra la sesión (vía el store), avisa y vuelve al inicio. Lo usan el menú de
- * la cuenta y el drawer móvil. `signOut` resuelve `true` si se cerró.
- */
 export function useSignOut() {
   const t = useTranslations("account");
   const tCommon = useTranslations("common");

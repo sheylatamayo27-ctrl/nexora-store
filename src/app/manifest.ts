@@ -1,10 +1,5 @@
 import type { MetadataRoute } from "next";
 
-/**
- * Manifest de la app web (instalar en el inicio del móvil). Textos en español,
- * el idioma por defecto. Los íconos de /public son el mismo de `src/app/icon.png`
- * en 192 y 512 px.
- */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Nexora — Tu tienda de tecnología",

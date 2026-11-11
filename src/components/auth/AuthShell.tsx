@@ -4,7 +4,6 @@ import { Logo } from "@/components/brand/Logo";
 import { AssetImage } from "@/components/media/AssetImage";
 import { Link } from "@/i18n/navigation";
 
-/** Claves del namespace "auth". */
 const perks = ["memberPrices", "firstOrderShipping", "earlyAccess"] as const;
 
 const stats = [
@@ -13,17 +12,12 @@ const stats = [
   { value: "24h", label: "expressDelivery" },
 ] as const;
 
-/**
- * Marco de las pantallas de acceso: panel de marca y columna del formulario
- * con "Volver a la tienda". El formulario de cada pantalla va en `children`.
- */
 export function AuthShell({ variant, children }: { variant: "signin" | "signup"; children: React.ReactNode }) {
   const t = useTranslations("auth");
   const isSignup = variant === "signup";
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
-      {/* Panel de marca */}
       <div className="relative flex min-h-[220px] flex-col justify-between overflow-hidden p-6 lg:min-h-screen lg:w-[46%] lg:p-10">
         {isSignup ? (
           <AssetImage
@@ -35,7 +29,6 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
           />
         ) : (
           <>
-            {/* Móvil/tablet: imagen original del panel (sin cambios). */}
             <AssetImage
               folder="misc"
               name="hero"
@@ -44,7 +37,6 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
               sizes="(max-width: 1024px) 100vw, 46vw"
               className="lg:hidden"
             />
-            {/* Escritorio: imagen vertical con los audífonos completos y centrados (07). */}
             <AssetImage
               folder="misc"
               name="auth-panel"
@@ -65,8 +57,6 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
           >
             <ChevronLeft className="h-[18px] w-[18px]" />
           </Link>
-          {/* Móvil/tablet: volver a la izquierda y logo en la esquina superior
-              derecha (justify-between). Escritorio: solo el logo, a la izquierda. */}
           <Logo tone="light" href={null} />
         </div>
 
@@ -84,7 +74,6 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
             </>
           ) : (
             <>
-              {/* Móvil: titular + valoración (como en Figma móvil) */}
               <div className="flex flex-col gap-4 lg:hidden">
                 <h2 className="max-w-md text-h3">{t("signInHeadline")}</h2>
                 <div className="flex items-center gap-2">
@@ -97,7 +86,6 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
                 </div>
               </div>
 
-              {/* Escritorio: testimonio + métricas (como en Figma desktop) */}
               <div className="hidden flex-col gap-8 lg:flex">
                 <figure className="flex flex-col gap-4 rounded-xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm">
                   <div className="flex gap-0.5">
@@ -130,9 +118,6 @@ export function AuthShell({ variant, children }: { variant: "signin" | "signup";
         </div>
       </div>
 
-      {/* Formulario — en <lg se alinea arriba (max-lg:items-start) para no dejar
-          un hueco grande por el centrado vertical; separación ~32px móvil /
-          ~40px tablet. Escritorio (≥lg) centrado e intacto (padding = p-10). */}
       <div className="flex flex-1 items-center justify-center px-6 pb-6 pt-8 max-lg:items-start sm:px-10 sm:pb-10 sm:pt-10">
         <div className="flex w-full min-w-0 max-w-md flex-col gap-5">
           <Link

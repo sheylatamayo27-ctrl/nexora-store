@@ -2,7 +2,6 @@ import { CardSkeletons, ContentBannerSkeleton, SkeletonRegion } from "@/componen
 import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-/** Novedades: banner + grilla de 8 tarjetas de producto. */
 export default function LoadingNewArrivals() {
   return (
     <SkeletonRegion className="flex flex-col">

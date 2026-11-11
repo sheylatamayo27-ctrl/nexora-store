@@ -5,10 +5,6 @@ import { products } from "./db/products.data";
 import { categories } from "./db/categories.data";
 import { toCategory, toProduct } from "./localize";
 
-/**
- * Un índice difuso por idioma (configuración en `@/lib/search`): en inglés se
- * busca por los nombres en inglés. Se construye la primera vez que se usa.
- */
 const searchers = new Map<Locale, ReturnType<typeof createProductSearch>>();
 
 function searcherFor(locale: Locale) {
@@ -23,7 +19,6 @@ function searcherFor(locale: Locale) {
   return search;
 }
 
-/** Busca productos por nombre, marca o categoría (tolera erratas). */
 export async function searchProducts(query: string, locale: Locale, limit?: number): Promise<Product[]> {
   // Backend real: fetch(apiBase + "/search?q=" + encodeURIComponent(query) + "&locale=" + locale + (limit ? "&limit=" + limit : ""))
   return searcherFor(locale)(query, limit);

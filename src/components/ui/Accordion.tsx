@@ -4,7 +4,6 @@ import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 
-/** Acordeón en tarjeta blanca con icono +/− y apertura animada. */
 export function Accordion({
   title,
   defaultOpen = false,

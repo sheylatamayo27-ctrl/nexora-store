@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/Container";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { BreadcrumbSkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Artículo: cabecera (categoría, título, extracto y autor), imagen y párrafos. */
 export default function LoadingBlogPost() {
   return (
     <SkeletonRegion className="flex flex-col">

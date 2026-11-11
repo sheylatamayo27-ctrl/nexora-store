@@ -8,17 +8,11 @@ import type { Locale } from "@/i18n/routing";
 import { formatDate } from "@/lib/format";
 import { getContentPage } from "@/server";
 
-/** Título, descripción y hreflang de una página de contenido; su ruta es `/<slug>`. */
 export async function contentPageMetadata(slug: ContentPageSlug, locale: Locale): Promise<Metadata> {
   const page = await getContentPage(slug, locale);
   return { title: page.title, description: page.description, alternates: localeAlternates(`/${slug}`, locale) };
 }
 
-/**
- * Página de contenido completa a partir de `src/server/db/pages.data.ts`. Las
- * legales (con `updated`) van en una tarjeta de lectura; `wide`, sin tarjeta y
- * con grillas a todo el ancho (nosotros).
- */
 export async function ContentPageView({
   slug,
   locale,

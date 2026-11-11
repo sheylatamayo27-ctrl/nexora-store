@@ -6,7 +6,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { getPathname, useRouter } from "@/i18n/navigation";
 
-/** Buscador de la página 404: lleva a /search?q=… (sin JS, el form hace lo mismo). */
 export function NotFoundSearch() {
   const t = useTranslations("search");
   const locale = useLocale();

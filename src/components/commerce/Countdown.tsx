@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/** Unidad: valor con dos dígitos y su clave de texto en "common.countdown". */
 type Unit = { v: string; l: "days" | "hours" | "minutes" | "seconds" };
 
 function split(ms: number): Unit[] {
@@ -22,11 +21,6 @@ function split(ms: number): Unit[] {
   ];
 }
 
-/**
- * Contador regresivo en vivo con el estilo de "Oferta del día".
- * El plazo se fija al montar (cliente) para evitar desajustes de hidratación;
- * `endsInHours` define la duración restante. Reutilizable en home y /offers.
- */
 export function Countdown({
   endsInHours = 72,
   size = "md",
@@ -35,7 +29,6 @@ export function Countdown({
 }: {
   endsInHours?: number;
   size?: "sm" | "md";
-  /** "dark" ajusta el separador para fondos oscuros (p. ej. el hero de ofertas). */
   tone?: "light" | "dark";
   className?: string;
 }) {

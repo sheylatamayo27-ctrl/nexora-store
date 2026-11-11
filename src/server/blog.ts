@@ -13,7 +13,6 @@ export async function getBlogPosts(locale: Locale): Promise<BlogPost[]> {
   return blogPosts.map((p) => toBlogPost(p, locale));
 }
 
-/** Artículo destacado para la cabecera del blog. */
 export async function getFeaturedPost(locale: Locale): Promise<BlogPost> {
   // Backend real: fetch(apiBase + "/blog?featured=true&locale=" + locale)
   const posts = await getBlogPosts(locale);
@@ -26,7 +25,6 @@ export async function getPostBySlug(slug: string, locale: Locale): Promise<BlogP
   return record && toBlogPost(record, locale);
 }
 
-/** Artículos relacionados: misma categoría primero, luego los más recientes. */
 export async function getRelatedPosts(slug: string, locale: Locale, limit = 3): Promise<BlogPost[]> {
   // Backend real: fetch(apiBase + "/blog/" + slug + "/related?limit=" + limit + "&locale=" + locale)
   const posts = await getBlogPosts(locale);

@@ -22,7 +22,6 @@ export interface CategoryFilters {
   sort: ProductSort;
 }
 
-/** Filtros al entrar en la vista (y tras "Limpiar todo", con `cats` vacío). */
 export function defaultFilters(cats: string[] = []): CategoryFilters {
   return {
     cats,
@@ -35,11 +34,6 @@ export function defaultFilters(cats: string[] = []): CategoryFilters {
   };
 }
 
-/**
- * Primera página del listado para estos filtros. `saleOnly`: vista de ofertas (solo
- * productos rebajados). El rango de precio completo no filtra; "Solo en stock" y
- * "Envío gratis" tampoco (el catálogo aún no tiene esos datos).
- */
 export function toListQuery(filters: CategoryFilters, saleOnly: boolean): ProductListQuery {
   const { cats, price, rating, brands, colors, avail, sort } = filters;
   return {
@@ -49,7 +43,6 @@ export function toListQuery(filters: CategoryFilters, saleOnly: boolean): Produc
     minPrice: price[0] !== PRICE_MIN ? price[0] : undefined,
     maxPrice: price[1] !== PRICE_MAX ? price[1] : undefined,
     minRating: rating ?? undefined,
-    // La vista de ofertas y "En oferta" usan el mismo criterio: precio rebajado.
     sale: saleOnly || avail.onSale,
     sort,
     page: 1,

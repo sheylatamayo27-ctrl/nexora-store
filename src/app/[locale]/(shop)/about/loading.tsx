@@ -1,7 +1,6 @@
 import { ContentPageSkeleton, TextLinesSkeleton } from "@/components/skeletons/blocks";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-/** Nosotros: párrafos y la grilla de 4 tarjetas de valores. */
 export default function LoadingAbout() {
   return (
     <ContentPageSkeleton wide>

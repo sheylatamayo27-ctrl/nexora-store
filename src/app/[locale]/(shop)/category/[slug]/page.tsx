@@ -51,7 +51,6 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title,
     description,
     alternates: localeAlternates(pathname, params.locale),
-    // Solo las categorías del catálogo tienen imagen; "offers" y el resto usan la del sitio.
     ...(image
       ? socialMetadata(params.locale, { pathname, title, description, image: assetSrc("products", image) })
       : {}),
@@ -62,11 +61,8 @@ export default async function CategoryPage({ params }: { params: Params }) {
   const { locale, slug } = params;
   setRequestLocale(locale);
   const { title, description, initialCategories } = await resolve(params);
-  // "offers" parte solo de los productos rebajados; el resto, de todo el catálogo.
   const saleOnly = slug === "offers";
 
-  // Primera página con los filtros iniciales (la misma consulta que hará el cliente):
-  // va en el HTML (SEO) y como fallback de SWR, así no hay parpadeo ni doble carga.
   const [categories, initialData, facets, tc] = await Promise.all([
     getCategories(locale),
     listProducts(toListQuery(defaultFilters(initialCategories), saleOnly), locale),

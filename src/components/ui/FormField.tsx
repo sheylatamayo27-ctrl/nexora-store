@@ -7,16 +7,9 @@ import { FieldError } from "@/components/ui/FieldError";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 
 type FormFieldProps = Omit<React.ComponentPropsWithoutRef<typeof Input>, "error" | "helper"> & {
-  /** Error ya traducido. Sin él, el campo se ve exactamente como un `Input`. */
   error?: string;
 };
 
-/**
- * `Input` para formularios. Con `error`: borde rojo y mensaje debajo, enlazado
- * con aria-describedby. Con `type="password"`: el ícono muestra/oculta la
- * contraseña (Eye cuando se ve; mientras está oculta, el `icon` recibido o EyeOff).
- * Reenvía la ref, así que acepta `{...register("campo")}` de react-hook-form.
- */
 export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function FormField(
   { error, id, type, icon, onIconClick, iconLabel, ...props },
   ref
@@ -45,11 +38,9 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
 });
 
 type SelectFieldProps = Omit<React.ComponentPropsWithoutRef<typeof Select>, "error" | "helper"> & {
-  /** Error ya traducido. Sin él, el campo se ve exactamente como un `Select`. */
   error?: string;
 };
 
-/** `Select` para formularios, con el mismo tratamiento de errores que `FormField`. */
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(function SelectField(
   { error, id, ...props },
   ref
@@ -71,11 +62,9 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(funct
 });
 
 type TextareaFieldProps = Omit<React.ComponentPropsWithoutRef<typeof Textarea>, "error" | "helper"> & {
-  /** Error ya traducido. */
   error?: string;
 };
 
-/** `Textarea` para formularios, con el mismo tratamiento de errores que `FormField`. */
 export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(function TextareaField(
   { error, id, ...props },
   ref

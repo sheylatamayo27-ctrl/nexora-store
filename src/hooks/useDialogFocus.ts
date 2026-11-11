@@ -5,12 +5,6 @@ import { useEffect, useRef, type RefObject } from "react";
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-/**
- * Foco de un panel modal hecho a mano (p. ej. el menú lateral del header):
- * al abrir enfoca `initialFocus` (o el primer elemento enfocable), mantiene el
- * Tab dentro del panel, cierra con Esc y, al cerrar, devuelve el foco a donde
- * estaba. Los modales sobre Radix (`ui/Modal`) ya hacen esto por su cuenta.
- */
 export function useDialogFocus(
   open: boolean,
   containerRef: RefObject<HTMLElement>,

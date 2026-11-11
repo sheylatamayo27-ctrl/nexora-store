@@ -9,18 +9,11 @@ import { Link } from "@/i18n/navigation";
 import { readCookieConsent, saveCookieConsent, type CookieChoice } from "@/lib/cookie-consent";
 import { cn } from "@/lib/utils";
 
-/** Espera antes de mostrarse, para no competir con la carga de la página. */
 const SHOW_DELAY = 1500;
 
 const OPTIONAL = ["analytics", "marketing"] as const;
 type Optional = (typeof OPTIONAL)[number];
 
-/**
- * Banner de consentimiento de cookies. Aparece en la primera visita (no hay
- * elección guardada) y, al aceptar, rechazar o guardar preferencias, guarda la
- * elección (ver `lib/cookie-consent.ts`) y no vuelve a mostrarse.
- * Es un diálogo no modal: la página sigue siendo usable mientras está abierto.
- */
 export function CookieConsent() {
   const t = useTranslations("cookies");
   const reduceMotion = useReducedMotion();
@@ -30,14 +23,12 @@ export function CookieConsent() {
   const preferencesHeading = useRef<HTMLHeadingElement>(null);
   const descriptionId = useId();
 
-  // localStorage solo existe en el cliente: se lee tras montar (sin desajuste de hidratación).
   useEffect(() => {
     if (readCookieConsent()) return;
     const timer = window.setTimeout(() => setOpen(true), SHOW_DELAY);
     return () => window.clearTimeout(timer);
   }, []);
 
-  // Al abrir las preferencias, el foco pasa a su título (el botón pulsado desaparece).
   useEffect(() => {
     if (view === "preferences") preferencesHeading.current?.focus();
   }, [view]);
@@ -157,7 +148,6 @@ function CookieIcon() {
   );
 }
 
-/** La política de cookies es la sección "Cookies" de la página de privacidad. */
 function PolicyLink({ children }: { children: React.ReactNode }) {
   return (
     <Link href="/privacy" className="whitespace-nowrap text-label-sm text-brand-700 hover:underline">

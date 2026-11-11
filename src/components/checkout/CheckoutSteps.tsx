@@ -2,7 +2,6 @@ import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-/** Claves de cada paso en el namespace "checkout". */
 const steps = ["stepCart", "stepInformation", "stepShipping", "stepPayment"] as const;
 
 export function CheckoutSteps({ current = 1 }: { current?: number }) {

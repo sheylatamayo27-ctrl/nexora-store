@@ -3,11 +3,6 @@
 import { useTranslations } from "next-intl";
 import { MAIN_CONTENT_ID } from "@/lib/a11y";
 
-/**
- * "Saltar al contenido": primer elemento enfocable de la página. Invisible hasta
- * recibir el foco con Tab. Lleva el foco al `<main>` sin desplazar la página
- * (el header es sticky y taparía el comienzo del contenido).
- */
 export function SkipLink() {
   const t = useTranslations("common");
   return (

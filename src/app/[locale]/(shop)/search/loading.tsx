@@ -1,7 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import { CardSkeletons, PageHeaderSkeleton, SkeletonRegion } from "@/components/skeletons/blocks";
 
-/** Búsqueda: cabecera con el término y cuadrícula de resultados. */
 export default function LoadingSearch() {
   return (
     <SkeletonRegion className="flex flex-col">

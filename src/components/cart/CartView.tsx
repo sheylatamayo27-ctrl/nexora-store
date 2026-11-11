@@ -20,7 +20,6 @@ import { DEFAULT_SHIPPING_METHOD, freeExpressProgress, shippingCost } from "@/li
 import type { Product } from "@/data/types";
 
 
-/** Carrito. El contenido sale del store del navegador; las recomendaciones, del servidor. */
 export function CartView({ recommended }: { recommended: Product[] }) {
   const t = useTranslations("cart");
   const tCommon = useTranslations("common");
@@ -38,8 +37,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
   const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
   const tax = subtotal * 0.16;
   const discount = couponDiscount(coupon, subtotal);
-  // Envío estimado con el método que el checkout trae elegido (exprés), el mismo
-  // que promete la barra de progreso: así el total coincide al pasar a pagar.
   const shipping = shippingCost(DEFAULT_SHIPPING_METHOD, subtotal, coupon);
   const total = subtotal + tax - discount + shipping;
   const { remaining, percent: pct } = freeExpressProgress(subtotal);
@@ -63,8 +60,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
     <div className="flex flex-col">
       <Container className="flex flex-col gap-2 pt-8">
         <Breadcrumb items={[{ label: t("title") }]} className="max-lg:hidden" />
-        {/* Conteo inline dentro del h1 (más pequeño y gris). En móvil (<sm) el
-            título baja a text-h3 para que quepa en una sola línea a 360px (M04). */}
         <h1 className="text-h3 text-text-primary sm:text-display-l">
           {t("title")}{" "}
           <span className="whitespace-nowrap align-baseline text-label font-normal text-text-secondary sm:text-label-lg">
@@ -74,11 +69,7 @@ export function CartView({ recommended }: { recommended: Product[] }) {
       </Container>
 
       <Container className="grid gap-8 py-8 lg:grid-cols-[1.7fr_1fr]">
-        {/* Columna de productos (max-lg:min-w-0: deja que la pista del grid encoja
-            por debajo del min-content de su contenido en móvil/tablet, evitando el
-            scroll horizontal; en escritorio (≥lg) queda intacta). */}
         <div className="flex flex-col gap-4 max-lg:min-w-0">
-          {/* Progreso envío gratis */}
           <div className="flex flex-col gap-3 rounded-xl bg-brand-100 p-5">
             <div className="flex items-center gap-3">
               <Truck className="h-5 w-5 shrink-0 text-brand-800" />
@@ -100,7 +91,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
           </div>
 
           <div className="overflow-hidden rounded-xl border border-border bg-surface">
-            {/* Cabecera (solo escritorio) */}
             <div className="hidden items-center justify-between border-b border-border p-4 lg:flex">
               <span className="text-label-lg text-text-primary">{itemCount}</span>
               <Link href="/category/headphones" className="text-label-sm text-brand-700">
@@ -112,7 +102,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
                 <CartLineItem key={item.key} item={item} />
               ))}
             </AnimatePresence>
-            {/* Pie (solo tablet): seguir comprando + envoltorio de regalo */}
             <div className="hidden items-center justify-between gap-4 border-t border-border bg-surface-subtle p-4 md:flex lg:hidden">
               <Link href="/category/headphones" className="flex items-center gap-1.5 text-label text-brand-700">
                 {tCommon("continueShopping")} <ArrowRight className="h-4 w-4" />
@@ -140,9 +129,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
           </div>
         </div>
 
-        {/* Resumen (max-lg:min-w-0: permite que la fila del cupón encoja en lugar
-            de forzar el ancho de la columna y desbordar la página en móvil/tablet;
-            en escritorio (≥lg) queda intacta). */}
         <div className="max-lg:min-w-0 lg:sticky lg:top-28 lg:h-fit">
           <OrderSummary
             itemsLabel={t("subtotalItems", { count })}
@@ -160,8 +146,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
         </div>
       </Container>
 
-      {/* Garantía (solo móvil, centrada) — con aire arriba y abajo para que no
-          quede pegada a "Comprados juntos frecuentemente". */}
       <Container className="pt-4 pb-9 md:hidden">
         <p className="flex items-center justify-center gap-2 text-center text-body-sm text-text-secondary">
           <Check className="h-4 w-4 shrink-0 text-success-500" />
@@ -169,26 +153,22 @@ export function CartView({ recommended }: { recommended: Product[] }) {
         </p>
       </Container>
 
-      {/* Recomendaciones */}
       <Container className="pb-20">
         <div className="flex flex-col gap-8">
           <SectionHeader title={t("frequentlyBought")} />
 
-          {/* Móvil: grilla de 2 columnas */}
           <div className="grid grid-cols-2 gap-3 md:hidden">
             {recommended.slice(0, 2).map((p) => (
               <ProductCard key={p.id} product={p} showColors={false} />
             ))}
           </div>
 
-          {/* Tablet: carrusel con la 4ª tarjeta asomando */}
           <div className="no-scrollbar -mx-4 hidden gap-4 overflow-x-auto px-4 pb-2 md:flex lg:hidden">
             {recommended.map((p) => (
               <ProductCard key={p.id} product={p} showColors={false} className="w-[30%] shrink-0" />
             ))}
           </div>
 
-          {/* Escritorio: grilla de 5 (intacta) */}
           <div className="hidden gap-4 pb-2 lg:grid lg:grid-cols-5">
             {recommended.map((p) => (
               <ProductCard key={p.id} product={p} showColors={false} />
@@ -197,7 +177,6 @@ export function CartView({ recommended }: { recommended: Product[] }) {
         </div>
       </Container>
 
-      {/* Barra fija de pago (móvil). El footer reserva su alto vía [data-fixed-bar]. */}
       <div
         data-fixed-bar
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-4 pt-3 shadow-[0_-4px_16px_rgba(15,23,42,0.08)] md:hidden"
