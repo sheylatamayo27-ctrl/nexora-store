@@ -2,8 +2,14 @@ import { Mail, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 import { ButtonLink } from "@/components/ui/Button";
+// TODO: usar getNotifications() cuando el backend esté conectado.
+import type { Notification } from "@/services/account";
 
-/** Notificaciones. Placeholder de front-end: siempre vacío hasta conectar el backend. */
+/**
+ * Notificaciones. Placeholder de front-end: siempre vacío hasta conectar el
+ * backend; entonces carga la lista (`Notification[]`) con `getNotifications()`
+ * de src/services/account.ts y píntala aquí.
+ */
 export function NotificationsView() {
   const t = useTranslations("notifications");
   return (

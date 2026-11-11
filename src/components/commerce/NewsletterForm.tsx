@@ -11,9 +11,9 @@ import { Dots } from "@/components/ui/Dots";
 import { FieldError } from "@/components/ui/FieldError";
 import { FORM_OPTIONS, useErrorText } from "@/lib/forms";
 import { email } from "@/lib/schemas/common";
-import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { subscribeNewsletter } from "@/services/newsletter";
 
 const newsletterSchema = z.object({ email });
 type NewsletterData = z.infer<typeof newsletterSchema>;
@@ -22,8 +22,8 @@ type NewsletterData = z.infer<typeof newsletterSchema>;
 const SUBSCRIBED_MS = 2000;
 
 /**
- * Suscripción a la newsletter de la home (cambiar `simulateRequest` por
- * POST /api/newsletter). El error va debajo del campo sin empujar el bloque en
+ * Suscripción a la newsletter de la home (el envío lo hace `subscribeNewsletter`,
+ * src/services/newsletter.ts). El error va debajo del campo sin empujar el bloque en
  * ≥sm (posición absoluta, sobre el padding de la tarjeta); en móvil, en línea.
  */
 export function NewsletterForm() {
@@ -44,9 +44,9 @@ export function NewsletterForm() {
     return () => clearTimeout(id);
   }, [subscribed]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: NewsletterData) => {
     try {
-      await simulateRequest(1000);
+      await subscribeNewsletter(data.email);
       reset();
       setSubscribed(true);
       notifyToast({ icon: Check, title: t("newsletterSuccess"), description: t("newsletterSuccessDescription") });

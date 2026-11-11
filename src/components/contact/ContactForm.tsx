@@ -8,13 +8,13 @@ import { FormField, TextareaField } from "@/components/ui/FormField";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { FORM_OPTIONS, useErrorText } from "@/lib/forms";
 import { CONTACT_MESSAGE_MAX, contactSchema, type ContactData } from "@/lib/schemas/contact";
-import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { submitContactForm } from "@/services/contact";
 
 const CONTACT_DEFAULTS: ContactData = { name: "", email: "", subject: "", message: "" };
 
-/** Formulario de /contact. Envío simulado: cambia `simulateRequest` por POST /api/contact. */
+/** Formulario de /contact. El envío lo hace `submitContactForm` (src/services/contact.ts). */
 export function ContactForm() {
   const t = useTranslations("contact");
   const tCommon = useTranslations("common");
@@ -34,9 +34,9 @@ export function ContactForm() {
   });
   const length = watch("message").length;
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: ContactData) => {
     try {
-      await simulateRequest(1500);
+      await submitContactForm(data);
       reset();
       notifyToast({ icon: MailCheck, title: t("sent"), description: t("sentDescription") });
     } catch {

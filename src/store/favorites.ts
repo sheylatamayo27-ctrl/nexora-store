@@ -9,6 +9,11 @@ import type { Locale } from "@/i18n/routing";
  * Favoritos persistidos en localStorage (igual que el carrito), así que
  * sobreviven a las recargas. Quien lea `items` para pintar debe esperar al
  * montaje (`mounted`) para no desajustar la hidratación del HTML del servidor.
+ *
+ * Sincronizar con la cuenta: hoy solo viven en el navegador. Con backend real,
+ * llama a `syncWishlist(get().items.map((p) => p.id))` (src/services/wishlist.ts)
+ * al final de `toggle`, `remove` y `clear` si hay sesión, y al iniciar sesión
+ * mezcla aquí lo que devuelva `getWishlist()`.
  */
 interface FavoritesState {
   items: Product[];

@@ -36,8 +36,8 @@ import { formatPrice } from "@/lib/format";
 import { FORM_OPTIONS, focusFirstError, useErrorText } from "@/lib/forms";
 import { checkoutSchema, type CheckoutData } from "@/lib/schemas/checkout";
 import { DEFAULT_SHIPPING_METHOD, shippingCost, type ShippingMethod } from "@/lib/shipping";
-import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
+import { placeOrder } from "@/services/orders";
 import { useCart } from "@/store/cart";
 import { MAIN_CONTENT_ID } from "@/lib/a11y";
 import { cn } from "@/lib/utils";
@@ -158,8 +158,8 @@ type TextField = Exclude<keyof CheckoutData, "newsletter" | "shippingMethod" | "
 
 /**
  * Checkout. Solo front-end: valida con zod (al salir de cada campo y al pagar)
- * y simula el cobro; para conectarlo, cambia `simulateRequest` por la llamada
- * real (p. ej. POST /api/orders con los datos validados).
+ * y crea el pedido con `placeOrder` (src/services/orders.ts, hoy simulado);
+ * para conectarlo, cambia ese servicio por la llamada real (POST /api/orders).
  */
 export function CheckoutView() {
   const t = useTranslations("checkout");
@@ -199,7 +199,7 @@ export function CheckoutView() {
 
   const onSubmit = async (data: CheckoutData) => {
     try {
-      await simulateRequest(2000);
+      await placeOrder(data);
       // La confirmación del pedido muestra el método y el costo que se pagaron.
       setShippingMethod(data.shippingMethod);
       notifyToast({ icon: CheckCircle2, title: t("paymentSuccess"), description: t("paymentSuccessDescription") });

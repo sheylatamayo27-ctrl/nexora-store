@@ -11,44 +11,35 @@ import { Link } from "@/i18n/navigation";
 import { intlLocales, type Locale } from "@/i18n/routing";
 import { FORM_OPTIONS, useErrorText } from "@/lib/forms";
 import { trackingSchema, type TrackingData, type TrackingInput } from "@/lib/schemas/tracking";
-import { simulateRequest } from "@/lib/simulate";
 import { notifyToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { trackOrder, type TrackingResult, type TrackingStatus } from "@/services/tracking";
 
 const TRACKING_DEFAULTS: TrackingInput = { orderNumber: "", email: "" };
-const DAY = 24 * 60 * 60 * 1000;
 
 type StepState = "done" | "current" | "upcoming";
+/** Claves del namespace "trackOrder". */
+type TrackKey = Parameters<ReturnType<typeof useTranslations<"trackOrder">>>[0];
+
+/** Texto de la etiqueta de estado (arriba a la derecha) para cada `currentStatus`. */
+const STATUS_LABEL = {
+  received: "stepReceived",
+  processing: "stepProcessing",
+  in_transit: "inTransit",
+  delivered: "stepDelivered",
+} as const satisfies Record<TrackingStatus, string>;
 
 /**
- * Pasos del seguimiento de ejemplo, con fechas relativas a la consulta (así nunca
- * se ven caducadas). `offset`: días desde hoy; `time`: hora local "HH:MM".
- */
-const steps: { label: "stepReceived" | "stepProcessing" | "stepInTransit" | "stepDelivered"; state: StepState; offset: number; time: string }[] = [
-  { label: "stepReceived", state: "done", offset: -2, time: "10:42" },
-  { label: "stepProcessing", state: "done", offset: -1, time: "09:15" },
-  { label: "stepInTransit", state: "current", offset: 0, time: "07:30" },
-  { label: "stepDelivered", state: "upcoming", offset: 2, time: "18:00" },
-];
-
-function at(now: number, offset: number, time: string) {
-  const date = new Date(now + offset * DAY);
-  const [h, m] = time.split(":").map(Number);
-  date.setHours(h, m, 0, 0);
-  return date;
-}
-
-/**
- * Rastreo de pedido. Búsqueda simulada: cualquier número válido devuelve el mismo
- * envío de ejemplo "En camino". Para conectarlo, cambia `simulateRequest` por
- * GET /api/orders/[número]?email=… y pinta su estado real.
+ * Rastreo de pedido. La búsqueda la hace `trackOrder` (src/services/tracking.ts);
+ * esta vista solo traduce y pinta el resultado: los pasos anteriores al estado
+ * actual salen como hechos y los posteriores como pendientes.
  */
 export function TrackOrderView() {
   const t = useTranslations("trackOrder");
   const tCommon = useTranslations("common");
   const locale = useLocale() as Locale;
   const errorText = useErrorText();
-  const [result, setResult] = useState<{ orderNumber: string; now: number } | null>(null);
+  const [result, setResult] = useState<TrackingResult | null>(null);
   const resultRef = useRef<HTMLElement>(null);
   const {
     register,
@@ -67,12 +58,16 @@ export function TrackOrderView() {
 
   const onSubmit = async (data: TrackingData) => {
     try {
-      await simulateRequest(1500);
-      setResult({ orderNumber: data.orderNumber, now: Date.now() });
+      setResult(await trackOrder(data.orderNumber, data.email));
     } catch {
       notifyToast({ tone: "error", icon: AlertCircle, title: t("failed"), description: tCommon("checkConnection") });
     }
   };
+
+  /** Traduce si `value` es una clave de "trackOrder" (el mock); si no, es texto que ya llega listo. */
+  const text = (value: string) => (t.has(value as TrackKey) ? t(value as TrackKey) : value);
+  const currentIndex = result ? result.steps.findIndex((s) => s.status === result.currentStatus) : -1;
+  const stateOf = (i: number): StepState => (i < currentIndex ? "done" : i === currentIndex ? "current" : "upcoming");
 
   const dateFormat = new Intl.DateTimeFormat(intlLocales[locale], { weekday: "short", day: "numeric", month: "short" });
   const timeFormat = new Intl.DateTimeFormat(intlLocales[locale], { hour: "2-digit", minute: "2-digit" });
@@ -120,7 +115,7 @@ export function TrackOrderView() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-h4 text-text-primary">{t("order", { number: result.orderNumber })}</h2>
             <span className="flex items-center gap-1.5 rounded-full bg-brand-100 px-3 py-1 text-label-sm text-brand-800">
-              <Truck className="h-4 w-4" /> {t("inTransit")}
+              <Truck className="h-4 w-4" /> {t(STATUS_LABEL[result.currentStatus])}
             </span>
           </div>
 
@@ -129,14 +124,14 @@ export function TrackOrderView() {
               <CalendarDays className="h-5 w-5 shrink-0 text-brand-700" />
               <div className="flex flex-col">
                 <span className="text-body-sm text-text-muted">{t("estimatedDelivery")}</span>
-                <span className="text-label text-text-primary">{dateFormat.format(at(result.now, 2, "18:00"))}</span>
+                <span className="text-label text-text-primary">{dateFormat.format(result.estimatedDelivery)}</span>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-lg bg-surface-subtle p-4">
               <Package className="h-5 w-5 shrink-0 text-brand-700" />
               <div className="flex min-w-0 flex-col">
                 <span className="text-body-sm text-text-muted">{t("carrier")}</span>
-                <span className="text-label text-text-primary">{t("carrierName")}</span>
+                <span className="text-label text-text-primary">{text(result.carrier)}</span>
               </div>
             </div>
           </div>
@@ -144,13 +139,14 @@ export function TrackOrderView() {
           <div className="flex flex-col gap-4">
             <h3 className="text-label-lg text-text-primary">{t("steps")}</h3>
             <ol className="flex flex-col">
-              {steps.map((step, i) => {
-                const date = at(result.now, step.offset, step.time);
-                const last = i === steps.length - 1;
+              {result.steps.map((step, i) => {
+                const { date } = step;
+                const state = stateOf(i);
+                const last = i === result.steps.length - 1;
                 return (
                   <li
-                    key={step.label}
-                    aria-current={step.state === "current" ? "step" : undefined}
+                    key={step.status}
+                    aria-current={state === "current" ? "step" : undefined}
                     className={cn("relative flex gap-4", !last && "pb-6")}
                   >
                     {!last && (
@@ -158,33 +154,33 @@ export function TrackOrderView() {
                         aria-hidden
                         className={cn(
                           "absolute left-4 top-9 bottom-1 w-0.5 -translate-x-1/2 rounded-full",
-                          step.state === "done" ? "bg-success-500" : "bg-border"
+                          state === "done" ? "bg-success-500" : "bg-border"
                         )}
                       />
                     )}
                     <span
                       className={cn(
                         "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                        step.state === "done" && "bg-success-500 text-white",
-                        step.state === "current" && "bg-brand-700 text-white motion-safe:animate-pulse",
-                        step.state === "upcoming" && "bg-border text-text-muted"
+                        state === "done" && "bg-success-500 text-white",
+                        state === "current" && "bg-brand-700 text-white motion-safe:animate-pulse",
+                        state === "upcoming" && "bg-border text-text-muted"
                       )}
                     >
-                      {step.state === "done" ? (
+                      {state === "done" ? (
                         <Check className="h-4 w-4" />
-                      ) : step.state === "current" ? (
+                      ) : state === "current" ? (
                         <Truck className="h-4 w-4" />
                       ) : (
                         <span className="text-label-sm">{i + 1}</span>
                       )}
                     </span>
                     <div className="flex flex-col pt-1">
-                      <span className={cn("text-label", step.state === "upcoming" ? "text-text-muted" : "text-text-primary")}>
-                        {t(step.label)}
-                        {step.state === "current" && <span className="sr-only"> ({t("stepCurrent")})</span>}
+                      <span className={cn("text-label", state === "upcoming" ? "text-text-muted" : "text-text-primary")}>
+                        {text(step.label)}
+                        {state === "current" && <span className="sr-only"> ({t("stepCurrent")})</span>}
                       </span>
                       <span className="text-body-sm text-text-secondary">
-                        {step.state === "upcoming"
+                        {state === "upcoming"
                           ? `${t("stepPending")} · ${dateFormat.format(date)}`
                           : `${dateFormat.format(date)} · ${timeFormat.format(date)}`}
                       </span>

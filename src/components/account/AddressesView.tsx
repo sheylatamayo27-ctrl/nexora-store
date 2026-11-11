@@ -5,10 +5,13 @@ import { useTranslations } from "next-intl";
 import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 import { Button } from "@/components/ui/Button";
 import { notifyToast } from "@/lib/toast";
+// TODO: usar getAddresses() cuando el backend esté conectado.
+import type { Address } from "@/services/account";
 
 /**
  * Direcciones. Placeholder de front-end: siempre vacío y "Agregar" solo avisa.
- * Al conectar el backend, lista aquí las direcciones y abre su formulario desde `add`.
+ * Al conectar el backend, carga las direcciones (`Address[]`) con `getAddresses()`
+ * de src/services/account.ts, lístalas aquí y abre su formulario desde `add`.
  */
 export function AddressesView() {
   const t = useTranslations("addresses");

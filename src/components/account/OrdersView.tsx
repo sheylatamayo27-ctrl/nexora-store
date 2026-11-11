@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Package,
   Truck,
@@ -18,35 +18,14 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-type OrderStatus = "processing" | "shipped" | "delivered" | "cancelled";
-
-/*
- * Pedidos de ejemplo. Los textos (fechas, resumen, productos, colores) son claves
- * de "orders.demo"; dirección y medio de pago son datos del cliente y no se traducen.
- */
-type DemoOrder = "o1" | "o2" | "o3" | "o4";
-type DemoProduct = "auraAnc" | "podsLite" | "soundGo" | "myBook" | "powerBank" | "keyPop" | "openEar" | "projector";
-type DemoColor = "midnightBlack" | "white" | "spaceGray";
-
-interface OrderItem {
-  name: DemoProduct;
-  image: string;
-  qty: number;
-  price: number;
-  color?: DemoColor;
-}
-
-interface Order {
-  id: string;
-  demo: DemoOrder;
-  status: OrderStatus;
-  items: OrderItem[];
-  shipping: number;
-  address: string;
-  payment: string;
-  cta: "trackOrder" | "buyAgain";
-}
+import {
+  orderStats,
+  orders as demoOrders,
+  type Order,
+  type OrderStatKey,
+  type OrderStatus,
+} from "@/server/db/orders.data";
+import { getOrders } from "@/services/orders";
 
 /** Un pedido con sus textos ya en el idioma actual. */
 interface ResolvedOrder extends Omit<Order, "items" | "cta"> {
@@ -57,12 +36,15 @@ interface ResolvedOrder extends Omit<Order, "items" | "cta"> {
   items: { name: string; image: string; qty: number; price: number; color?: string }[];
 }
 
-const stats = [
-  { icon: Package, n: "12", l: "statTotal", bg: "bg-brand-100", fg: "text-brand-800" },
-  { icon: Truck, n: "2", l: "statInTransit", bg: "bg-accent-100", fg: "text-accent-700" },
-  { icon: CheckCircle2, n: "9", l: "statDelivered", bg: "bg-success-100", fg: "text-success-700" },
-  { icon: Heart, n: "8", l: "statWishlist", bg: "bg-sale-100", fg: "text-sale-500" },
-] as const;
+/** Icono y colores de cada cifra del resumen (las cifras vienen de `orderStats`). */
+const statStyles: Record<OrderStatKey, { icon: typeof Package; bg: string; fg: string }> = {
+  statTotal: { icon: Package, bg: "bg-brand-100", fg: "text-brand-800" },
+  statInTransit: { icon: Truck, bg: "bg-accent-100", fg: "text-accent-700" },
+  statDelivered: { icon: CheckCircle2, bg: "bg-success-100", fg: "text-success-700" },
+  statWishlist: { icon: Heart, bg: "bg-sale-100", fg: "text-sale-500" },
+};
+
+const stats = orderStats.map((s) => ({ ...statStyles[s.key], n: s.value, l: s.key }));
 
 const statusStyles: Record<OrderStatus, string> = {
   processing: "bg-accent-100 text-accent-700",
@@ -75,57 +57,6 @@ const STEPS: { status: OrderStatus; icon: typeof Package }[] = [
   { status: "processing", icon: Clock },
   { status: "shipped", icon: Truck },
   { status: "delivered", icon: CheckCircle2 },
-];
-
-const orders: Order[] = [
-  {
-    id: "#NX-482913",
-    demo: "o1",
-    status: "processing",
-    items: [
-      { name: "auraAnc", image: "headphones", qty: 1, price: 59.99, color: "midnightBlack" },
-      { name: "podsLite", image: "earbuds", qty: 2, price: 15.99, color: "white" },
-      { name: "soundGo", image: "speaker", qty: 1, price: 41.99 },
-    ],
-    shipping: 0,
-    address: "Parque Tecnológico 221B, CDMX, 01090",
-    payment: "VISA ·· 4821",
-    cta: "trackOrder",
-  },
-  {
-    id: "#NX-479201",
-    demo: "o2",
-    status: "shipped",
-    items: [{ name: "myBook", image: "laptop", qty: 1, price: 1035.99, color: "spaceGray" }],
-    shipping: 0,
-    address: "Parque Tecnológico 221B, CDMX, 01090",
-    payment: "Mastercard ·· 7390",
-    cta: "trackOrder",
-  },
-  {
-    id: "#NX-471188",
-    demo: "o3",
-    status: "delivered",
-    items: [
-      { name: "powerBank", image: "powerbank", qty: 1, price: 17.99 },
-      { name: "keyPop", image: "keyboard", qty: 1, price: 35.99 },
-      { name: "openEar", image: "openear", qty: 1, price: 21.99 },
-    ],
-    shipping: 0,
-    address: "Av. Reforma 88, CDMX, 06600",
-    payment: "PayPal · sheyla@nexora.store",
-    cta: "buyAgain",
-  },
-  {
-    id: "#NX-462034",
-    demo: "o4",
-    status: "cancelled",
-    items: [{ name: "projector", image: "projector", qty: 1, price: 229.99 }],
-    shipping: 0,
-    address: "Parque Tecnológico 221B, CDMX, 01090",
-    payment: "VISA ·· 4821",
-    cta: "buyAgain",
-  },
 ];
 
 const tabs: { key: "all" | OrderStatus; status: OrderStatus | null }[] = [
@@ -145,6 +76,22 @@ export function OrdersView() {
   const [active, setActive] = useState<OrderStatus | null>(null);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<ResolvedOrder | null>(null);
+  /*
+   * Pedidos de `getOrders` (src/services/orders.ts). Arranca con los de ejemplo
+   * para que el HTML del servidor no salga vacío; con backend real, empieza en
+   * `[]` (o un estado de carga) y deja que el servicio los traiga.
+   */
+  const [orders, setOrders] = useState<Order[]>(demoOrders);
+
+  useEffect(() => {
+    let cancelled = false;
+    getOrders()
+      .then((list) => !cancelled && setOrders(list))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const resolved = useMemo<ResolvedOrder[]>(
     () =>
@@ -156,14 +103,14 @@ export function OrdersView() {
         cta: t(o.cta),
         items: o.items.map((i) => ({ ...i, name: t(`demo.${i.name}`), color: i.color && t(`demo.${i.color}`) })),
       })),
-    [t]
+    [orders, t]
   );
 
   const counts = useMemo(() => {
     const map = new Map<OrderStatus, number>();
     for (const o of orders) map.set(o.status, (map.get(o.status) ?? 0) + 1);
     return map;
-  }, []);
+  }, [orders]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

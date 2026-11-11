@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, Check } from "lucide-react";
+import { AlertCircle, Mail, Phone, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { notifyToast } from "@/lib/toast";
+import { updateProfile } from "@/services/account";
 import { useAuth, type User } from "@/store/auth";
 
 type Field = "firstName" | "lastName" | "email" | "phone";
@@ -31,18 +32,19 @@ function validate(v: Values): Errors {
 }
 
 /**
- * Configuración (datos del perfil). Valida en el cliente y guarda nombre y
- * correo en la sesión (`updateProfile`), así el perfil y el header se
- * actualizan. Con backend, ahí iría también la llamada real (p. ej. PATCH /api/account).
+ * Configuración (datos del perfil). Valida en el cliente y guarda con
+ * `updateProfile` (src/services/account.ts), que actualiza la sesión, así el
+ * perfil y el header se actualizan. Para el backend real se cambia ese servicio.
  */
 export function SettingsView() {
   const t = useTranslations("settings");
+  const tCommon = useTranslations("common");
   const tFields = useTranslations("common.fields");
   const tValidation = useTranslations("validation");
-  const updateProfile = useAuth((s) => s.updateProfile);
   // /account/* solo se pinta con sesión (`RequireAuth`), así que el usuario ya está aquí.
   const [values, setValues] = useState<Values>(() => initialValues(useAuth.getState().user));
   const [errors, setErrors] = useState<Errors>({});
+  const [saving, setSaving] = useState(false);
 
   const field = (name: Field) => {
     const error = errors[name];
@@ -59,13 +61,25 @@ export function SettingsView() {
     };
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (saving) return;
     const next = validate(values);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    updateProfile({ name: `${values.firstName.trim()} ${values.lastName.trim()}`, email: values.email.trim() });
-    notifyToast({ title: t("savedTitle"), description: t("savedDescription"), icon: Check });
+    setSaving(true);
+    try {
+      await updateProfile({
+        name: `${values.firstName.trim()} ${values.lastName.trim()}`,
+        email: values.email.trim(),
+        phone: values.phone.trim() || undefined,
+      });
+      notifyToast({ title: t("savedTitle"), description: t("savedDescription"), icon: Check });
+    } catch {
+      notifyToast({ tone: "error", icon: AlertCircle, title: tCommon("checkConnection") });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

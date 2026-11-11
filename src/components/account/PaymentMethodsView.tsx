@@ -5,11 +5,14 @@ import { useTranslations } from "next-intl";
 import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 import { Button } from "@/components/ui/Button";
 import { notifyToast } from "@/lib/toast";
+// TODO: usar getPaymentMethods() cuando el backend esté conectado.
+import type { PaymentMethod } from "@/services/account";
 
 /**
  * Métodos de pago. Placeholder de front-end: siempre vacío y "Agregar" solo
- * avisa. Al conectar la pasarela de pago, lista aquí las tarjetas guardadas y
- * abre su formulario desde `add`.
+ * avisa. Al conectar la pasarela de pago, carga las tarjetas guardadas
+ * (`PaymentMethod[]`) con `getPaymentMethods()` de src/services/account.ts,
+ * lístalas aquí y abre su formulario desde `add`.
  */
 export function PaymentMethodsView() {
   const t = useTranslations("payments");
